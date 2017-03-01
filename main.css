@@ -1,0 +1,608 @@
+
+body{
+  background: #28313A;
+  font-family: Menlo;
+  padding-top: 70px;
+}
+
+@font-face {
+  font-family: Beon;
+  src: local("Beon"),
+       url(Beon.otf);
+}
+
+/*NAV / FOOTER*/
+/*.navbar-fixed-top{
+  height: 70px;
+  background: pink;
+}*/
+
+/*LANDING ROUTE*/
+#landingContent{
+  height:80vh;
+  width: 100vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 70px;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: none;
+  background: transparent;
+  color: white;
+}
+
+#landingBody{
+  background-image: url('bartender.jpg');
+  background-size: cover;
+}
+
+#landingBody img{
+  opacity: 1;
+}
+
+#landingCopy{
+  height: 100%;
+  padding-top: 10%;
+}
+
+#landingCopy h1{
+  font-family: Beon;
+  font-size: 90px;
+  color: red;
+  color: #fff;
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px red, 0 0 30px red, 0 0 40px red, 0 0 55px red, 0 0 75px red;
+}
+
+#landingCopy h2{
+  font-family: Beon;
+  font-size: 80px;
+  color: red;
+  color: #fff;
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px blue, 0 0 30px blue, 0 0 40px blue, 0 0 55px blue, 0 0 75px blue;
+}
+
+#rightUl a{
+  color: white;
+}
+
+.navbar {
+  margin-bottom: 0px;
+}
+
+#myNav{
+  height: 70px;
+  background: #28313A;
+  border-bottom: white;
+}
+
+#myLandingNav{
+  height: 70px;
+  background: linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,1));
+  border-bottom: white;
+}
+
+#navbarLogo{
+  height: 70px;
+  color: white;
+  line-height: 40px;
+}
+
+#navbarLogo a{
+  color:white;
+}
+
+#navData{
+  text-align: center;
+  float: right !important;
+}
+
+.navbar-nav>li>a{
+  line-height: 40px;
+}
+
+.navbar-inverse .navbar-nav>li>a{
+  color:white;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 30px;
+    width: 100%;
+}
+
+.right{
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  height:7vh;
+  background:;
+}
+
+#footerText{
+  height:30px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  text-align: center;
+  color: white;
+}
+
+
+#footerText a{
+  color: white;
+}
+
+#footerText h5{
+  line-height: 10px;
+}
+
+/*INDEX ROUTE*/
+#unassignedCol{
+  background: rgba(255,255,255,0.2);
+  margin-right: 20px;
+  height:80vh;
+  border: 2px solid rgba(255,255,255,1);
+  padding-top: 20px;
+  overflow: scroll;
+/*  box-shadow: 0px 0px 10px #fff;*/
+}
+
+#assignedCol{
+  background: rgba(255,255,255,0.2);
+  height:80vh;
+  border: 2px solid rgba(255,255,255,1);
+  padding-top: 20px;
+  overflow: scroll;
+}
+
+
+@media (min-width: 992px) {
+#orderView {
+    margin-left: 7.5%;
+  }
+}
+
+#unassignedOrderRow{
+/*  background: red;*/
+  height: 10vh;
+  margin-bottom: 10px;
+}
+
+#assignedOrderRow{
+  background:;
+  height: 10vh;
+  margin-bottom: 40px;
+}
+
+#unassignedOrderTicket{
+/*  border:2px solid white;
+*/  height: 100%;
+  background: rgba(255,255,255,1);
+}
+
+#assignedOrderTicket{
+/*  border:2px solid white;
+*/  height: 100%;
+  background: rgba(255,255,255,1);
+}
+
+
+#unassignedOrderTicketText{
+  height:100%;
+/*  background: orange;*/
+}
+
+#assignedOrderTicketNum{
+  height:50%;
+  background: white;
+  text-align: left;
+  width: 100%;
+/*  border-bottom: 2px solid black*/
+
+}
+
+#assignedOrderTicketLocation{
+  height:50%;
+  background: white;
+  text-align: left;
+  width: 100%;
+}
+
+#unassignedOrderTicketRow{
+  height:100%;
+/*  background: green;*/
+}
+
+#assignedOrderTicketRow{
+  height:100%;
+/*  background: green;
+*/}
+
+#unassignedOrderTicketRow a{
+  color:white;
+}
+
+#assignedOrderTicketRow a{
+  color:white;
+}
+
+#orderReadyCol{
+  height: 100%;
+  background:#1f381b;
+}
+
+#closeOrderCol{
+  height: 50%;
+  background:#560e17;
+  width: 100%
+}
+
+#changeTrigger{
+  background: ;
+  text-align: center;
+  color: white;
+}
+
+#changeTrigger a{
+  color: white;
+}
+
+#loggedInAt{
+  color:white;
+  margin-left: 8.5%;
+  background: ;
+  padding-left: 0px;
+}
+
+#myTriggerModal{
+
+}
+
+#myTriggerModal button{
+  color: rgba(255,255,255,1);
+}
+
+#triggerModalStyle{
+  background: #28313A;
+  color:white;
+  border:2px solid white;
+}
+
+#triggerModalRow{
+  background: rgba(255,255,255,0.2);
+  height: 50px;
+ /* border: 2px solid white;*/
+  margin-bottom: 10px;
+}
+
+#triggerModalRow a{
+  color:white;
+}
+
+/*ACCOUNT ROUTE*/
+#accountContent{
+  height: 75vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+/*  border: 2px solid red;
+*/  background: ;
+  color: #444954;
+  /*  padding-left: 10vw;*/
+}
+
+#mainAccountRow{
+  height: 100%;
+  width: 100%;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+#accountRow1{
+  height: 50%;
+  margin-left: 11.5%;
+}
+
+#accountRow2{
+  height: 50%;
+  margin-left: 11.5%;
+}
+
+#accountManageUsers{
+  height:100%;
+  background: rgba(255,255,255,0.2);
+  margin-right: 20px;
+  margin-bottom: 20px;
+  border: 2px solid white;
+  outline: 10px solid #28313A;
+  color:white;
+  padding-top: 10%;
+}
+
+
+#accountBanking{
+  height:100%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid white;
+  outline: 10px solid #28313A;
+  margin-bottom: 20px;
+  color:white;
+  padding-top: 10%;
+
+}
+
+#accountGrid{
+  height:100%;
+  background: rgba(255,255,255,0.2);
+  margin-right: 20px;
+  margin-bottom: 20px;
+  border: 2px solid white;
+  outline: 10px solid #28313A;
+  color:white;
+  padding-top: 10%;
+}
+
+#accountTriggers{
+  height:100%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid white;
+  outline: 10px solid #28313A;
+  color:white;
+  padding-top: 10%;
+
+}
+
+/*ABOUT ROUTE*/
+#aboutContent{
+  height:80vh;
+  width: 100vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 70px;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: none;
+  background: transparent;
+  color: white;
+}
+
+#aboutBody{
+  background: black;
+}
+
+/*PRICING ROUTE*/
+#pricingContent{
+  height:80vh;
+  width: 100vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 70px;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: none;
+  background: transparent;
+  color: white;
+}
+
+#pricingBody{
+  background: black;
+}
+
+
+/*CONTACT ROUTE*/
+#contactContent{
+  height:80vh;
+  width: 100vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 70px;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: none;
+  background: transparent;
+  color: white;
+}
+
+#contactBody{
+  background: black;
+}
+
+/*GRID ROUTE*/
+#gridContent{
+  height: 45vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+/*  border: 2px solid red;
+*/  background: ;
+  color: white;
+  /*  padding-left: 10vw;*/
+  padding-top: 10%;
+}
+
+#gridContent input{
+  color: white;
+  text-align: center;
+  border: 2px solid white;
+  background: #;
+  font-family: Menlo;
+}
+
+#saveGridBtn{
+  background: #e82500;
+  border-radius: 0px;
+}
+
+
+/*BANKING ROUTE*/
+#bankingContent{
+  height: 45vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: 2px solid white;
+  background: rgba(255,255,255,0.2) ;
+  color: white;
+  /*  padding-left: 10vw;*/
+  padding-top: 10%;
+}
+
+/*MENU ROUTE*/
+#menuContent{
+  height: 60vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: 2px solid white;
+  background:;
+  color: white;
+  /*  padding-left: 10vw;*/
+}
+
+#menuContent th{
+  text-align: center;
+}
+
+/*USERS ROUTE*/
+
+#userContent{
+  height: 60vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: 2px solid white;
+  background:;
+  color: white;
+  /*  padding-left: 10vw;*/
+
+}
+
+#userContent th{
+  text-align: center;
+}
+
+#changePass{
+  background: #e82500;
+}
+
+#deleteUserBtn{
+  background: #e82500;
+}
+
+#mainTable{
+  background: rgba(255,255,255,0.2);
+}
+
+/*TRIGGER ROUTE*/
+#triggerContent{
+  height: 60vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+  border: 2px solid white;
+  background: ;
+  color: white;
+  /*  padding-left: 10vw;*/
+}
+
+#triggerContent a {
+  color:white;
+}
+
+/*BOOT ROUTE*/
+#bootContent{
+  height: 60vh;
+  width: 80vw;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right:0;
+  margin: auto;
+  position: absolute; 
+/*  border: 2px solid white;*/
+  background: ;
+  color: black;
+  /*  padding-left: 10vw;*/
+}
+
+#bootContent input:focus,
+#bootContent select:focus,
+#bootContent textarea:focus,
+#bootContent button:focus {
+    outline: none;
+}
+
+#bootContent label{
+  text-align: left;
+}
+
+
+#pwr:visited{
+  display: none;
+}
+
+.modal-dialog{
+  margin: 29vh auto;
+  width:25vw;
+}
+
+#myBootModal {
+  color: rgba(255,255,255,1);
+
+}
+
+#bootModalStyle{
+  background: #28313A;
+  color:white;
+  border:2px solid white;
+}
+
+#bootModalStyle a{
+  background: rgba(255,255,255,1);
+  color: #28313A;
+}
+

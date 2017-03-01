@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Barhop</title>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="main.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" typr="img/png" href="barhop_icon.png">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="myNav">
+    <a href="index.html" class="navbar-brand" id="navbarLogo"><b>Barhop</b><sub> Beta</sub></a>
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navData" id="collapsedButton">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar" id="bar"></span>
+        <span class="icon-bar" id="bar"></span>
+        <span class="icon-bar" id="bar"></span>
+      </button>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navData">
+      <ul class="nav navbar-nav" id="rightUl">
+        <li><a href="account.html" >Account</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div id="triggerContent">
+    <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
+      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">Trigger 1</div>
+      <a href="">
+        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">Edit</div>
+      </a>
+    </div>
+
+    <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
+      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">Trigger 2</div>
+      <a href="">
+        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">Edit</div>
+      </a>
+    </div>
+
+    <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
+      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">Trigger 3</div>
+      <a href="">
+        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">Edit</div>
+      </a>
+    </div>
+    <br>
+<button type="button" class="btn" id="saveGridBtn" data-toggle="modal" data-target="#addTriggerModal">Add Trigger</button>
+
+    <!-- Modal -->
+  <div class="modal fade" id="addTriggerModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content" id="triggerModalStyle">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Triggers</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row" id="triggerModalRow">
+            <a href="">Trigger 1</a>
+          </div>
+        </div>
+<!--         <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div> -->
+      
+    </div>
+  </div>
+  </div>
+  <!-- END MODAL -->
+
+  </div>
+
+
+ 
+  <footer class="footer">
+    <div class="container" id="footerText">
+      <h5> &copy; 2016 Barhop Corporation</h5>
+      <!-- <a href="terms.html"><h5><u>Terms and Conditions</u></h5></a> -->
+    </div>
+  </footer>
+  
+</body>
+</html>
