@@ -6,7 +6,7 @@ from t_auth import views
 
 
 urlpatterns = [
-    url('^login/$', 'django.contrib.auth.views.login', {'template_name': 'authentication/login_page.html'},
+    url('^login/$', 'django.contrib.auth.views.login', {'template_name': 'authentication/Auth_login.html'},
         name='login'),
     url('^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='logout'),
     
