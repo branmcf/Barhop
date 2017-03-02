@@ -1,0 +1,150 @@
+{%extends 'index.html'%}
+{%block content %}
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top" style="background: #34495e">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header" style="color: white">
+        <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand" id="brand"><i><b>Barhop</b></i><sub> Alpha</sub></a>
+    </div>
+
+    <!-- Collection of nav links, forms, and other content for toggling -->
+    <div id="navbarCollapse" class="collapse navbar-collapse" style="color: white">
+        {% if not user.is_authenticated %}
+        <ul class="nav navbar-nav">
+            <li><a href="{%url 'how_it_works'%}" id="navlinks" >How it Works</a></li>
+            <li><a href="{%url 'about_us'%}" id="navlinks" >About Us</a></li>
+            <li><a href="{%url 'contact_us'%}" id="navlinks" >Contact Us</a></li>
+            <li><a href="https://medium.com/@Barhop" target="_blank" id="navlinks">Blog</a></li>
+        </ul>
+        {% endif %}
+        <ul class="nav navbar-nav navbar-right" style="color: #ffffff">
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}" id="navlinks">My Account</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}" id="navlinks">Login</a></li>
+            <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
+            {%endif%}
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid" id="settings">
+<br>
+    <div class="contentset" id="settings">
+    <div class="part1">
+        <br>
+        <br>
+        <br>
+        <br>
+        <img class="user-image" src="/static/images/profile/200x200/{{user.profile_image}}" height="200" width="200" alt=""/>
+        <br>
+
+        <input type="file" name="logo" id="logo-img" align="center" style="margin:10px auto; display:block;"/>
+
+    </div>
+
+    <div class="part2">
+        <div class="partbox">
+        <form role="form" method="post">
+            {%csrf_token%}
+        <div id="number_contains_group">
+            <label for="id_mobile">Your Mobile Number :</label>
+            <input class="form-control" id="id_mobile" name="mobile" value="{%if user.mobile%}{{user.mobile}}{%endif%}"
+                   placeholder="User Mobile Number ">
+            <div class="errormsg">{{ form.mobile.errors }}</div>
+        </div>
+        <br>
+            <button class="btn btn-primary pull-center" type="submit" id="save">Save</button>
+        </form>
+    </div>
+    </div>
+
+    <div class="part3">
+        <div class="partbox">
+        <span><label>Email :</label><p>{{user.email}}</p></span>
+        <span><label>Username :</label><p>{{user.username}}</p></span>
+    </div>
+    </div>
+    <div class="part4">
+        <div class="partbox">
+            <a href="{%url 'managed_account:add_bank_account'%}" class="btn btn-info">Add Bank Account</a>
+                <a href="{%url 'managed_account:list_account'%}" class="btn btn-info">List Bank Accounts</a>
+                <a href="{%url 'managed_account:account_status'%}" class="btn btn-info">View Account Status</a>
+        <a href="{%url 'password_change'%}" class="btn btn-info">Change
+            Password</a>
+            <br>
+            <br>
+        <a onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
+        class="btn btn-warning">Logout</a>
+        <br>
+        <br>
+    </span>
+        <a onclick='if (confirm("Are you sure you want to delete your account ?")){window.location.replace("  {% url 'account_delete'%}");}' class="btn btn-danger">Delete Account</a>
+    </span>
+    </div>
+</div>
+
+<script type="text/javascript">
+var height = $(document).height();
+var menu_height = $("#menu").height();
+var content_height = height - menu_height;
+
+$(".contentset").css("height", content_height);
+$(".contentset").css("top", menu_height);
+</script>
+</div>
+</div>
+   <!-- <div id="contentset">Some content<br />Some content<br />Some content</div>
+
+   <div class="container">
+        <div class="box box-primary">
+            <div class="box-body">
+                <div class="form-group" id="centered">
+                    <br>
+                    <label for="logo-img" style="line-height: 2em">Image For Profile Pic</label>
+                    <input type="file" name="logo" id="logo-img"/>
+
+                    <p class="help-block">Upload Image for Profile. Preferred Size: 200x200</p>
+                    <img class="user-image" src="/static/images/profile/200x200/{{user.profile_image}}" height="200"
+                         width="200" alt=""/>
+
+                    <div class="msg" id="img-res"></div>
+                </div>
+            </div>
+        </div>
+        <br/>
+    </div>
+    <span><label>Email :</label><p>{{user.email}}</p></span>
+    <span><label>Username :</label><p>{{user.username}}</p></span>
+    {% if user.twilio_mobile %}
+    <span><label>Twilio Number :</label><p>{{user.twilio_mobile}}</p></span>
+    {% endif %}
+    <div class="col-md-3 no-float row">
+        <form role="form" method="post">
+            {%csrf_token%}
+        <div id="number_contains_group">
+            <label for="id_mobile">User Mobile Number :</label>
+            <input class="form-control" id="id_mobile" name="mobile" value="{%if user.mobile%}{{user.mobile}}{%endif%}"
+                   placeholder="User Mobile Number ">
+            <div class="errormsg">{{ form.mobile.errors }}</div>
+        </div>
+            <button class="btn btn-primary pull-center" type="submit">Save</button>
+        </form>
+        <br/>
+    </div>
+    <div class="row">
+        <a href="{%url 'password_change'%}" class="btn btn-default">Change
+            Password</a>
+        <a onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
+        class="btn btn-default">Logout</a></span>
+        <a onclick='if (confirm("Are you sure you want to delete your account ?")){window.location.replace("  {% url 'account_delete'%}");}' class="btn btn-default">Delete</a></span>
+    </div>
+</div> -->
+{% endblock%}
+
+

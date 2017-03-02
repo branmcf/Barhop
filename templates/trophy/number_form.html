@@ -1,0 +1,48 @@
+<div class="modal fade" id="add_number" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="cm-form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Search Available Number</h4>
+            </div>
+            <form id='add_number_form' role="form" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div id="postcode_group">
+                            <label for="id_postcode">Postcode :</label>
+                            <input type="text" id="id_postcode" name="postcode" class="form-control"
+                                   size=4 placeholder="near US postal code (e.g. 9411)">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="near_group">
+                            <label for="id_near_number">Near Number :</label>
+                            <input type="text" class="form-control" id="id_near_number" size=7 name="near_number"
+                                   placeholder="near this other number (e.g. +14156562345):">
+                        </div>
+                        <br/>
+                    </div>
+                    <div class="row">
+                        <div id="number_contains_group">
+                            <label for="id_pattern">Pattern :</label>
+                            <input class="form-control" id="id_pattern" name="pattern"
+                                   placeholder="matching this pattern (e.g. 415***EPIC)">
+                        </div>
+                        <br/>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="form-group">
+                            <button class="btn btn-primary pull-center" type="submit">SEARCH</button>
+                            <button type="button" class="btn btn-primary pull-right" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

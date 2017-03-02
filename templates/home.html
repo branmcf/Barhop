@@ -1,0 +1,83 @@
+{% extends 'index.html'%}
+{% block content%}
+<!-- Container for main landing page contents -->
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top" style="background: transparent">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header" style="color: white">
+        <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand" id="brand"><i><b>Barhop</b></i><sub> Alpha</sub></a>
+    </div>
+    
+    <!-- Collection of nav links, forms, and other content for toggling -->
+    <div id="navbarCollapse" class="collapse navbar-collapse" style="color: white">
+        {% if not user.is_authenticated %}
+        <ul class="nav navbar-nav">
+            <li><a href="{%url 'how_it_works'%}" id="navlinks" >How it Works</a></li>
+            <li><a href="{%url 'about_us'%}" id="navlinks" >About Us</a></li>
+            <li><a href="{%url 'contact_us'%}" id="navlinks" >Contact Us</a></li>
+            <li><a href="https://medium.com/@Barhop" target="_blank" id="navlinks">Blog</a></li>
+        </ul>
+        {% endif %}
+        <ul class="nav navbar-nav navbar-right" style="color: #ffffff">
+            {% if user.is_authenticated %}
+            <li><a href="{%url 'profile'%}" id="navlinks">My Account</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}" id="navlinks">Login</a></li>
+            <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
+            {%endif%}
+        </ul>
+    </div>
+</nav>
+
+<div id="overflow">
+<div class="fullscreen-bg">
+    <video loop muted autoplay poster="" class="fullscreen-bg__video">
+        <source src="/static/video/Beer_Bubbles_300314__Videvo.mov" type="video/mp4">
+    </video>
+</div>
+</div>
+
+<div id="jumbo-contain">
+	<div class="container" id="landing">
+    <br>
+    <br>
+    <br>
+    <div id="bhlogo">
+  <img src ="/static/images/barhop_home_logo.png" height="300" width="900" id="homelogo">
+</div>
+    <!--  -->
+    <br>
+    <br>
+          <span id="tag">Drinks via SMS!</span>
+          <br>
+      <!-- <br>
+      <h3> <span style=" color: #7f8c8d">The Alpha release of Barhop is coming to Dallas in December! </span</h3>
+      <h3> <span style=" color: #7f8c8d">Text "BARHOP" to the phone number below to join the waiting list today! </span></h3>
+      <br> -->
+
+      <!--<span id="betanum">(214)736-1968</span> -->
+  </div>
+
+
+<!-- Social, PP, TOS and copyright -->
+  <div class="footer">
+
+       <!-- <h5 style="display:inline-block;"> Privacy Policy | </h5>
+
+        <h5 style="display:inline-block;"> Terms of Service | </h5> -->
+          <br>
+<h4 id="footertext"> Share us! </h4>
+<a href="https://www.facebook.com/sharer/sharer.php?u=www.barhop.io"><img src="/static/images/Fb_logo_blue.png" height="40" width="50"></a>
+
+<a href="https://twitter.com/home?status=I%20just%20signed%20up%20for%20the%20Barhop.io%20waiting%20list!%20Check%20out%20barhop.io%20to%20order%20drinks%20via%20SMS!"><img src="/static/images/Twitter_logo_blue.png" height="40" width="50"></a>
+<br>
+<h6 style="display:inline-block; color: white"> &copy; 2016 Barhop </h6>
+    </div>
+</div>
+
+{% endblock%}

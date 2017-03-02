@@ -1,0 +1,18 @@
+{% extends 'index.html'%}
+{%block content %}
+<div class="container">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{data.id}}">
+        <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="{{data.data_key}}"
+                data-amount="{{data.data_amount}}"
+                data-name="{{data.data_name}}"
+                data-description="{{data.data_description}}"
+                data-image="/static/images/barhop_icon.png"
+                data-locale="auto">
+        </script>
+    </form>
+</div>
+{%endblock %}

@@ -1,0 +1,83 @@
+{% extends 'index.html' %}
+{% block content %}
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top" style="background: #34495e">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header" style="color: white">
+        <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand" id="brand"><i><b>Barhop</b></i><sub> Alpha</sub></a>
+    </div>
+    
+    <!-- Collection of nav links, forms, and other content for toggling -->
+    <div id="navbarCollapse" class="collapse navbar-collapse" style="color: white">
+        {% if not user.is_authenticated %}
+        <ul class="nav navbar-nav">
+            <li><a href="{%url 'how_it_works'%}" id="navlinks" >How it Works</a></li>
+            <li><a href="{%url 'about_us'%}" id="navlinks" >About Us</a></li>
+            <li><a href="{%url 'contact_us'%}" id="navlinks" >Contact Us</a></li>
+            <li><a href="https://medium.com/@Barhop" target="_blank" id="navlinks">Blog</a></li>
+        </ul>
+        {% endif %}
+        <ul class="nav navbar-nav navbar-right" style="color: #ffffff">
+            {% if user.is_authenticated %}
+            <li><a href="{%url 'profile'%}" id="navlinks">My Account</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}" id="navlinks">Login</a></li>
+            <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
+            {%endif%}
+        </ul>
+    </div>
+</nav>
+
+<div class="container1">
+    <div class="row1">
+        <h2>Sign up</h2>
+            <div class="form-top">
+                <div class="form-top-right">
+                    <i class="fa fa-key"></i>
+                </div>
+            </div>
+            <div class="form-bottom">
+                <form role="form" method="POST" action="{{ app_path }}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_username">BarName :</label>
+                            <div class="errormsg">{{ form.username.errors }}</div>
+                            <input for="id_mobile" type="text" name="username" class="form-control"
+                                   value="{% if form.username.value %}{{form.username.value}}{% endif %}"
+                                   placeholder="Username"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_username">Email :</label>
+                            <div class="errormsg">{{ form.email.errors }}</div>
+                            <input for="id_mobile" type="text" name="email" class="form-control"
+                                   value="{% if form.email.value %}{{form.email.value}}{% endif %}"
+                                   placeholder="Email"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_username">Password :</label>
+                            <div class="errormsg">{{ form.password1.errors }}</div>
+                            <input for="id_password1" type="password" name="password1" class="form-control"
+                                   placeholder="Password"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_username">Re-type Password :</label>
+                            <div class="errormsg">{{ form.password2.errors }}</div>
+                            <input for="id_password2" type="password" name="password2" class="form-control"
+                                   placeholder="Re-type Password"/>
+                        </div>
+                        <br>
+
+                        <div class="v-wrap">
+                            <button type="submit" id="cu-btn" class="btn login-btn vbox">Sign Up</button>
+                        </div>
+                </form>
+            </div>
+
+    </div>
+</div>
+{% endblock %}

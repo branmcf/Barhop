@@ -1,0 +1,27 @@
+
+
+  <div class="authbox" style=" display: inline-block; text-align: center;">
+	   <form method="POST" action="{{ URL::to('auth/login') }}">
+            <div>
+                Email Address
+                <br>
+                <input type="email" name="email" value="">
+            </div>
+            <div>
+              <br>
+                Password
+                <br>
+                <input type="password" name="password" id="password">
+            </div>
+
+            <div>
+                <input type="checkbox" name="remember"> Remember Me
+            </div>
+             <div class="v-wrap">
+                <button type="submit"id="li-btn" class="btn login-btn v-box">Login</button>
+            </div>
+      </form>
+        <h5> <a href ="forgot.html" id="authlink">Forgot your password? </a> </h5>
+        <h5> <a href ="Auth_register.html" id="authlink">New member? </a> </h5>
+    </div>
+{%endblock%}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Icon -->
+<link rel="icon" type="image/png" href="images/barhop_icon.png">
+
+<!-- Site title --> 
+<title>Barhop UI</title>
+
+<!-- Bootstrap CDN -->
+  <link href=/static/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+<!-- Bootstrap CDN Javascript -->
+  <script src="/static/js/bootstrap.min.js" integrity="sha256-Sk3nkD6mLTMOF0EOpNtsIry+s1CsaqQC1rVLTAy+0yc= sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
+<!-- Personal Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+<!-- Pacifico Font-->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Pacifico">
+</head>
+
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" style="background-color: #34495e">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" id="navlogo" href="javascript:home()"> <i><b>Barhop </b></i><sub>Alpha</sub></a>
+    </div>
+    <div class="navbar-collapse collapse in" id="bs-example-navbar-collapse-1">
+      <ul id="nav" class="nav navbar-nav">
+        <li><a href="javascript:howItWorks()" style="color:white;">How it Works</a></li>
+        <li><a href="javascript:aboutUs()" style="color:white;">About Us</a></li>
+        <li><a href="javascript:contact()" style="color:white;">Contact Us</a></li>
+        <li><a href="https://medium.com/@Barhop" target="_blank" style="color:white;">Blog</a></li>
+      </ul>
+  </div>
+      <!--<ul class="nav navbar-nav navbar-right">
+        <li><a href="pages/signIn.html">Already a member?</a></li>
+      </ul>-->
+
+  </div>
+</nav>
+
+    <div class="authbox" style=" display: inline-block; text-align: center;">
+	<form method="POST" action="{{ URL::to('auth/register') }}" id="plz">
+            <div>
+                Email Address
+                <br>
+               <input type="text" name="name" value="" > 
+            </div> 
+            <div>
+                Username
+                <br>
+                <input type="email" name="email" value="">
+            </div>
+
+            <div>
+                Password
+                <br>
+                <input type="password" name="password" id="signup-form">
+            </div>
+            <div>
+                Confirm Password
+                <br>
+                <input type="password" name="password_confirmation" align="center" >
+            </div>
+            <br>
+            <div class="v-wrap">
+                <button type="submit" id="cu-btn" class="btn login-btn vbox">Sign Up</button>
+            </div>
+        </form>
+  </div>
+
+</body>
+</html>

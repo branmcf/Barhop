@@ -1,0 +1,12 @@
+{% extends 'index.html'%}
+{%block content %}
+<form enctype="multipart/form-data" action="" method="post" id="create_managed_account" novalidate="">
+    {%csrf_token%}
+    <div>
+        <p class="bank-errors" style="color: red;"></p>
+        {{form.as_p}}
+    </div>
+
+    <button class="btn btn-primary pull-center" type="submit">Submit</button>
+</form>
+{% endblock %}

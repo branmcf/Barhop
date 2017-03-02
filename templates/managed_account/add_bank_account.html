@@ -1,0 +1,52 @@
+{% extends 'index.html'%}
+{%block js_content%}
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+{%endblock%}
+{%block content %}
+<form enctype="multipart/form-data" action="" method="post" id="add_bank_account_form" novalidate="">
+    {%csrf_token%}
+    <div>
+        <p class="bank-errors" style="color: red;"></p>
+        {{form.as_p}}
+    </div>
+
+    <button class="btn btn-primary pull-center" type="submit">Submit</button>
+</form>
+
+<script type="text/javascript">
+    $(function () {
+        Stripe.setPublishableKey("{{stripe_public_key}}");
+
+        function stripeResponseHandler(status, response) {
+            var $form = $('#add_bank_account_form');
+
+            if (response.error) {
+                // Show the errors on the form
+                $form.find('.bank-errors').text(response.error.message);
+                $form.find('button').prop('disabled', false);
+            } else {
+                // response contains id and bank_account, which contains additional bank account details
+                var token = response.id;
+                // Insert the token into the form so it gets submitted to the server
+                $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+                // and submit
+                $form.get(0).submit();
+            }
+        }
+
+        $('#add_bank_account_form').submit(function (ev) {
+            ev.preventDefault();
+            Stripe.bankAccount.createToken({
+                country: $('#id_country').val(),
+                currency: 'usd',
+                routing_number: $('#id_routing_number').val(),
+                account_number: $('#id_account_number').val(),
+                name: $('#id_name').val(),
+                account_holder_type: $('#id_account_holder_type').val()
+            }, stripeResponseHandler);
+        });
+
+
+    });
+</script>
+{%endblock %}

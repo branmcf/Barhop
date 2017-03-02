@@ -1,0 +1,52 @@
+<div class="modal fade" id="edit_trophy" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="cm-form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Trophy Info</h4>
+            </div>
+            <form id='trophy_form' role="form" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="id_modal_trophy" value="">
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div id="trophy_group" class="form-group">
+                            <label for="id_trophy">Trophy :</label>
+                            <input type="text" id="id_trophy" name="trophy" class="form-control"
+                                   placeholder="Trophy Text">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="message_group" class="form-group">
+                            <label for="id_message">Response :</label>
+                            <textarea class="form-control" id="id_message" name="message"></textarea>
+                        </div>
+                        <br/>
+                    </div>
+                    <div class="row">
+                        <div id="default_order_response_group" class="form-group">
+                            <label for="id_default_order_response">Default Order Response :</label>
+                            <textarea class="form-control" id="id_default_order_response"
+                                      name="default_order_response"></textarea>
+                        </div>
+                        <br/>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="form-group">
+                            <button class="btn btn-primary pull-center" type="submit">SAVE</button>
+                            <button class="btn btn-danger pull-center" data-dismiss="modal"
+                                    data-target="#confirm-delete" data-toggle="modal">DELETE
+                            </button>
+                            <button type="button" class="btn btn-primary pull-right" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

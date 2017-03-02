@@ -1,0 +1,104 @@
+{% extends 'index.html'%}
+{% block content%}
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top" style="background: #34495e">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header" style="color: white">
+        <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand" id="brand"><i><b>Barhop</b></i><sub> Alpha</sub></a>
+    </div>
+    
+    <!-- Collection of nav links, forms, and other content for toggling -->
+    <div id="navbarCollapse" class="collapse navbar-collapse" style="color: white">
+        {% if not user.is_authenticated %}
+        <ul class="nav navbar-nav">
+            <li><a href="{%url 'how_it_works'%}" id="navlinks" >How it Works</a></li>
+            <li><a href="{%url 'about_us'%}" id="navlinks" >About Us</a></li>
+            <li><a href="{%url 'contact_us'%}" id="navlinks" >Contact Us</a></li>
+            <li><a href="https://medium.com/@Barhop" target="_blank" id="navlinks">Blog</a></li>
+        </ul>
+        {% endif %}
+        <ul class="nav navbar-nav navbar-right" style="color: #ffffff">
+            {% if user.is_authenticated %}
+            <li><a href="{%url 'profile'%}" id="navlinks">My Account</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}" id="navlinks">Login</a></li>
+            <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
+            {%endif%}
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <!-- Left Navigation -->
+        <div class="col-md-3 no-float">
+
+            <div id="thumbnailwrapper">
+                <div id="artiststhumbnail">
+                    <a href="#">
+                        <img src="/static/images/profile/200x200/{{user.profile_image}}" alt="artist"
+                             border="1" height="200" width="200">
+                    </a>
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            My Numbers
+            <br>
+
+            <div class="list-group">
+                {% for item in trophies %}
+                <li class="list-group-item"><a class="trophy_item" id="trophy_{{item.id}}" data-id="{{item.id}}" style="color: #34495e">{%if item.trophy %}{{item.trophy}}{%else%}Edit to add Trophy{%endif%} ({{item.twilio_mobile}})</a><a
+                        class="glyphicon glyphicon-wrench pull-right trophy-edit" data-id="{{item.id}}"
+                        data-toggle="modal"
+                        data-target="#edit_trophy"
+                        style="color: #34495e"></a></li>
+                {% endfor %}
+            </div>
+            <a type="button" href="{%url 'trophy:search'%}" class="btn btn-info btn-lg">Add Twilio Number</a>
+        </div>
+
+        <div id='conversation_section' class="col-md-9 no-float">
+            <br>
+            {% for item in con_messages %}
+            <div class="media{%if item.has_new_message%} alert-info {%endif%}" id="conversation_{{item.0.id}}">
+                <div class="media-left media-middle">
+                    <a href="{%url 'route:view_conversation' item.0.id%}"><img class="media-object" src="/static/images/profile/200x200/{{item.0.customer.profile_image}}"
+                         height="200" width="200"></a>
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading">{{item.0.customer.username}}</h4>
+
+                    <div class="well">{{item.1.message}}</div>
+					    <span style="display:inline;">
+					    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#price_info"
+                                data-id="{{item.0.id}}" data-customer-id="{{item.0.customer.id}}">Send
+                            Invoice
+                        </button>
+					    <button type="button" class="btn btn-info order-ready" data-toggle="modal" data-target="#order_ready"
+                                data-id="{{item.0.id}}" data-customer-id="{{item.0.customer.id}}">Order
+                            Ready
+                        </button>
+					    <button type="button" class="btn btn-warning" data-toggle="modal"
+                                data-target="#confirm-order-close" data-id="{{item.0.id}}">Close Order
+                        </button>
+						</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{%include 'trophy/number_form.html' %}
+{%include 'trophy/trophy_form.html' %}
+{%include 'trophy/delete_trophy.html' %}
+{%include 'trophy/close_order.html' %}
+{%include 'trophy/order_ready_form.html' %}
+{%include 'payment/send_price.html' %}
+{% endblock %}

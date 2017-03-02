@@ -1,0 +1,31 @@
+<div class="modal fade" id="order_ready" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="cm-form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Order Ready</h4>
+            </div>
+            <form id='order_ready_form' role="form" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div id="order_message_group">
+                            <label for="id_order_message">Message :</label>
+                            <textarea class="form-control" id="id_order_message" name="message"></textarea>
+                        </div>
+                        <br/>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="form-group">
+                            <button class="btn btn-primary pull-center" type="submit">SEND</button>
+                            <button type="button" class="btn btn-primary pull-right" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

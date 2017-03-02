@@ -1,0 +1,39 @@
+<div class="modal fade" id="price_info" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="cm-form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Send Invoice</h4>
+            </div>
+            <form id='get_price_form' role="form" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div id="amount_group">
+                            <label for="id_amount">Amount :</label>
+                            <input type="text" id="id_amount" name="amount" class="form-control"
+                                   placeholder="Amount in Cents Eg. 2000 for $20">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="detail_group">
+                            <label for="id_detail">Detail :</label>
+                            <textarea class="form-control" id="id_detail" name="detail"></textarea>
+                        </div>
+                        <br/>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="form-group">
+                            <button class="btn btn-primary pull-center" type="submit">SEND</button>
+                            <button type="button" class="btn btn-primary pull-right" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

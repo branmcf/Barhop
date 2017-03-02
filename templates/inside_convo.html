@@ -1,0 +1,93 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+
+        <!-- Conent -->
+        <div class="col-md-9 no-float">
+            <br>
+            <button>
+                <a class="glyphicon glyphicon-chevron-left" aria-hidden="true" id="AppSetBtn"
+                   href='/'></a>
+            </button>
+
+            <img class="displayed" src="/static/images/profile/200x200/{{customer.profile_image}}" height="200"
+                 width="200">
+            <h4 class="media-heading" style="text-align:center;">Customer name: {{customer.username}}</h4>
+
+            <div class="container-fluid">
+                <div class="container">
+                    <br>
+                    <br>
+
+                    <div class="col-md-4">
+						    <span class="displayed2">
+						    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#price_info"
+                                    data-id="{{conv_id}}" data-customer-id="{{customer.id}}">Send
+                                Invoice
+                            </button>
+                                <br>
+                                <br>
+						    <button type="button" class="btn btn-info order-ready" data-toggle="modal"
+                                    data-target="#order_ready"
+                                    data-id={{conv_id}} data-customer-id="{{customer.id}}">Order
+                                Ready
+                            </button>
+						    <br>
+						    <br>
+						    <button type="button" class="btn btn-warning" data-toggle="modal"
+                                    data-target="#confirm-order-close" data-id="{{conv_id}}">Close Conversation
+                            </button>
+						    <br>
+						    <br>
+						    <button type="button" class="btn btn-danger" data-toggle="modal"
+                                    data-target="#confirm-block" data-customer-id="{{customer.id}}">Block
+                            </button>
+							</span>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="list-group" id="message_list">
+                            {% for item in messages %}
+                            <button type="button"
+                                    class="list-group-item {% if item.direction %}list-group-item-success {%else%} list-group-item-warning{%endif%}">
+                                {{item.message}}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!--<div class="col-md-4">-->
+                    <!--<span class="displayed2">-->
+                    <!--<button type="button" class="btn btn-primary" id="displayed2">Send Response</button>-->
+                    <!--</span>-->
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+
+        function startRefresh() {
+            setTimeout(startRefresh, 60000);
+            var url = window.location.href;
+            url = url.replace("view_conversation", "ajax_conversation");
+            $.get(url, function (data) {
+                if (data.success) {
+                    var html = '';
+                    $.each(data.data, function (k, v) {
+                        html += '<button type="button" class="list-group-item ' + ((v.direction) ? 'list-group-item-success">' : 'list-group-item-warning">') + v.message + '</button>';
+                    });
+                    $('#message_list').html(html);
+                }
+            });
+        }
+
+        startRefresh();
+    });
+</script>
+{%include 'payment/send_price.html' %}
+{%include 'trophy/order_ready_form.html' %}
+{%include 'trophy/close_order.html' %}
+{%include 'block/confirm_block.html' %}
+{% endblock %}
