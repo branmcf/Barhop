@@ -15,5 +15,5 @@ urlpatterns = [
     url(r'^users/$', UsersView.as_view(), name='user_view'),
     url(r'^banking/$', BankingView.as_view(), name='bank_view'),
     url(r'^grid/$', GridView.as_view(), name='grid_view'),
-    url(r'^triggers/$', TriggersView.as_view(), name='triggers_view')
+    url(r'^triggers/$', TriggersView.as_view(), name='triggers_view'),
 ]
