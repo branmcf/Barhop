@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^how_it_works/$', main.how_it_works, name='how_it_works'),
     url(r'^about_us/$', main.about_us, name='about_us'),
     url(r'^contact_us/$', main.contact_us, name='contact_us'),
+    url(r'^pricing/$', main.pricing, name='pricing'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('t_auth.urls')),
     url(r'^route/', include('route.urls', namespace='route')),

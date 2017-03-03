@@ -1,13 +1,14 @@
-<head>
+{% extends 'base.html' %}
+{% block content %}
+<!-- <head>
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
 
-<!-- Personal Stylesheet -->
+
 <link rel="stylesheet" href="static/css/style.css">
 </head>
-{% extends 'index.html' %}
-{% block content %}
+
 <nav role="navigation" class="navbar navbar-default navbar-fixed-top" style="background: #34495e">
-    <!-- Brand and toggle get grouped for better mobile display -->
+
     <div class="navbar-header" style="color: white">
         <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
             <span class="sr-only">Toggle navigation</span>
@@ -18,7 +19,7 @@
         <a href="/" class="navbar-brand" id="brand"><i><b>Barhop</b></i><sub> Alpha</sub></a>
     </div>
     
-    <!-- Collection of nav links, forms, and other content for toggling -->
+
     <div id="navbarCollapse" class="collapse navbar-collapse" style="color: white">
         {% if not user.is_authenticated %}
         <ul class="nav navbar-nav">
@@ -37,19 +38,31 @@
             {%endif%}
         </ul>
     </div>
-</nav>
-<div class="content2" style="background:#ecf0f1">
+</nav> -->
 
-    <iframe src="https://player.vimeo.com/video/153309307" width="750" height="422" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-    <h3>We know that ordering a drink at a crowded bar is a pain in the ass, that's why we built Barhop.</h3>
+<div class="container1" style="color: #fff">
+    <div class="row1">
 
-    <h3>
-        Barhop is a message-driven service that combines the approachability of SMS
-        <br>
-        and the security of a web application to streamline ordering and payment.
-        <br>
-        <br>
-    </h3>
+        <div class="col-md-3">        
+        </div>
+
+        <div class="col-md-6">
+            <div class="content2" >
+
+                <iframe src="https://player.vimeo.com/video/153309307" width="750" height="422" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+                <h3>We know that ordering a drink at a crowded bar is a pain in the ass, that's why we built Barhop.</h3>
+
+                <h3>
+                    Barhop is a message-driven service that combines the approachability of SMS
+                    <br>
+                    and the security of a web application to streamline ordering and payment.
+                    <br>
+                    <br>
+                </h3>
+            </div>
+        </div>
+    </div>
 </div>
 <!--<div class="content2" style="background:#ffffff">
     <br>

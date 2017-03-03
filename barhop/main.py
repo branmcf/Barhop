@@ -48,4 +48,13 @@ def contact_us(request):
     :param request:
     :return:
     """
-    return render(request, 'contact_us.html')
+    return render(request, 'contact.html')
+
+
+def pricing(request):
+    """
+
+    :param request:
+    :return:
+    """
+    return render(request, 'pricing.html')
