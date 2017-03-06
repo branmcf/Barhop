@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^block/', include('block.urls', namespace='block')),
     url(r'^account/', include('managed_account.urls', namespace='managed_account')),
     url(r'^delete_employe/', DeleteEmployeView.as_view() , name='deleteEmploye'),
-    url(r'^change_password/', changePasswordView.as_view() , name='change_password')
+    url(r'^change_password/', ChangePasswordView.as_view() , name='change_password'),    
+    url(r'^change_access/', ChangeAccessLeveView.as_view() , name='change_access_level')
 ]
 urlpatterns += staticfiles_urlpatterns()

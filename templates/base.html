@@ -16,6 +16,20 @@
 </head>
 
 <body id="landingBody">
+  {% if messages %}
+    {% for message in messages %}
+      <div{% if message.tags %} class="alert alert-{{ message.tags }} message"{% endif %}>
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="message alert alert-success message" style="display: none;">
+    <a class="close" data-dismiss="alert" href="#">&times;</a>
+      
+    </div>
+  {% endif %}
+
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="myLandingNav">
     <a href="/" class="navbar-brand" id="navbarLogo"><b>Barhop</b></a>
     <div class="navbar-header">
@@ -45,9 +59,20 @@
   <footer class="footer">
     <div class="container" id="footerText">
       <h5> &copy; 2017 Barhop Corporation</h5>
-      <!-- <a href="terms.html"><h5><u>Terms and Conditions</u></h5></a> -->
     </div>
   </footer>
-  
+  <script>
+    $(document).ready(function() {
+        // messages timeout for 10 sec 
+        setTimeout(function() {
+            $('.message').fadeOut('slow');
+        }, 4000); // <-- time in milliseconds, 1000 =  1 sec
+
+        // delete message
+        // $('.del-msg').live('click',function(){
+        //     $('.del-msg').parent().attr('style', 'display:none;');
+        // })
+    });
+</script>
 </body>
 </html>
