@@ -1,7 +1,8 @@
 __author__ = 'nibesh'
 
 from trophy.models import TrophyModel
-from t_auth.models import CustomUser, RefNewUser, Trigger
+from t_auth.models import CustomUser, RefNewUser
+from managed_account.models import Trigger
 
 
 def parse_sms(req):
