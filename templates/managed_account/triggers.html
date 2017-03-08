@@ -27,60 +27,80 @@
     <div class="collapse navbar-collapse" id="navData">
       <ul class="nav navbar-nav" id="rightUl">
         <li><a href="/account" >Account</a></li>
-        <li><a onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
+        <li><a onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout' %} ");}'
         >Logout</a></li>
       </ul>
     </div>
   </nav>
 
   <div id="triggerContent">
+    {% for trigger in trigger_data %}
     <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
-      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">Trigger 1</div>
-      <a href="">
-        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">Edit</div>
-      </a>
+      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">{{ trigger.trigger_name }}</div>
+      <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">
+          <a href="" class="edit_trigger" data-id={{trigger.id}} data-text={{trigger.trigger_name}} data-toggle="modal" data-target="#editTriggerModal">Edit</a> /
+          <a href="{% url 'managed_account:delete_trigger' trigger.id %}" >Delete</a>
+      </div>
     </div>
 
-    <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
-      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">Trigger 2</div>
-      <a href="">
-        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">Edit</div>
-      </a>
-    </div>
+      {% empty %}
+        No triggers yet.
+      {% endfor %}
+      <button type="button" class="btn" id="saveGridBtn" data-toggle="modal" data-target="#addTriggerModal" style="margin-top: 20px;">Add Trigger</button>
 
-    <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
-      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">Trigger 3</div>
-      <a href="">
-        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">Edit</div>
-      </a>
-    </div>
-    <br>
-<button type="button" class="btn" id="saveGridBtn" data-toggle="modal" data-target="#addTriggerModal">Add Trigger</button>
-
-    <!-- Modal -->
+  <!-- Modal Add Trigger -->
   <div class="modal fade" id="addTriggerModal" role="dialog">
     <div class="modal-dialog">
       <!-- Modal content-->
       <div class="modal-content" id="triggerModalStyle">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Triggers</h4>
+          <h4 class="modal-title">Add Trigger</h4>
         </div>
         <div class="modal-body">
-          <div class="row" id="triggerModalRow">
-            <a href="">Trigger 1</a>
-          </div>
+          <form action="." method="POST" style="color: #666;">
+              {% csrf_token %}
+              <div class="form-group">
+                {{form.trigger_name}}
+                <div class="errormsg">{{ form.trigger_name.errors| striptags }}</div>
+              </div>
+              <div class="form-group">                              
+                <button type="submit">Add</button>
+              </div>
+          </form>
         </div>
-<!--         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+  <!-- END MODAL -->
+
+  <!-- Modal Edit Trigger -->
+  <div class="modal fade" id="editTriggerModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content" id="triggerModalStyle">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit Trigger</h4>
         </div>
-      </div> -->
-      
+        <div class="modal-body">
+          <form method="GET" id="editForm" style="color: #666;">
+
+            <input type="hidden" name="triggerId"   id="trigger_id"/>
+            
+            <div class="form-group">
+              <input type="text" name="triggerName" id="trigger_name"/>
+            </div>            
+              <div class="errormsg" id="edit_error"></div>
+            <div class="form-group">  
+              <input type="button" id="btn_edit" value="Edit Trigger">
+            </div>
+          </form>
+        </div>
     </div>
   </div>
   </div>
   <!-- END MODAL -->
-
   </div>
 
 
@@ -94,3 +114,39 @@
   
 </body>
 </html>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    var error = '{{ form.errors }}';
+      if ( error != ''){
+        $('#addTriggerModal').modal('show');
+        }
+  });
+  $( ".edit_trigger" ).on( "click", function() {
+     var value = this.getAttribute('data-text');
+     var id = this.getAttribute('data-id');
+     $("#trigger_name").val(value);
+     $("#trigger_id").val(id);
+  });
+
+
+  $("#btn_edit").click(function(){
+
+      trigger_name = $('#trigger_name').val()
+      trigger_id = $('#trigger_id').val()
+      $.ajax({
+        url: "{% url 'managed_account:edit_trigger' %}",
+        type:'GET',
+        data: {'trigger_name':trigger_name,'trigger_id':trigger_id},
+        success: function (data){
+           if(data['status'] == "success")
+               location.reload();
+           else
+               $("#edit_error").text(data['success_message'])
+        }
+      });
+  });
+
+
+</script>

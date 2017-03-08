@@ -23,19 +23,19 @@
                         <label for="id_username">Username/Email:</label>
                         <input type="text" name="username" placeholder="Username/ Email"
                                class="form-username form-control" id="id_username">
-                        {% if form.user.errors %}
+                        {% if form.username.errors %}
                         <span class="help-inline">{{form.username.errors}}</span>
                         {% endif %}
-                    </div>
+                    </div>                    
                     <div class="form-group">
-                        <label for="id_password">Password:</label>
-                        <input type="password" name="password" placeholder="Password"
-                               class="form-password form-control" id="id_password">
-                        {%if form.password.errors %}
-                        <span class="help-inline">{{form.password.errors}}</span>
-                        {% endif %}
+                      <label for="id_password">Password:</label>
+                      <input type="password" name="password" placeholder="Password"
+                             class="form-password form-control" id="id_password">
+                      {%if form.password.errors %}
+                      <span class="help-inline">{{form.password.errors}}</span>
+                      {% endif %}
                     </div>
-                    <button type="submit" class="btn">Login</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
                 </form>
             </div>
           </div>

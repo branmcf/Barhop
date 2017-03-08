@@ -25,3 +25,16 @@ class BankAccount(models.Model):
     account_holder_type = models.CharField(max_length=15)
     stripeToken = models.CharField(max_length=40)
     date = models.DateTimeField(default=timezone.now)
+
+class Trigger(models.Model):
+    dealer = models.ForeignKey(CustomUser)
+    trigger_name = models.CharField(max_length=250, unique=True)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.trigger_name
+
+    class Meta:
+        db_table = 'trigger'
+        verbose_name = 'Trigger'
+        verbose_name_plural = 'Triggers'

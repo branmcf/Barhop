@@ -1,7 +1,7 @@
 
 import datetime
 
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
@@ -19,18 +19,17 @@ from lib.image_handler import is_image, is_valid_image, ProfileImageUploader
 
 from t_auth import forms
 from t_auth import utils
+
+from django.contrib.auth import login,logout, authenticate
+from django.contrib import messages
+
 from t_auth.models import RefNewUser, CustomUser
 from route.models import Conversation, Message
 from trophy.models import TrophyModel
-
+from t_auth.forms import LoginForm
 from managed_account.models import ManagedAccount
-
-
-
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
-
-
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -81,7 +80,6 @@ def sign_up(request):
 def activate_account(request, uidb64=None, token=None,
                      token_generator=default_token_generator):
     UserModel = get_user_model()
-    import pdb;pdb.set_trace()
     try:
         uid = urlsafe_base64_decode(uidb64)
         user = UserModel._default_manager.get(pk=uid)
@@ -125,6 +123,32 @@ def activate_account(request, uidb64=None, token=None,
         return render(request, 'authentication/sign_up_successful.html')
     return render(request, 'authentication/invalid_link.html')
 
+class LoginView(View):
+    template_name = "authentication/Auth_login.html"
+    
+    def get(self, request, *args, **kwargs):
+        form = LoginForm()
+        return render(request, self.template_name, {'form':form})
+
+    def post(self, request, *args, **kwargs):
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_authenticated() and user.is_ref_user == False: 
+                    if user.is_active :
+                        login(request, user)
+                        return HttpResponseRedirect('/')
+                    else:
+                        messages.success(request, "Sorry, you are not a Authorized user.")
+                        return render(self.request,self.template_name,{'form':form})
+            else:
+                messages.success(request, "Sorry, you are not a Authorized user.")
+                return render(self.request,self.template_name,{'form':form})
+        else:
+            return render(self.request,self.template_name,{'form':form})
 
 @csrf_exempt
 @login_required

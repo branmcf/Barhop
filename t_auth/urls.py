@@ -3,11 +3,12 @@ __author__ = 'nibesh'
 from django.conf.urls import url
 
 from t_auth import views
-
+from t_auth.views import LoginView
 
 urlpatterns = [
-    url('^login/$', 'django.contrib.auth.views.login', {'template_name': 'authentication/Auth_login.html'},
-        name='login'),
+    # url('^login/$', 'django.contrib.auth.views.login', {'template_name': 'authentication/Auth_login.html'},
+    #     name='login'),
+    url('^login/$', LoginView.as_view(), name='login'),
     url('^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='logout'),
     
     url('^signup/$', views.sign_up, name='sign_up'),

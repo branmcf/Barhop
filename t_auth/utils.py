@@ -1,7 +1,7 @@
 __author__ = 'nibesh'
 
 import json
-
+from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.encoding import force_bytes
@@ -38,3 +38,9 @@ def json_response(status_code=None, **kwargs):
         response.status_code = status_code
     response["Access-Control-Allow-Origin"] = '*'
     return response
+
+def send_email_auth(subject,message_body,to_email):
+    print("Sending mail...")
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    send_mail(subject,message_body,from_email,to_email,fail_silently=False)

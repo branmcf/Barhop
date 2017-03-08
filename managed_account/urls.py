@@ -15,5 +15,7 @@ urlpatterns = [
     url(r'^users/$', UsersView.as_view(), name='user_view'),
     url(r'^banking/$', BankingView.as_view(), name='bank_view'),
     url(r'^grid/$', GridView.as_view(), name='grid_view'),
-    url(r'^triggers/$', TriggersView.as_view(), name='triggers_view'),
+    url('^triggers/$', TriggerView.as_view(), name='triggers'),
+    url(r'^edit_trigger/$', TriggerEditView.as_view(), name='edit_trigger'),
+    url(r'^delete_trigger/(?P<pk>\d+)$', TriggerDeleteView.as_view(), name='delete_trigger'),
 ]

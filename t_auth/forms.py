@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 from .models import CustomUser
 from .utils import phone_regex
-
+from django.utils.translation import ugettext_lazy as _
 
 class CustomUserCreationForm(UserCreationForm):
     UserCreationForm.error_messages.update({
@@ -123,3 +123,26 @@ class NewUserSignUpForm(forms.Form):
                 code='password_mismatch',
             )
         return password2
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=255, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    error_messages = {
+            'invalid_login': _('The username credential is unknown.'),
+            'invalid_pass': _('Invalid password or PIN'),
+            'inactive': _('This account is inactive'),
+        }    
+
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'form-control' 
+        self.fields['password'].widget.attrs['class'] = 'form-control'
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if username:
+            count = CustomUser.objects.filter(username=username).count()
+            if count == 0:
+                self._errors['username'] = self.error_class([_("Invalid Username")])
+        return username

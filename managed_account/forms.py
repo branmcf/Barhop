@@ -1,6 +1,7 @@
 __author__ = 'nibesh'
 
 from django import forms
+from .models import Trigger
 
 COUNTRY_CHOICES = [('AU', 'Australia'), ('CA', 'Canada'), ('DK', 'Denmark'), ('FI', 'Finland'), ('IE', 'Ireland'),
                    ('NO', 'Norway'), ('SE', 'SWEDEN'), ('GB', 'United Kingdom'), ('US', 'United States')]
@@ -21,3 +22,8 @@ class BankAccountCreationForm(forms.Form):
 
 class ManagedAccountCreationForm(forms.Form):
     country = forms.ChoiceField(choices=COUNTRY_CHOICES, label='Country of Operation')
+
+class AddTriggerForm(forms.ModelForm):
+    class Meta:
+        model = Trigger
+        fields = ('trigger_name',)

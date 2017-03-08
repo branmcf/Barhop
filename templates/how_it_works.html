@@ -1,44 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- <head>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
 
-
-<link rel="stylesheet" href="static/css/style.css">
-</head>
-
-<nav role="navigation" class="navbar navbar-default navbar-fixed-top" style="background: #34495e">
-
-    <div class="navbar-header" style="color: white">
-        <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a href="/" class="navbar-brand" id="brand"><i><b>Barhop</b></i><sub> Alpha</sub></a>
-    </div>
-    
-
-    <div id="navbarCollapse" class="collapse navbar-collapse" style="color: white">
-        {% if not user.is_authenticated %}
-        <ul class="nav navbar-nav">
-            <li><a href="{%url 'how_it_works'%}" id="navlinks" >How it Works</a></li>
-            <li><a href="{%url 'about_us'%}" id="navlinks" >About Us</a></li>
-            <li><a href="{%url 'contact_us'%}" id="navlinks" >Contact Us</a></li>
-            <li><a href="https://medium.com/@Barhop" target="_blank" id="navlinks">Blog</a></li>
-        </ul>
-        {% endif %}
-        <ul class="nav navbar-nav navbar-right" style="color: #ffffff">
-            {% if user.is_authenticated %}
-            <li><a href="{%url 'profile'%}" id="navlinks">My Account</a></li>
-            {% else %}
-            <li><a href="{% url 'login' %}" id="navlinks">Login</a></li>
-            <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
-            {%endif%}
-        </ul>
-    </div>
-</nav> -->
 
 <div class="container1" style="color: #fff">
     <div class="row1">
@@ -64,42 +26,5 @@
         </div>
     </div>
 </div>
-<!--<div class="content2" style="background:#ffffff">
-    <br>
-    <br>
-    <span id="hiw">See how easy it is to get started below!</span>
-    <br>
-    <h2>1 - Text Your Order </h2>
-    <img src="/static/images/regmock.png" height="600" width="575">
-    <br>
-    <h2>2 - Confirm Payment </h2>
-    <img src="/static/images/stripemock.png" height="600" width="575">
-    <br>
-    <h2>3 - Enjoy Your Drink </h2>
-    <img src="/static/images/drinkdonemock.png" height="600" width="575">
-    <br>
-</div> -->
-
-<!-- <div class="content2" style="background:#ecf0f1">
-    <h5> How It Works </h5>
-
-    <p>
-
-    <h2>1 - Sign Up</h2>
-    <img src="/static/images/iphone_icon.png" height="250" width="300">
-    <br>
-
-    <h2>2 - Text Your Order</h2>
-    <br>
-    <br>
-    <img src="/static/images/text_icon.png" height="150" width="150">
-    <br>
-    <br>
-
-    <h2>3 - Enjoy Your Drink</h2>
-    <br>
-    <br>
-    <img src="/static/images/drink_icon.png" height="150" width="150">
-</div> -->
 
 {% endblock %}

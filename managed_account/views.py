@@ -4,16 +4,20 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 import stripe
+
 from django.contrib import messages
 from payment.models import PaymentModel
+from t_auth.utils import send_email_auth
 from t_auth.models import CustomUser, DealerEmployeMapping
 from trophy.models import TrophyModel
-from .models import BankAccount, ManagedAccount
-from .forms import BankAccountCreationForm, ManagedAccountCreationForm
+from .models import BankAccount, ManagedAccount, Trigger
+from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm
 from t_auth.forms import CustomUserCreationForm
-from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
+from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 import json
 
 @login_required
@@ -132,9 +136,80 @@ class BankingView(TemplateView):
 class GridView(TemplateView):
     template_name = "managed_account/grid.html"
 
-class TriggersView(TemplateView):
-    template_name = "managed_account/triggers.html"
+class TriggerView(FormView):
+    model = Trigger
+    form_class = AddTriggerForm
+    template_name = 'managed_account/triggers.html'
+    success_url = '.'
 
+    def get_context_data(self, **kwargs):
+        context = super(TriggerView, self).get_context_data(**kwargs)
+        context['trigger_data'] = Trigger.objects.filter(dealer=self.request.user)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            return self.form_valid(form, **kwargs)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+    def form_valid(self, form):
+        trigger_name = form.cleaned_data['trigger_name']
+        dealer = self.request.user
+        obj = Trigger(trigger_name=trigger_name,dealer=dealer)
+        obj.save()
+        return super(TriggerView, self).form_valid(form)
+
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(TriggerView, self).dispatch(*args, **kwargs)
+
+class TriggerEditView(View):
+    model = Trigger
+    success_url = '/accounts/triggers/'
+
+    def get(self,request,*args,**kwargs):
+        trigger_name = request.GET.get("trigger_name", "")
+        trigger_name = trigger_name.strip()
+        data = {}
+        if trigger_name:
+            try:
+                trigger = Trigger.objects.get(id=request.GET.get("trigger_id",""))
+                trigger.trigger_name = trigger_name
+                trigger.save()
+
+                data['status'] = 'success'
+                data['success_message'] = ''
+
+            except:
+
+                data['status'] = 'failed'
+                data['success_message'] = 'This name already exists'
+        else:
+            data['status'] = 'failed'
+            data['success_message'] = 'please enter a name'
+
+        return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(TriggerEditView, self).dispatch(*args, **kwargs)
+
+class TriggerDeleteView(DeleteView):
+    model = Trigger
+    template_name = 'managed_account/delete_trigger.html'
+    success_url = '/account/triggers/'
+
+    def post(self, *args, **kwargs):
+        return self.delete(*args, **kwargs)
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(TriggerDeleteView, self).dispatch(*args, **kwargs)
 
 class UsersView(FormView):
     template_name = "managed_account/users.html"
@@ -146,8 +221,7 @@ class UsersView(FormView):
         dealer = self.request.user
         context = self.get_context_data(**kwargs)
         context['form'] = form
-        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
-        # messages.success(request, "Successfully logged out.")        
+        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)            
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -160,6 +234,8 @@ class UsersView(FormView):
 
     def form_invalid(self, form, **kwargs):
         context = self.get_context_data(**kwargs)
+        dealer = self.request.user
+        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
         context['form'] = form
         return self.render_to_response(context)
 
@@ -168,17 +244,28 @@ class UsersView(FormView):
         context['form'] = form
         username = form.cleaned_data.get('username')
         email = form.cleaned_data.get('email')
-        password = form.cleaned_data.get('password')
+        password = form.cleaned_data.get('password1')
         dealer = self.request.user
 
         try :
-            user = CustomUser(username=username, email=email, is_active=False, is_staff=False)
+            user = CustomUser(username=username, email=email, is_active=True, is_staff=False)
             user.set_password(password)
             user.save()
-
             trophy = TrophyModel.objects.get(dealer=dealer)
-
             DealerEmployeMapping(dealer=dealer, employe=user, trophy_model=trophy, is_active=True).save()
+
+            # ------> mail to employe <------
+            ip = self.request.META.get('REMOTE_ADDR')
+            message_body = render_to_string('mail_template/mail_newEmploye.html',
+                {'dealer_name': dealer.username,
+                'ip':ip,
+                'username': username,
+                'password':password })
+            subject = 'Bar-Hope'
+            to_email = [email]
+            send_email_auth(subject,message_body,to_email)
+            #------------------------
+
         except:
             pass
         context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
@@ -222,11 +309,21 @@ class ChangePasswordView(View):
 
         try:
             user = CustomUser.objects.get(id=request.POST['user_id'])
-            user.set_password(request.POST['password'])
+            password = request.POST['password']
+            user.set_password(password)
             user.save()
             data['error_msg'] = ""
             data['success'] = "True"
             messages.success(request, "Password Changed Successfully.")
+
+            # ------> mail new password to employe <------
+            message_body = render_to_string('mail_template/mail_passwordchange.html',
+                {'username': user.username,
+                'password':password })
+            subject = 'Password Change'
+            to_email = [ user.email ]
+            send_email_auth(subject,message_body,to_email)
+            #------------------------
 
             for message in messages.get_messages(request):
                 django_messages.append({
