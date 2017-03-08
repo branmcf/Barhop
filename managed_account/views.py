@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import stripe
-
+from django.contrib import messages
 from payment.models import PaymentModel
 from t_auth.models import CustomUser, DealerEmployeMapping
 from trophy.models import TrophyModel
@@ -147,6 +147,7 @@ class UsersView(FormView):
         context = self.get_context_data(**kwargs)
         context['form'] = form
         context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
+        # messages.success(request, "Successfully logged out.")        
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -170,22 +171,18 @@ class UsersView(FormView):
         password = form.cleaned_data.get('password')
         dealer = self.request.user
 
-        # try :
-        user = CustomUser(username=username, email=email, is_active=False, is_staff=False)
-        user.set_password(password)
-        user.save()
+        try :
+            user = CustomUser(username=username, email=email, is_active=False, is_staff=False)
+            user.set_password(password)
+            user.save()
 
-        trophy = TrophyModel.objects.get(dealer=dealer)
+            trophy = TrophyModel.objects.get(dealer=dealer)
 
-        DealerEmployeMapping(dealer=dealer, employe=user, trophy_model=trophy, is_active=True).save()
-        # except:
-        #     pass
+            DealerEmployeMapping(dealer=dealer, employe=user, trophy_model=trophy, is_active=True).save()
+        except:
+            pass
         context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
         return self.render_to_response(context)
-
-        # idea_obj = form.save()
-        # idea_obj.status = '1'
-        # idea_obj.save()
 
 class DeleteEmployeView(View):
 
@@ -193,25 +190,80 @@ class DeleteEmployeView(View):
         context = super(DeleteEmployeView, self).get_context_data(**kwargs)
         return context
 
-    def post(self, request, *args, **kwargs):    
+    def post(self, request, *args, **kwargs):
+        data = {}
+        django_messages = []
         try:
             user_id = request.POST['data']
-            CustomUser.objects.get(id=user_id).delete()
-            message = "success"
-            return HttpResponse(json.dumps({'success': 'True', 'error_msg': message}), content_type='application/json')
-        except:
-            message = "something went WRONG"
-            return HttpResponse(json.dumps({'success': 'False', 'error_msg': message}), content_type='application/json')
+            employe = CustomUser.objects.get(id=user_id)
+            username = employe.username
+            employe.delete()
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Deleted Employe "+username)
 
-class changePasswordView(View):
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+class ChangePasswordView(View):
 
     def post(self, request):
+        data = {}
+        django_messages = []
+
         try:
             user = CustomUser.objects.get(id=request.POST['user_id'])
-            user.set_password(request.POST['password2'])
+            user.set_password(request.POST['password'])
             user.save()
-            message = "success"
-            return HttpResponse(json.dumps({'success': 'True', 'error_msg': message}), content_type='application/json')
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Password Changed Successfully.")
+
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+            return HttpResponse(json.dumps(data), content_type='application/json')
         except:
-            message = "something went WRONG"
-            return HttpResponse(json.dumps({'success': 'True', 'error_msg': message}), content_type='application/json')
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+class ChangeAccessLeveView(View):
+
+    def post(self, request):
+        data = {}
+        django_messages = []
+        try:
+            user = CustomUser.objects.get(id=request.POST['user_id'])
+            if user.is_staff:
+                user.is_staff = False
+            else:
+                user.is_staff = True
+            user.save()
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Employe : '"+user.username+"' Access Level Changed Successfully.")
+
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')

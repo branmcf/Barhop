@@ -2,27 +2,37 @@
 {% block content %}
 
   <div id="userContent">
-    <div>
+    <div>    
       <table id="mainTable" class="table">
             <thead><tr><th>Employee Name</th><th></th><th>Access Level</th><th></th></tr></thead>
             <tbody>
             {% for employe in employe_list %}
-              <tr>
+              <tr id="{{employe.employe.id}}" >
                 <td>{{employe.employe.username}}</td>
                 <td>
                   <button class="btn btn-danger" id="{{employe.employe.id}}" onclick="changePassword(this.id)">Change Password</button>
                 </td>
                 <td>
-                    {% if employe.employe.is_staff %}
-                    <label for="q1-y"><input type="radio" onclick="changeAccessLevel(this.id, this.value)"  name="{{employe.id}}" id="{{employe.id}}"  value="Team" /> Team</label>
-                    <label for="q1-y"><input type="radio" onclick="changeAccessLevel(this.id, this.value)" checked="checked"  name="{{employe.id}}" id="{{employe.id}}" value="Admin" /> Admin </label>
-                    {% else %}
-                    <label for="q1-y"><input type="radio" onclick="changeAccessLevel(this.id, this.value)" checked="checked" name="{{employe.id}}" id="{{employe.id}}" value="Team" /> Team</label>
-                    <label for="q1-y"><input type="radio" onclick="changeAccessLevel(this.id, this.value)"  name="{{employe.id}}" id="{{employe.id}}" value="Admin" /> Admin </label>
-                    {% endif %}      
-                                                                        
+                    
+                    <label for="q1-y"><input type="radio" onclick="changeAccessLevel(this.id)" 
+                      {% if not employe.employe.is_staff %}
+                        checked="checked"
+                      {% endif %}
+                     name="{{employe.employe.id}}" id="{{employe.employe.id}}"  value="Team" /> Team
+                     </label>
+
+                    <label for="q1-y"><input type="radio" onclick="changeAccessLevel(this.id)"
+                      {% if employe.employe.is_staff %}
+                        checked="checked"
+                      {% endif %}
+                    name="{{employe.employe.id}}" id="{{employe.employe.id}}" value="Admin" /> Admin 
+                    </label>
+
                 </td>
-                <td ><button class="btn btn-danger" id="{{employe.employe.id}}" onclick="deleteEmploy(this.id)" >Delete User</button> </td>
+                <td id="deleteUserBtn">                  
+                  <!-- <button class="btn btn-danger" id="{{employe.employe.id}}" onclick="deleteEmploye(this.id)" >Delete User</button> -->
+                  <a id="delete-btn" title="delete" href data-toggle="modal" data-target="#confirmModal"  onclick="delete_Employe({{employe.employe.id}})"> Delete </a>
+                   </td>
               </tr>
             {% endfor %}
             </tbody>
@@ -79,7 +89,6 @@
   </div>
   <!-- END MODAL -->
 
-
   <!-- Modal change password -->
   <div class="modal fade" id="changePasswordModal" role="dialog">
     <div class="modal-dialog">
@@ -95,51 +104,99 @@
               <span id="passwordvalidation" style="color: red;"></span>
               <input id="userIDField" type="hidden" name="user_id" />
             <div class="form-group">
-                <label for="id_username">New Password :</label>
-                <input id="password1" type="text" name="password1" class="form-control"
-                       placeholder="Username"/>
+              <label for="id_username">New Password :</label>
+              <input id="password1" type="text" name="password1" class="form-control"
+                     placeholder="Username"/>
             </div>
 
             <div class="form-group">
-                <label  for="id_username">Re-Enter New Password :</label>
-                <input id="password2" type="text" name="password2" class="form-control"
-                       placeholder=""/>
+              <label  for="id_username">Re-Enter New Password :</label>
+              <input id="password2" type="text" name="password2" class="form-control"
+                     placeholder=""/>
             </div>
             <br>
             <div class="v-wrap">
-                <button type="button" id="passwordChangeButton" class="btn btn-primary">Change Password</button>
+              <button type="button" id="passwordChangeButton" class="btn btn-primary">Change Password</button>
             </div>
           </form>
-
         </div>    
+      </div>
     </div>
   </div>
-  </div>
-  </div>
+  <!-- end modal -->
+
+</div>
+
+<!-- Modal Delete Employe -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content" id="triggerModalStyle">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Change Password</h4>
+        </div>
+        <div class="modal-body">
+          <span>Are You Sure To Delete This Employe.. ? </span>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button data-entity-id="" type="button" class="btn btn-primary remove_item">Delete</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<script>
+  function delete_Employe(delete_id)
+  {
+    $('.remove_item').attr('data-entity-id', delete_id);
+  }
+
+  $(".remove_item").click(function () {
+      var entityId = $(this).attr('data-entity-id');
+      var itemId = entityId;
+      $.ajax({
+        url: '{% url 'deleteEmploye' %}',
+        type:'POST',
+        data:{
+          'data': itemId,
+        },
+        success: function (data){
+           if(data["success"] == 'True' ){
+            $('table#mainTable tr#'+itemId).remove();
+            $('#confirmModal').modal('hide');
+            update_messages(data.messages);
+          }
+          else{
+            update_messages(data.error_msg);
+          }
+        }
+      });
+      return false;
+  });
+</script>
+
+
 <script>
   
-function changeAccessLevel(id, value){
-  console.log("changeAccessLevel")
-}
-
-function deleteEmploy(userid){
-  // alert(id);
-  $.ajax({
-    url: '{% url 'deleteEmploye' %}',
+function changeAccessLevel(radio_id){
+  console.log("changeAccessLevel");
+   $.ajax({
+    url: '{% url 'change_access_level' %}',
     type:'POST',
     data:{
-      'data': userid,
+      'user_id' : radio_id,    
     },
     success: function (data){
        if(data["success"] == 'True' ){
-        window.location=window.location;
-        console.log("success")
+        update_messages(data.messages);         
       }
       else{
-        alert(data['error_msg']);
+        update_messages(data.error_msg);
       }
     }
   });
+
 }
 
 function changePassword(userid){
@@ -147,35 +204,45 @@ function changePassword(userid){
   $('#changePasswordModal').modal('show');
 }
 
-</script>
 
-<script type="text/javascript">
-    $('#passwordChangeButton').click(function(){
-    var user_id = $('#userIDField').val();
-    var password1 = $('#password1').val();              
-    var password2 = $('#password2').val(); 
-    if (password2 == password1){
-       $.ajax({
-          url: '{% url 'change_password' %}',
-          type:'POST',
-          data:{
-            'user_id' : user_id,
-            'password': password2,      
-          },
-          success: function (data){
-             if(data["success"] == 'True' ){
-              window.location=window.location;
-              console.log("success")
-            }
-            else{
-              alert(data['error_msg']);
-            }
+$('#passwordChangeButton').click(function(){
+  var user_id = $('#userIDField').val();
+  var password1 = $('#password1').val();              
+  var password2 = $('#password2').val(); 
+  if (password2 == password1){
+     $.ajax({
+        url: '{% url 'change_password' %}',
+        type:'POST',
+        data:{
+          'user_id' : user_id,
+          'password': password2,      
+        },
+        success: function (data){
+           if(data["success"] == 'True' ){
+            $('#changePasswordModal').modal('hide');
+            update_messages(data.messages);         
           }
-        });
-     }
-     else{
-      document.getElementById("passwordvalidation").textContent="Password are not Same";
-     }
-    });
+          else{
+            update_messages(data.error_msg);
+          }
+        }
+      });
+   }
+   else{
+    document.getElementById("passwordvalidation").textContent="Password are not Same";
+   }
+});
+
+function update_messages(messages){
+  console.log("update message");
+  $(".message").html("");
+  $.each(messages, function (i, m) {
+      $(".message").append(m.message);
+  });  
+  $('.message').show();
+  setTimeout(function() {
+      $('.message').fadeOut('slow');
+  }, 5000);
+}
 </script>
 {% endblock %}
