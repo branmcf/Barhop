@@ -1,7 +1,7 @@
 __author__ = 'nibesh'
 
 from trophy.models import TrophyModel
-from t_auth.models import CustomUser, RefNewUser
+from t_auth.models import CustomUser, RefNewUser, Trigger
 
 
 def parse_sms(req):
@@ -46,4 +46,15 @@ def get_ref_user_by_mobile(mobile):
     try:
         return RefNewUser.objects.get(mobile=mobile)
     except RefNewUser.DoesNotExist:
+        return None
+
+def get_trigger_by_name(trigger):
+    """
+
+    :param trigger_name:
+    :return:
+    """
+    try:
+        return Trigger.objects.get(trigger_name=trigger)
+    except Trigger.DoesNotExist:
         return None

@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 import datetime
 
@@ -82,6 +81,7 @@ def sign_up(request):
 def activate_account(request, uidb64=None, token=None,
                      token_generator=default_token_generator):
     UserModel = get_user_model()
+    import pdb;pdb.set_trace()
     try:
         uid = urlsafe_base64_decode(uidb64)
         user = UserModel._default_manager.get(pk=uid)
@@ -93,32 +93,34 @@ def activate_account(request, uidb64=None, token=None,
         user.is_staff = True
         user.save()
 
-        trohpy = TrophyModel(dealer=user, message="Bar", default_order_response="default response", enabled=True).save()
-
-        acc = stripe.Account.create(country='US', managed=True)
-        ma = ManagedAccount(dealer=user, account_id=acc['id'], public_key=acc['keys']['publishable'], secret_key=acc['keys']['secret'])
-        ma.save()
-
         if user.is_ref_user:
             ref_user = RefNewUser.objects.get(mobile=user.mobile)
             dealer = ref_user.dealer
+
             try:
-                t = TrophyModel.objects.get(dealer=dealer, twilio_mobile=ref_user.dealer_mobile)
+                trophy_data = TrophyModel.objects.get(dealer=dealer)
             except TrophyModel.DoesNotExist:
                 return Http404
 
-            c = Conversation(dealer=dealer, customer=user, trophy=t)
+            c = Conversation(dealer=dealer, customer=user, trophy=trophy_data)
             c.save()
 
-            m = Message(conversation=c, message=ref_user.trophy, date=ref_user.date, direction=True)
+            m = Message(conversation=c, message=ref_user.trigger, date=ref_user.date, direction=True)
             m.save()
             message = 'Thanks for Signing Up.'
 
-            reply = t.message
+            reply = trophy_data.message
             message += reply
             m = Message(conversation=c, message=message, direction=False)
             m.save()
-            send_message(t.twilio_mobile, user.mobile, message)
+            send_message(settings.BARHOP_NUMBER, user.mobile, message)
+        else:
+            #For dealers only
+            trohpy = TrophyModel(dealer=user, message="Bar", default_order_response="default response", enabled=True).save()
+
+            acc = stripe.Account.create(country='US', managed=True)
+            ma = ManagedAccount(dealer=user, account_id=acc['id'], public_key=acc['keys']['publishable'], secret_key=acc['keys']['secret'])
+            ma.save()
 
         return render(request, 'authentication/sign_up_successful.html')
     return render(request, 'authentication/invalid_link.html')

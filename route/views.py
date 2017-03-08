@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 from twilio import twiml
 
@@ -9,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
 
 from t_auth.models import RefNewUser, CustomUser
+from trophy.models import TrophyModel
 
 from block.models import BlockModel
 
@@ -17,43 +17,57 @@ from lib.tw import send_new_user_message, send_message
 
 from route.forms import OrderReadyForm
 from route.models import Conversation, Message
-from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mobile, get_ref_user_by_mobile)
+from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mobile, get_ref_user_by_mobile, get_trigger_by_name)
 
 
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
+from django.conf import settings
 
 
 @require_POST
 @csrf_exempt
-def handle_sms(request, dealer_id):
+def handle_sms(request):
     """
 
     :param request:
     :return:
     """
-
+    import pdb;pdb.set_trace()
+    trigger = None
+    dealer_id = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)
 
-    r = twiml.Response()
-    trophy = get_trophy_by_twilio_mobile(dealer_id)
+    if body:
+        body = str(body)
+        if body.find('-') != -1:
+            trigger = body.split('-')[1]
+            trigger = trigger.strip()
 
-    if trophy is None:
+    r = twiml.Response()
+    
+    trigger_data = get_trigger_by_name(trigger)
+
+    if trigger_data is None:
         return HttpResponse(str(r))
 
-    dealer = trophy.dealer
+    dealer = trigger_data.dealer
+    try:
+        trophy = TrophyModel.objects.get(dealer=dealer)
+    except:
+        trophy = None
 
     customer = get_user_by_mobile(from_)
 
     if customer is None:
-        if body.lower() != trophy.trophy.lower():
+        if trigger.lower() != trigger_data.trigger_name.lower():
             return HttpResponse(str(r))
 
         ru = get_ref_user_by_mobile(from_)
         if ru:
             send_new_user_message(request, dealer_id, from_, ru.id)
         else:
-            a = RefNewUser(dealer=dealer, dealer_mobile=dealer_id, mobile=from_, trophy=body.lower())
+            a = RefNewUser(dealer=dealer, dealer_mobile=dealer_id, mobile=from_, trigger=trigger.lower())
             a.save()
             send_new_user_message(request, dealer_id, from_, a.id)
         return HttpResponse(str(r))

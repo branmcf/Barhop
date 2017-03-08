@@ -1,6 +1,6 @@
-{% extends 'index.html' %}
+{% extends "base.html" %}
 {% block content %}
-<div class="container">
+<div lass="container1" style="color: #fff">
     <div class="row">
         <div class="col-sm-6 col-sm-offset-3 form-box">
             <div class="form-top">
@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="form-bottom">
-                <form role="form" method="POST" action="{{ app_path }}">
+                <form role="form" style="color: #fff" method="POST" action="{{ app_path }}">
                         {% csrf_token %}
                     <input type="hidden" name="id" value="{{id}}">
                         <div class="form-group">
@@ -37,7 +37,7 @@
                         <br>
 
                         <div class="v-wrap">
-                            <button type="submit" id="cu-btn" class="btn login-btn vbox">Sign Up</button>
+                            <button type="submit" id="cu-btn" class="btn btn-primary vbox">Sign Up</button>
                         </div>
                 </form>
             </div>
