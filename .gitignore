@@ -1,0 +1,6 @@
+.idea
+*.pyc
+*.sqlite3
+*.jpg
+*.png
+.DS_Store
