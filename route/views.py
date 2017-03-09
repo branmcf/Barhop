@@ -49,6 +49,8 @@ def handle_sms(request):
 
     ##here we have to notify the client that there is no such trigger name.
     if trigger_data is None:
+        message = 'This trigger name does not exist'
+        send_message(dealer_id, from_, message)
         return HttpResponse(str(r))
 
     dealer = trigger_data.dealer
