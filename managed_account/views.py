@@ -144,7 +144,14 @@ class TriggerView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(TriggerView, self).get_context_data(**kwargs)
-        context['trigger_data'] = Trigger.objects.filter(dealer=self.request.user)
+        user = self.request.user
+        try:
+            employee_data = DealerEmployeMapping.objects.get(employe=user)
+            if employee_data:
+                dealer = employee_data.dealer
+        except:
+            dealer = user
+        context['trigger_data'] = Trigger.objects.filter(dealer=dealer)
         return context
 
     def post(self, request, *args, **kwargs):
