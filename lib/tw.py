@@ -20,7 +20,6 @@ def send_message(from_, to, message):
     :param message:
     :return:
     """
-    print from_, to, message
     client.messages.create(from_=from_, to=to, body=message)
 
 
@@ -33,7 +32,7 @@ def send_new_user_message(request, from_, to, ref_id):
     message = 'Welcome to Barhop, We see you are new ! Please Signup here. '
     url = get_current_url(request) + reverse('new_register')
     url += '?id=' + str(ref_id)
-    url = shorten(url)
+    #url = shorten(url)
     message += ' ' + url
     send_message(from_, to, message)
 
