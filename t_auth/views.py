@@ -118,7 +118,7 @@ def activate_account(request, uidb64=None, token=None,
         else:
 
             user.is_active = True
-            user.is_staff = False
+            user.is_staff = True
             user.save()
             #For dealers only
             trohpy = TrophyModel(dealer=user, message=user.username, default_order_response="Thanks for ordering.", enabled=True).save()
