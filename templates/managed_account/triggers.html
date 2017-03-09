@@ -35,17 +35,14 @@
 
   <div id="triggerContent">
     {% for trigger in trigger_data %}
-    <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
-      <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">{{ trigger.trigger_name }}</div>
-      <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">
-          <a href="" class="edit_trigger" data-id={{trigger.id}} data-text={{trigger.trigger_name}} data-toggle="modal" data-target="#editTriggerModal">Edit</a> /
-          <a href="{% url 'managed_account:delete_trigger' trigger.id %}" >Delete</a>
+      <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
+        <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">{{ trigger.trigger_name }}</div>
+        <div class="col-md-4" style="background: #444954; height:100%; padding-top:3%; border-left:2px solid white;">
+            <a href="" class="edit_trigger" data-id={{trigger.id}} data-text={{trigger.trigger_name}} data-toggle="modal" data-target="#editTriggerModal">Edit</a> /
+            <a href="{% url 'managed_account:delete_trigger' trigger.id %}" >Delete</a>
+        </div>
       </div>
-    </div>
-
-      {% empty %}
-        No triggers yet.
-      {% endfor %}
+    {% endfor %}
       <button type="button" class="btn" id="saveGridBtn" data-toggle="modal" data-target="#addTriggerModal" style="margin-top: 20px;">Add Trigger</button>
 
   <!-- Modal Add Trigger -->

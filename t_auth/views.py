@@ -87,11 +87,13 @@ def activate_account(request, uidb64=None, token=None,
         user = None
 
     if user is not None and user.is_active is False and token_generator.check_token(user, token):
-        user.is_active = True
-        user.is_staff = True
-        user.save()
-
+        
         if user.is_ref_user:
+
+            user.is_active = True
+            user.is_staff = False
+            user.save()
+
             ref_user = RefNewUser.objects.get(mobile=user.mobile)
             dealer = ref_user.dealer
 
@@ -108,13 +110,18 @@ def activate_account(request, uidb64=None, token=None,
             message = 'Thanks for Signing Up.'
 
             reply = trophy_data.message
-            message += reply
+            message = reply
             m = Message(conversation=c, message=message, direction=False)
             m.save()
             send_message(settings.BARHOP_NUMBER, user.mobile, message)
+
         else:
+
+            user.is_active = True
+            user.is_staff = False
+            user.save()
             #For dealers only
-            trohpy = TrophyModel(dealer=user, message="Bar", default_order_response="default response", enabled=True).save()
+            trohpy = TrophyModel(dealer=user, message=user.username, default_order_response="Thanks for ordering.", enabled=True).save()
 
             acc = stripe.Account.create(country='US', managed=True)
             ma = ManagedAccount(dealer=user, account_id=acc['id'], public_key=acc['keys']['publishable'], secret_key=acc['keys']['secret'])

@@ -32,7 +32,7 @@ def handle_sms(request):
 
     :param request:
     :return:
-    """
+    """    
     trigger = None
     dealer_id = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)
@@ -47,10 +47,12 @@ def handle_sms(request):
     
     trigger_data = get_trigger_by_name(trigger)
 
+    ##here we have to notify the client that there is no such trigger name.
     if trigger_data is None:
         return HttpResponse(str(r))
 
     dealer = trigger_data.dealer
+
     try:
         trophy = TrophyModel.objects.get(dealer=dealer)
     except:
@@ -66,9 +68,10 @@ def handle_sms(request):
         if ru:
             send_new_user_message(request, dealer_id, from_, ru.id)
         else:
-            a = RefNewUser(dealer=dealer, dealer_mobile=dealer_id, mobile=from_, trigger=trigger.lower())
-            a.save()
-            send_new_user_message(request, dealer_id, from_, a.id)
+            ref_user = RefNewUser(dealer=dealer, dealer_mobile=dealer_id, mobile=from_, trigger=trigger.lower())
+            ref_user.save()
+            #Send mail to user for signup
+            send_new_user_message(request, dealer_id, from_, ref_user.id)
         return HttpResponse(str(r))
 
     if customer.is_active is False:

@@ -91,7 +91,7 @@ class RefNewUser(models.Model):
     dealer = models.ForeignKey(CustomUser, related_name='user_creator')
     dealer_mobile = models.CharField(max_length=15)
     mobile = models.CharField(max_length=15)
-    trophy = models.CharField(max_length=30)
+    trigger = models.CharField(max_length=30)
     date = models.DateTimeField(default=timezone.now)
 
     class Meta:

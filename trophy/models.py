@@ -1,3 +1,4 @@
+
 __author__ = 'nibesh'
 
 from django.db import models
@@ -19,16 +20,3 @@ class TrophyModel(models.Model):
         verbose_name = 'Trophy'
         verbose_name_plural = 'Trophies'
 
-
-class Trigger(models.Model):    
-    dealer = models.ForeignKey('t_auth.CustomUser', related_name='delear_triggers')
-    trigger_name = models.CharField(max_length=250)    
-    active = models.BooleanField(default=True)    
-
-    def __str__(self):        
-        return self.trigger_name
-
-    class Meta:
-        db_table = 'trigger'
-        verbose_name = 'Trigger'
-        verbose_name_plural = 'Triggers'
