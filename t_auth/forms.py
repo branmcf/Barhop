@@ -141,7 +141,11 @@ class LoginForm(forms.Form):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        if username:
+        if '@' in username:
+            count = CustomUser.objects.filter(email=username).count()
+            if count == 0:
+                self._errors['username'] = self.error_class([_("Invalid Mail-ID")])
+        else:
             count = CustomUser.objects.filter(username=username).count()
             if count == 0:
                 self._errors['username'] = self.error_class([_("Invalid Username")])

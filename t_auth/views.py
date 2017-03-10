@@ -20,7 +20,7 @@ from lib.image_handler import is_image, is_valid_image, ProfileImageUploader
 from t_auth import forms
 from t_auth import utils
 
-from django.contrib.auth import login,logout, authenticate
+from django.contrib.auth import login,logout, authenticate, get_user_model
 from django.contrib import messages
 
 from t_auth.models import RefNewUser, CustomUser
@@ -137,12 +137,26 @@ class LoginView(View):
         form = LoginForm()
         return render(request, self.template_name, {'form':form})
 
+    def authenticate_user(self, username=None, password=None):
+        
+        if '@' in username:
+            kwargs = {'email': username}
+        else:
+            kwargs = {'username': username}
+        try:
+            user = CustomUser.objects.get(**kwargs)
+            if user.check_password(password):
+                return user
+        except:
+            return None
+
     def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
+            user = self.authenticate_user(username=username, password=password)
+            user = authenticate(username=user.username, password=password)
             if user is not None:
                 if user.is_authenticated() and user.is_ref_user == False: 
                     if user.is_active :
