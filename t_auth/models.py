@@ -38,9 +38,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     mobile = models.CharField(_('Mobile'), max_length=15, null=True, blank=True, validators=[phone_regex])
-    # twilio_mobile = models.CharField(max_length=15, blank=True, null=True)
 
     is_ref_user = models.BooleanField(default=False)
+
+    is_dealer = models.BooleanField(default=False)
 
     profile_image = models.CharField(max_length=50, default='default_avatar.png', blank=True)
 
@@ -100,6 +101,7 @@ class RefNewUser(models.Model):
 class DealerEmployeMapping(models.Model):
     dealer = models.ForeignKey(CustomUser, related_name='dealer_mapping')
     employe = models.ForeignKey(CustomUser, related_name='employee_mapping')
+    created_by = models.ForeignKey(CustomUser, related_name='user_created_by')
     trophy_model = models.ForeignKey('trophy.TrophyModel')
     is_active = models.BooleanField(_('active'), default=True)
 

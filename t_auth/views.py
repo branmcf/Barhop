@@ -68,6 +68,7 @@ def sign_up(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
+            user.is_dealer = True
             user.save()
             utils.send_email_verification(request, user)
             return render(request, 'authentication/email_sent.html')
@@ -119,6 +120,7 @@ def activate_account(request, uidb64=None, token=None,
 
             user.is_active = True
             user.is_staff = True
+            user.is_dealer = True
             user.save()
             #For dealers only
             trohpy = TrophyModel(dealer=user, message=user.username, default_order_response="Thanks for ordering.", enabled=True).save()
@@ -157,14 +159,9 @@ class LoginView(View):
             password = form.cleaned_data['password']
             user = self.authenticate_user(username=username, password=password)
             user = authenticate(username=user.username, password=password)
-            if user is not None:
-                if user.is_authenticated() and user.is_ref_user == False: 
-                    if user.is_active :
-                        login(request, user)
-                        return HttpResponseRedirect('/')
-                    else:
-                        messages.success(request, "Sorry, you are not a Authorized user.")
-                        return render(self.request,self.template_name,{'form':form})
+            if user is not None and user.is_authenticated() and user.is_ref_user == False and user.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/')
             else:
                 messages.success(request, "Sorry, you are not a Authorized user.")
                 return render(self.request,self.template_name,{'form':form})

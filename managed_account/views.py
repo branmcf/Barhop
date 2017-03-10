@@ -226,6 +226,7 @@ class UsersView(FormView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         user = self.request.user
+
         try:
             employee_data = DealerEmployeMapping.objects.get(employe=user)
             if employee_data:
@@ -235,7 +236,7 @@ class UsersView(FormView):
 
         context = self.get_context_data(**kwargs)
         context['form'] = form
-        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)            
+        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True).exclude(employe__id=user.id)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -259,14 +260,23 @@ class UsersView(FormView):
         username = form.cleaned_data.get('username')
         email = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password1')
-        dealer = self.request.user
+        login_user = self.request.user
+
 
         try :
             user = CustomUser(username=username, email=email, is_active=True, is_staff=False)
             user.set_password(password)
             user.save()
+
+            # checking user type 
+            if login_user.is_dealer:
+                dealer = login_user
+            else:
+                user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+                dealer = user_mapping_obj.dealer
+
             trophy = TrophyModel.objects.get(dealer=dealer)
-            DealerEmployeMapping(dealer=dealer, employe=user, trophy_model=trophy, is_active=True).save()
+            DealerEmployeMapping(dealer=dealer, employe=user, trophy_model=trophy,created_by=login_user, is_active=True).save()
 
             # ------> mail to employe <------
             ip = self.request.META.get('REMOTE_ADDR')
@@ -301,7 +311,7 @@ class DeleteEmployeView(View):
             employe.delete()
             data['error_msg'] = ""
             data['success'] = "True"
-            messages.success(request, "Deleted Employe "+username)
+            messages.success(request, "Successfully deleted the employe "+username)
 
             for message in messages.get_messages(request):
                 django_messages.append({

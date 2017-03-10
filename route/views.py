@@ -34,7 +34,7 @@ def handle_sms(request):
     :return:
     """    
     trigger = None
-    dealer_id = settings.BARHOP_NUMBER
+    vendor_number = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)
 
     if body:
@@ -50,7 +50,7 @@ def handle_sms(request):
     ##here we have to notify the client that there is no such trigger name.
     if trigger_data is None:
         message = 'This trigger name does not exist'
-        send_message(dealer_id, from_, message)
+        send_message(vendor_number, from_, message)
         return HttpResponse(str(r))
 
     dealer = trigger_data.dealer
@@ -68,12 +68,12 @@ def handle_sms(request):
 
         ru = get_ref_user_by_mobile(from_)
         if ru:
-            send_new_user_message(request, dealer_id, from_, ru.id)
+            send_new_user_message(request, vendor_number, from_, ru.id)
         else:
-            ref_user = RefNewUser(dealer=dealer, dealer_mobile=dealer_id, mobile=from_, trigger=trigger.lower())
+            ref_user = RefNewUser(dealer=dealer, dealer_mobile=vendor_number, mobile=from_, trigger=trigger.lower())
             ref_user.save()
             #Send mail to user for signup
-            send_new_user_message(request, dealer_id, from_, ref_user.id)
+            send_new_user_message(request, vendor_number, from_, ref_user.id)
         return HttpResponse(str(r))
 
     if customer.is_active is False:
