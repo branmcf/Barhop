@@ -28,7 +28,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
                                     'unique': _("A user with that username already exists."),
                                 })
 
-    email = models.EmailField(_('email address'), unique=True, blank=False, null=False)
+    email = models.EmailField(_('email address'), unique=True, blank=True, null=True)
     is_staff = models.BooleanField(_('staff status'), default=False,
                                    help_text=_('Designates whether the user can log into this admin '
                                                'site.'))

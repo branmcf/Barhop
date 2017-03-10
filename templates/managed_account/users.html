@@ -1,7 +1,7 @@
 {% extends "base_inner.html" %}
 {% block content %}
 
-  <div id="userContent">
+  <div id="userContent" style="overflow-y:auto;">
     <div>    
       <table id="mainTable" class="table table-fixed">
             <thead><tr><th>Employee Name</th><th></th><th>Access Level</th><th></th></tr></thead>
@@ -59,13 +59,13 @@
                        placeholder="Username"/>
                 <div  class="errormsg">{{ form.username.errors }}</div>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="id_username">Employe Email :</label>                
                 <input for="id_mobile" type="text" name="email" class="form-control"
                        value="{% if form.email.value %}{{form.email.value}}{% endif %}"
                        placeholder="Email"/>
                 <div  class="errormsg">{{ form.email.errors }}</div>
-            </div>
+            </div> -->
             <div class="form-group">
                 <label for="id_username">Password :</label>                
                 <input for="id_password1" type="password" name="password1" class="form-control"

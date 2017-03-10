@@ -250,7 +250,7 @@ class UsersView(FormView):
     def form_invalid(self, form, **kwargs):
         context = self.get_context_data(**kwargs)
         dealer = self.request.user
-        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
+        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True).exclude(employe__id=user.id)
         context['form'] = form
         return self.render_to_response(context)
 
@@ -279,20 +279,21 @@ class UsersView(FormView):
             DealerEmployeMapping(dealer=dealer, employe=user, trophy_model=trophy,created_by=login_user, is_active=True).save()
 
             # ------> mail to employe <------
-            ip = self.request.META.get('REMOTE_ADDR')
-            message_body = render_to_string('mail_template/mail_newEmploye.html',
-                {'dealer_name': dealer.username,
-                'ip':ip,
-                'username': username,
-                'password':password })
-            subject = 'Bar-Hope'
-            to_email = [email]
-            send_email_auth(subject,message_body,to_email)
+            # ip = self.request.META.get('REMOTE_ADDR')
+            # message_body = render_to_string('mail_template/mail_newEmploye.html',
+            #     {'dealer_name': dealer.username,
+            #     'ip':ip,
+            #     'username': username,
+            #     'password':password })
+            # subject = 'Bar-Hope'
+            # to_email = [email]
+            # send_email_auth(subject,message_body,to_email)
             #------------------------
 
         except:
             pass
-        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True)
+            
+        context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True).exclude(employe=login_user)
         return self.render_to_response(context)
 
 class DeleteEmployeView(View):
@@ -341,12 +342,12 @@ class ChangePasswordView(View):
             messages.success(request, "Password Changed Successfully.")
 
             # ------> mail new password to employe <------
-            message_body = render_to_string('mail_template/mail_passwordchange.html',
-                {'username': user.username,
-                'password':password })
-            subject = 'Password Change'
-            to_email = [ user.email ]
-            send_email_auth(subject,message_body,to_email)
+            # message_body = render_to_string('mail_template/mail_passwordchange.html',
+            #     {'username': user.username,
+            #     'password':password })
+            # subject = 'Password Change'
+            # to_email = [ user.email ]
+            # send_email_auth(subject,message_body,to_email)
             #------------------------
 
             for message in messages.get_messages(request):

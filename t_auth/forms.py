@@ -31,6 +31,8 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
+        if email in (None,''):
+            return None
         try:
             CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
