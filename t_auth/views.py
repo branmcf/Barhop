@@ -158,10 +158,14 @@ class LoginView(View):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = self.authenticate_user(username=username, password=password)
-            user = authenticate(username=user.username, password=password)
-            if user is not None and user.is_authenticated() and user.is_ref_user == False and user.is_active:
-                login(request, user)
-                return HttpResponseRedirect('/')
+            if user:
+                user = authenticate(username=user.username, password=password)
+           	if user is not None and user.is_authenticated() and user.is_ref_user == False and user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect('/')
+            	else:
+                    messages.success(request, "Sorry, you are not a Authorized user.")
+                    return render(self.request,self.template_name,{'form':form})
             else:
                 messages.success(request, "Sorry, you are not a Authorized user.")
                 return render(self.request,self.template_name,{'form':form})

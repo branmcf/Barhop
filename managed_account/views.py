@@ -249,7 +249,7 @@ class UsersView(FormView):
 
     def form_invalid(self, form, **kwargs):
         context = self.get_context_data(**kwargs)
-        dealer = self.request.user
+        user = self.request.user
         context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True).exclude(employe__id=user.id)
         context['form'] = form
         return self.render_to_response(context)
