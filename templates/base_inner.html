@@ -43,7 +43,7 @@
         {% if request.user.is_staff %}
         <li><a href="/account" >Account</a></li>
         {% endif %}
-        <li><a onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
+        <li><a href="#" onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
         >Logout</a></li>
       </ul>
     </div>
