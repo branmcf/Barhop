@@ -30,6 +30,7 @@ class Trigger(models.Model):
     dealer = models.ForeignKey(CustomUser)
     trigger_name = models.CharField(max_length=250, unique=True)
     active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(CustomUser, related_name='trigger_created_by')
 
     def __str__(self):
         return self.trigger_name

@@ -164,8 +164,15 @@ class TriggerView(FormView):
 
     def form_valid(self, form):
         trigger_name = form.cleaned_data['trigger_name']
-        dealer = self.request.user
-        obj = Trigger(trigger_name=trigger_name,dealer=dealer)
+        login_user = self.request.user
+
+        if login_user.is_dealer:
+            dealer = login_user
+        else:
+            user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+            dealer = user_mapping_obj.dealer
+
+        obj = Trigger(trigger_name=trigger_name, dealer=dealer, created_by=login_user )
         obj.save()
         return super(TriggerView, self).form_valid(form)
 
