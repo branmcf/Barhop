@@ -80,7 +80,6 @@ def sign_up(request):
 @require_GET
 def activate_account(request, uidb64=None, token=None,
                      token_generator=default_token_generator):
-    import pdb;pdb.set_trace()
     UserModel = get_user_model()
     try:
         uid = urlsafe_base64_decode(uidb64)
