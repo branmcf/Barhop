@@ -15,9 +15,9 @@ from lib.tw import send_price_message, send_message
 
 from t_auth.models import CustomUser
 
-from managed_account.models import ManagedAccount
+from .models import ManagedAccountStripeCredentials
 
-from .models import PaymentModel, TwilioPurchaseModel, RevenueModel
+from .models import PaymentModel, RevenueModel
 from .forms import PriceSubmissionForm
 
 from route.models import Conversation, Message
@@ -44,8 +44,8 @@ def send_price(request):
 
     form = PriceSubmissionForm(request.POST)
     try:
-        ManagedAccount.objects.get(dealer=user)
-    except ManagedAccount.DoesNotExist:
+        ManagedAccountStripeCredentials.objects.get(dealer=user)
+    except ManagedAccountStripeCredentials.DoesNotExist:
         form.add_error('detail', 'Please add Bank Account first in your profile.')
         return json_response(success=False, errors=form.errors)
 
@@ -104,7 +104,7 @@ def process_payment(request):
         try:
             dealer = o.dealer
             customer = o.customer
-            ma = ManagedAccount.objects.get(dealer=dealer)
+            ma = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
             stripe_account = ma.account_id
             res = stripe.Charge.create(amount=d_amount, currency='usd', source=stripe_token, description=o.detail,
                                        application_fee=application_fee, stripe_account=stripe_account,
@@ -161,42 +161,3 @@ def process_payment(request):
     return render(request, 'payment/payment.html', {'data': data})
 
 
-@login_required
-def twilio_payment(request):
-    if request.method == 'POST':
-        try:
-            _id = int(request.POST['id'])
-            o = TwilioPurchaseModel.objects.get(pk=_id, processed=False)
-        except (ValueError, TwilioPurchaseModel.DoesNotExist):
-            raise Http404
-
-        stripe_token = request.POST['stripeToken']
-        stripe_token_type = request.POST['stripeTokenType']
-        stripe_email = request.POST['stripeEmail']
-        try:
-            res = stripe.Charge.create(amount=o.amount, currency='usd', source=stripe_token, description=o.detail)
-        except stripe.error.CardError:
-            return render(request, 'payment/payment_failed.html', {'_id': _id})
-
-        o.stripeToken = stripe_token
-        o.stripeTokenType = stripe_token_type
-        o.stripeEmail = stripe_email
-        o.charge_id = res.id
-        o.processed = True
-        o.save()
-
-    try:
-        _id = int(request.GET.get('id'))
-        o = TwilioPurchaseModel.objects.get(pk=_id, processed=False)
-    except (ValueError, TwilioPurchaseModel.DoesNotExist):
-        raise Http404
-
-    data = {
-        'id': _id,
-        'data_key': settings.STRIPE_PUBLIC_KEY,
-        'data_amount': o.amount,
-        'data_name': 'Barhop',
-        'data_description': o.detail,
-    }
-
-    return render(request, 'payment/twilio_payment.html', {'data': data})

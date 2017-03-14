@@ -1,46 +1,58 @@
-__author__ = 'nibesh'
-
 from django.db import models
 from django.utils import timezone
 
 from t_auth.models import CustomUser
 from trophy.models import TrophyModel
+from managed_account.models import PurchaseOrder
+
+class StripeData(models.Model):
+    secret_key = models.CharField(max_length=200, null=False, blank=False)
+    client_id = models.CharField(max_length=200, null=False, blank=False)
+ 
+    class Meta:
+        verbose_name = 'Stripe Credentials'
+        verbose_name_plural = 'Stripe Credentials'
+
+
+class ManagedAccountStripeCredentials(models.Model):
+    dealer = models.ForeignKey(CustomUser)
+    publishable_key = models.CharField(max_length=500, null=True, blank=True)
+    livemode = models.BooleanField()
+    access_token = models.CharField(max_length=500, null=True, blank=True)
+    scope = models.CharField(max_length=200, null=True, blank=True)
+    refresh_token = models.CharField(max_length=500, null=True, blank=True)
+    account_user_id = models.CharField(max_length=300, null=True, blank=True)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __unicode__(self):
+        return "%s" % (self.access_token)
+
+    class Meta:
+        verbose_name = 'ManagedAccountStripeCredentials'
+        verbose_name_plural = 'ManagedAccountStripeCredentials'
 
 
 class PaymentModel(models.Model):
+    order = models.ForeignKey(PurchaseOrder, related_name='order')
     dealer = models.ForeignKey(CustomUser, related_name='dealer')
     customer = models.ForeignKey(CustomUser, related_name='customer')
-    trophy = models.ForeignKey(TrophyModel)
-    date = models.DateTimeField(default=timezone.now)
-    amount = models.IntegerField(help_text='Amount in cents')
+    charge_id = models.CharField(max_length=40, blank=True, null=True)
+    payment_date = models.DateTimeField(default=timezone.now)
+    total_amount = models.FloatField(help_text='Amount in cents')
+    order_amount = models.FloatField(help_text='Atual item amount')
     sales_tax = models.IntegerField(help_text='Amounts in cents', default=0)
     tip = models.IntegerField(help_text='Tip in Cents', default=0)
     detail = models.TextField(max_length=200)
     stripeToken = models.CharField(max_length=30, blank=True, null=True)
     stripeTokenType = models.CharField(max_length=15, blank=True, null=True)
     stripeEmail = models.EmailField(blank=True, null=True)
-    charge_id = models.CharField(max_length=40, blank=True, null=True)
+    bill_number = models.CharField(max_length=200, null=True, blank=True)
     processed = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Customer Payment'
         verbose_name_plural = 'Customer Payments'
         db_table = 'payment'
-
-class TwilioPurchaseModel(models.Model):
-    buyer = models.ForeignKey(CustomUser, related_name='buyer')
-    date = models.DateTimeField(default=timezone.now)
-    amount = models.IntegerField(help_text='Amount in cents')
-    detail = models.TextField(max_length=200)
-    stripeToken = models.CharField(max_length=30, blank=True, null=True)
-    stripeTokenType = models.CharField(max_length=15, blank=True, null=True)
-    stripeEmail = models.EmailField(blank=True, null=True)
-    charge_id = models.CharField(max_length=40, blank=True, null=True)
-    processed = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'twilio_payment'
-
 
 class RevenueModel(models.Model):
     dealer = models.ForeignKey(CustomUser)

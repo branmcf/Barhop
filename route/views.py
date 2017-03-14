@@ -33,6 +33,7 @@ def handle_sms(request):
     :param request:
     :return:
     """    
+    import pdb;pdb.set_trace()
     trigger = None
     vendor_number = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)

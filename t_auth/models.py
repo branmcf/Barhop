@@ -1,5 +1,3 @@
-__author__ = 'nibesh'
-
 from django.db import models
 from django.utils import timezone
 from django.core import validators
@@ -8,11 +6,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 from t_auth.utils import phone_regex
-# from lib import mails
 from django.core.mail import send_mail
-
-# from trophy.models import TrophyModel
-
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(_('username'), max_length=30, unique=True,

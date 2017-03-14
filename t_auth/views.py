@@ -27,7 +27,7 @@ from t_auth.models import RefNewUser, CustomUser
 from route.models import Conversation, Message
 from trophy.models import TrophyModel
 from t_auth.forms import LoginForm
-from managed_account.models import ManagedAccount
+from payment.models import ManagedAccountStripeCredentials
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -80,6 +80,7 @@ def sign_up(request):
 @require_GET
 def activate_account(request, uidb64=None, token=None,
                      token_generator=default_token_generator):
+    import pdb;pdb.set_trace()
     UserModel = get_user_model()
     try:
         uid = urlsafe_base64_decode(uidb64)
@@ -125,9 +126,9 @@ def activate_account(request, uidb64=None, token=None,
             #For dealers only
             trohpy = TrophyModel(dealer=user, message=user.username, default_order_response="Thanks for ordering.", enabled=True).save()
 
-            acc = stripe.Account.create(country='US', managed=True)
-            ma = ManagedAccount(dealer=user, account_id=acc['id'], public_key=acc['keys']['publishable'], secret_key=acc['keys']['secret'])
-            ma.save()
+            # acc = stripe.Account.create(country='US', managed=True)
+            # ma = ManagedAccountStripeCredentials(dealer=user, account_user_id=acc['id'], publishable_key=acc['keys']['publishable'], secret_key=acc['keys']['secret'])
+            # ma.save()
 
         return render(request, 'authentication/sign_up_successful.html')
     return render(request, 'authentication/invalid_link.html')
