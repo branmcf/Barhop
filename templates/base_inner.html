@@ -10,6 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="img/png" href="/static/images/barhop_icon.png">
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
+  <script src="/static/js/mindmup-editabletable.js"></script>
 </head>
 
 <body>
@@ -41,7 +42,8 @@
     <div class="collapse navbar-collapse" id="navData">
       <ul class="nav navbar-nav" id="rightUl">
         {% if request.user.is_staff %}
-        <li><a href="/account" >Account</a></li>
+        <li><a href="/account" >Account</a></li>        
+        <!-- <li><a href="/account/menu" >Menu</a></li> -->
         {% endif %}
         <li><a href="#" onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
         >Logout</a></li>

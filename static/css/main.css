@@ -195,8 +195,9 @@ body{
 }
 
 
-#unassignedOrderTicketText{
+.unassignedOrderTicketText{
   height:100%;
+  font-size: 12px;
 /*  background: orange;*/
 }
 
@@ -216,7 +217,7 @@ body{
   width: 100%;
 }
 
-#unassignedOrderTicketRow{
+.unassignedOrderTicketRow{
   height:100%;
 /*  background: green;*/
 }
@@ -226,7 +227,7 @@ body{
 /*  background: green;
 */}
 
-#unassignedOrderTicketRow a{
+.unassignedOrderTicketRow a{
   color:white;
 }
 
@@ -234,12 +235,12 @@ body{
   color:white;
 }
 
-#orderReadyCol{
+.orderReadyCol{
   height: 100%;
   background:#1f381b;
 }
 
-#closeOrderCol{
+.closeOrderCol{
   height: 50%;
   background:#560e17;
   width: 100%
@@ -276,7 +277,7 @@ body{
   border:2px solid white;
 }
 
-#triggerModalRow{
+.triggerModalRow{
   background: rgba(255,255,255,0.2);
   height: 50px;
  /* border: 2px solid white;*/
@@ -456,6 +457,11 @@ body{
   border-radius: 0px;
 }
 
+.saveGridBtn{
+  background: #e82500;
+  border-radius: 0px;
+}
+
 
 /*BANKING ROUTE*/
 #bankingContent{
@@ -530,7 +536,9 @@ body{
 #mainTable{
   background: rgba(255,255,255,0.2);
 }
-
+#mainTable tr{
+  height:40px;
+} 
 /*TRIGGER ROUTE*/
 #triggerContent{
   height: 60vh;
