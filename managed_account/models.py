@@ -31,6 +31,7 @@ class MenuItems(models.Model):
     item_name = models.CharField(max_length=800, null=False, blank=False)
     item_price = models.FloatField(null=True, blank=True)
     quantity_available = models.PositiveIntegerField(default=0, blank=True, null=True)
+    created_by = models.ForeignKey(CustomUser, related_name='menu_created_by', blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -45,7 +46,8 @@ class PurchaseOrder(models.Model):
     order_code = models.CharField(max_length=250, unique=True)
     dealer = models.ForeignKey(CustomUser, related_name = "purchase_order_dealer", blank=True, null=True)
     customer = models.ForeignKey(CustomUser, related_name = "purchase_order_customer", blank=True, null=True)
-    menu = models.ForeignKey(MenuItems, null=True, blank=True)
+    trigger = models.ForeignKey(Trigger,blank=True, null=True)
+    menu_item = models.ForeignKey(MenuItems, null=True, blank=True)
     order_status = models.CharField(_('Status'), choices=ORDER_CHOICES, max_length=10)
     total_amount_paid = models.FloatField(blank=True, null=True)
     created = models.DateTimeField(default=timezone.now)
