@@ -8,7 +8,7 @@
 
         {% for order in purchase_paid_orders %}
         <div class="row" id="unassignedOrderRow" style="overflow:auto;">
-          <div class="col-md-10 col-md-offset-1 asd" id="unassignedOrderTicket">
+          <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">
 
             <div class="row unassignedOrderTicketRow" id="orderDataList">
               <div class="col-md-10 unassignedOrderTicketText" id="">
@@ -59,10 +59,7 @@
           </div>
         </div>
         {% endfor %}
-
-
       </div>
-
     </div> <!-- order view-->
   </div> <!-- main row-->
 
@@ -71,9 +68,11 @@
     Logged in @trigger
   </div>
   <div class="col-md-4" id="changeTrigger">
-    <a id="ctid" data-toggle="modal" data-target="#myTriggerModal">Change Trigger</a>
+    <a id="ctid" data-toggle="modal" data-target="#myTriggerModal" class="btn btn-primary">Change Trigger</a>
+  </div>
+</div>
 
-    <!-- Modal -->
+  <!-- Modal -->
   <div class="modal fade" id="myTriggerModal" role="dialog">
     <div class="modal-dialog">
       <!-- Modal content-->
@@ -84,21 +83,15 @@
         </div>
         <div class="modal-body">
           {% for trigger in triggers %}
-          <div class="row triggerModalRow" id={{trigger.id}}>
-            <a href="/?trigger={{trigger.id}}">{{trigger.trigger_name}}</a>
+          <div class="row" id={{trigger.id}}>
+            <a href="/?trigger={{trigger.id}}" class="btn btn-link">{{trigger.trigger_name}}</a>
           </div>
           {% endfor %}
-        </div>
-<!--         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div> -->
-      
+        </div>      
+      </div>
     </div>
   </div>
-  </div>
   <!-- END MODAL -->
-</div>
 <script type="text/javascript">
   $('.orderReadyCol').click(function(event){
     order_id = $(this).attr('id');
@@ -117,7 +110,6 @@
         }
       }
     });
-
   });
 
   $('.closeOrderCol').click(function(event){
@@ -137,9 +129,7 @@
         }
       }
     });
-
   });
-
 
 </script>
 
