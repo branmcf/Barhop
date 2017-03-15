@@ -6,8 +6,7 @@ from django.contrib.auth import views
 from . import views as account_view
 from .views import *
 
-urlpatterns = [ 
-    url(r'^$', account_view.account_home, name='accounts_details'),
+urlpatterns = [
     url(r'^account_status/$', account_view.account_status, name='account_status'),
     url(r'^users/$', UsersView.as_view(), name='user_view'),
     url(r'^banking/$', BankingView.as_view(), name='bank_view'),

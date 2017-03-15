@@ -66,13 +66,10 @@ def index(request):
     return render(request, 'landing.html')
 
 
-
-
-
-
 @login_required
 def account_home(request):
     return render(request, 'managed_account/account_main.html')
+
 
 @login_required
 def account_status(request):
