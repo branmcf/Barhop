@@ -1,7 +1,7 @@
 __author__ = 'nibesh'
 
 from django import forms
-from .models import Trigger
+from .models import Trigger, Grid
 
 COUNTRY_CHOICES = [('AU', 'Australia'), ('CA', 'Canada'), ('DK', 'Denmark'), ('FI', 'Finland'), ('IE', 'Ireland'),
                    ('NO', 'Norway'), ('SE', 'SWEDEN'), ('GB', 'United Kingdom'), ('US', 'United States')]
@@ -27,3 +27,19 @@ class AddTriggerForm(forms.ModelForm):
     class Meta:
         model = Trigger
         fields = ('trigger_name',)
+
+
+class GridForm(forms.ModelForm):
+
+    # def __init__(self,user=None, *args, **kwargs):
+    #     # import pdb;pdb.set_trace()
+    #     super(GridForm, self).__init__(*args, **kwargs)
+    #     obj = Grid.objects.filter(dealer__id=user).first()
+    #     print obj
+
+        # self.fields['grid_row'].initial = object
+        # self.fields['grid_column'].initial = object.grid_column
+
+    class Meta:
+        model = Grid
+        fields = ('__all__')

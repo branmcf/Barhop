@@ -1,0 +1,17 @@
+{% extends "base_inner.html" %}
+{% block content %}
+
+
+<div class="container" id="trigger_container" >
+  <h2 id="select_trigger">Select Trigger</h2>
+  <ul class="list-group" id="list_group">
+      {% for each in trigger %}
+          <li class="list-group-item list_item"><a href="{% url 'managed_account:edit_grid' each.id %}" >{{each}}</a></li>
+      {% endfor %}
+  </ul>
+</div>
+
+
+
+
+{% endblock %}

@@ -71,7 +71,7 @@ class Grid(models.Model):
     created_by = models.ForeignKey(CustomUser, related_name="created_employee",blank=True, null=True)
 
     def __str__(self):
-        return self.trigger
+        return str(self.trigger)
 
     class Meta:
         db_table = 'Grid'
@@ -85,7 +85,7 @@ class GridDetails(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.grid
+        return str(self.grid)
 
     class Meta:
         db_table = 'GridDetails'

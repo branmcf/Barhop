@@ -33,18 +33,29 @@
     </div>
   </nav>
 
-  <div id="gridContent">
-    <div>
-      <input>
-      x
-      <input>
-    </div>
+  <div id="gridContent" >
+      <form method="POST" novalidate>
+        <div>
+          {% csrf_token %}
 
-    <br>
+          {% if grid %}
+          <input id="id_grid_row" min="0" name="grid_row" type="number" value="{{grid.grid_row}}"  style="color:black;"/>
+          X
+          <input id="id_grid_column" min="0" name="grid_column" type="number" value="{{grid.grid_column}}" style="color:black;" />
+          {% else %}
+          <input id="id_grid_row" min="0" name="grid_row" type="number" value="0"  style="color:black;"/>
+          X
+          <input id="id_grid_column" min="0" name="grid_column" type="number" value="0" style="color:black;"/>
+          {% endif %}
 
-    <div>
-      <button type="button" class="btn" id="saveGridBtn">Save</button>
-    </div>
+        </div>
+          <input type="hidden" value="{{trigger_id}}" name="trigger_id">
+        <br>
+
+        <div>
+          <button type="submit" class="btn" id="saveGridBtn">Save</button>
+        </div>
+      </form>
   </div>
 
  
