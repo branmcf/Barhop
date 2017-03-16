@@ -10,13 +10,61 @@ from payment.models import PaymentModel,ManagedAccountStripeCredentials
 from t_auth.utils import send_email_auth
 from t_auth.models import CustomUser, DealerEmployeMapping
 from trophy.models import TrophyModel
-from .models import  Trigger,Grid,GridDetails
+
+from .models import  Trigger,Grid,GridDetails, MenuItems, PurchaseOrder
 from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm
 from t_auth.forms import CustomUserCreationForm
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 import json
+from django.core import serializers
+
+
+
+
+def index(request):
+    """
+
+    :param request:
+    :return:
+    """
+    data = {}
+    if request.user.is_authenticated():
+        trophies = TrophyModel.objects.filter(dealer=request.user).order_by('-date')
+        c_messages = []
+        if trophies:
+            conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
+                'date')
+            c_messages = [(item, Message.objects.filter(conversation=item).order_by('-id')[0]) for item in
+                          conversations]
+        try :
+            login_user = request.user
+            if login_user.is_dealer:
+                dealer = login_user
+            else:
+                user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+                dealer = user_mapping_obj.dealer
+
+            trigger_id = request.GET.get('trigger')
+            if trigger_id:
+                trigger = Trigger.objects.get(id=trigger_id)
+                purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=trigger)
+                purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', trigger=trigger)
+            else:
+                purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID')
+                purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')
+            
+            triggers = Trigger.objects.filter(dealer=dealer)
+            data['triggers'] = triggers
+            data['trophies'] = trophies
+            data['con_messages'] = c_messages
+            data['purchase_paid_orders'] = purchase_paid_orders
+            data['purchase_ready_orders'] = purchase_ready_orders
+            return render(request, 'dealer/index.html',data)
+        except:
+            pass
+    return render(request, 'landing.html')
 
 
 @login_required
@@ -379,6 +427,91 @@ class ChangeAccessLeveView(View):
                     "extra_tags": message.tags
                 })
             data['messages'] = django_messages
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+class OrderReadyView(View):
+
+    def post(self, request):
+        data = {}
+        django_messages = []
+        try:
+            order_id = request.POST['order_id']
+            purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
+            purchase_order_obj.order_status = 'READY'
+            purchase_order_obj.save()
+
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Order Status changed.")
+
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+class OrderCloseView(View):
+    def post(self, request):
+        data = {}
+        django_messages = []
+        try:
+            order_id = request.POST['order_id']
+            purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
+            purchase_order_obj.order_status = 'CLOSED'
+            purchase_order_obj.save()
+
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Order Status changed.")
+
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+class MenuListView(FormView):
+    template_name = "managed_account/menu.html"
+
+    def get(self, request, *args, **kwargs):
+        # form_class = self.get_form_class()
+        # form = self.get_form(form_class)
+        context = self.get_context_data(**kwargs)
+        user = self.request.user
+        try:
+            employee_data = DealerEmployeMapping.objects.get(employe=user)
+            if employee_data:
+                dealer = employee_data.dealer
+        except:
+            dealer = user
+
+        context['menu_data'] = MenuItems.objects.filter(dealer=dealer)
+
+        return self.render_to_response(context)
+
+    def post(self, request):
+        data = {}
+        django_messages = []
+        try:            
             return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             data['error_msg'] = "something went WRONG"
