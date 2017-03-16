@@ -1,21 +1,20 @@
 
 {% extends "base_inner.html" %}
 {% block content %}
-
+ <div class="container">
   <div class="row" style="text-align:center;">
-    <div class="col-md-12 col-md-offset-1" id="orderView">
-      <div class="col-md-5" id="unassignedCol">
-
+    <div id="orderView">
+      <div class="col-md-6" id="unassignedCol" style="overflow:auto;">
         {% for order in purchase_paid_orders %}
-        <div class="row" id="unassignedOrderRow" style="overflow:auto;">
+        <div class="row" id="unassignedOrderRow">
           <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">
 
             <div class="row unassignedOrderTicketRow" id="orderDataList">
               <div class="col-md-10 unassignedOrderTicketText" id="">
-                <span>Item : {{ order.menu_item.item_name }}</span>
-                <span>Price : {{ order.menu_item.item_price }}</span><br>
-                <span>Status :{{ order.order_status }}</span>
-                <span>Expires : {{ order.expires }}</span>
+                <p class="item_det"><span class="span1">Item : {{ order.menu_item.item_name }}</span></p>
+                <p class="item_det"><span class="span2">Price : {{ order.menu_item.item_price }}</span></p>
+                <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
+                <span class="span2">Expires : {{ order.expires }}</span></p>
               </div>
               <a href="">
               <div class="col-md-2 orderReadyCol" id={{order.id}}>
@@ -30,28 +29,31 @@
 
       </div>
 
-      <div class="col-md-5" id="assignedCol">
+      <div class="col-md-6" id="assignedCol" style="overflow:auto;">
+        <div id="imaginary_container">
+          <span id="searchError" style="display:none;">Please enter a Order Code </span> 
+          <div class="input-group stylish-input-group">
+              <input type="text" id="order_code" class="form-control"  placeholder="Search" >
+              <span class="input-group-addon">
+                  <button id="searchButton">
+                      <span class="glyphicon glyphicon-search"></span>
+                  </button>  
+              </span>
+          </div>
+        </div>
+        <div id="orderListToClose">
         {% for order in purchase_ready_orders %}
-        <div class="row" id="assignedOrderRow" style="overflow:auto;">
-          <div class="col-md-10 col-md-offset-1" id="assignedOrderTicket">
-            <div class="row" id="assignedOrderTicketRow">
-              <div class="col-md-10" id="assignedOrderTicketNum">
-                <table style="font-size: 11px;">
-                  <tr>
-                    <td> Item : {{ order.menu_item.item_name }}</td>
-                    <td> Price : {{ order.menu_item.item_price }} </td>
-                  </tr>
-                  <tr>
-                    <td> Status :{{ order.order_status }}</td>
-                    <td>  Expires : {{ order.expires }}</td>
-                  </tr>
-                </table>
+        <div class="row" id="unassignedOrderRow" >
+          <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">            
+            <div class="row unassignedOrderTicketRow" id="orderDataList">
+              <div class="col-md-10 unassignedOrderTicketText" id="">
+                <p class="item_det"><span class="span1">Item : {{ order.menu_item.item_name }}</span></p>
+                <p class="item_det"><span class="span2">Price : {{ order.menu_item.item_price }}</span></p>
+                <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
+                <span class="span2">Expires : {{ order.expires }}</span></p>
               </div>
-              <!-- <div class="col-md-10" id="assignedOrderTicketLocation">
-                Location:
-              </div> -->
               <a href="">
-              <div class="col-md-2 closeOrderCol" id={{order.id}}>
+              <div class="col-md-2 assigned-order closeOrder" id={{order.id}}>
                 Close Order
               </div>
               </a>
@@ -59,11 +61,12 @@
           </div>
         </div>
         {% endfor %}
+        </div>
       </div>
     </div> <!-- order view-->
   </div> <!-- main row-->
 
-<div class="row">
+<div class="row" style="margin-top: 30px;">
   <div class="col-md-3" id="loggedInAt">
     Logged in @trigger
   </div>
@@ -91,6 +94,7 @@
       </div>
     </div>
   </div>
+  </div>
   <!-- END MODAL -->
 <script type="text/javascript">
   $('.orderReadyCol').click(function(event){
@@ -112,7 +116,7 @@
     });
   });
 
-  $('.closeOrderCol').click(function(event){
+  $('.closeOrder').click(function(event){
     order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_close/',
@@ -130,6 +134,27 @@
       }
     });
   });
+
+$('#searchButton').click(function(){
+  $("#searchError").hide();
+  var order_code = $('#order_code').val();
+  if (order_code != ''){
+    $.ajax({
+      url: '/',
+      type:'POST',
+      data:{
+        order_code:order_code,
+      },
+      success: function (data){
+          $("#orderListToClose").html(data);
+      }
+    });
+  }
+  else{
+    $("#searchError").show();
+  }
+
+});
 
 </script>
 

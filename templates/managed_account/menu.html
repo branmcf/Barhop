@@ -1,0 +1,101 @@
+{% extends "base_inner.html" %}
+{% block content %}
+  <script>
+    var data = [];
+    var change = {};
+  </script>
+  <div id="menuContent">
+    <div>
+      <table id="mainTable" class="table">
+            <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Quantity</th></tr></thead>
+            <tbody>
+            {% if menu_data %}
+            {% for data in menu_data %}
+              <tr>
+                <td id="{{ data.id }}" class="id" >{{ data.id }}</td>
+                <td id="{{ data.id }}" class="item_name" >{{ data.item_name }}</td>
+                <td id="{{ data.id }}" class="item_price" >{{ data.item_price }}</td>
+                <td id="{{ data.id }}" class="quantity_available" >{{ data.quantity_available }}</td>
+              </tr>
+            {% endfor %}
+            {% else %}
+              <p>Menu List is Empty!</p>
+            {% endif %}
+            </tbody>
+      </table>
+    </div>
+      <button type="button" class="btn" id="saveGridBtn">Edit</button>
+    <div id="eidtButtons" style="display: none;margin-top: 10px">
+      <button type="button" class="btn saveGridBtn" id="cancel">Cancel</button>
+      <button type="button" class="btn saveGridBtn" id="saveMenuButton">Save</button>
+      <button type="button" class="btn saveGridBtn" id="addMenuButton">Add</button>      
+    </div>
+  </div>
+
+<script>
+
+$("#saveGridBtn").click(function(){
+  if ($('#eidtButtons').css('display') == 'none') {
+    $("#eidtButtons").show();    
+  }
+  else{
+    $("#eidtButtons").hide();
+    $("#addMenuButton").show();
+  }
+
+});
+
+$("#addMenuButton").click(function(){
+  var new_row = "<tr id='last_row'><td>...</td> <td>...</td> <td id='1223'>...</td> <td>...</td> </tr>"
+  $("#mainTable tbody").append(new_row);
+  $('#mainTable').editableTableWidget();
+  $("#addMenuButton").hide();
+  
+  // $('#mainTable td').on('change', function(evt, newValue) {
+  //   alert("change");
+  // });
+  $('#mainTable td').on('change', function(evt, newValue) {
+    change['id'] = evt.target.id;
+    console.log(evt.target);
+                document.getElementById(evt.target.id).getAttribute("class"); 
+    change['field'] = "item_name";
+    change['value'] = newValue;
+    console.log("Data :");
+    console.log(data);
+  });
+});
+
+$("#saveMenuButton").click(function(){
+  var tr = document.getElementById('last_row');
+  var td = tr.getElementsByTagName("td");
+  var item_name = td[1].innerHTML
+  var item_price = td[2].innerHTML
+  var item_quantity = td[3].innerHTML
+
+   $.ajax({
+    url: '{% url 'menu_view' %}',
+    type:'POST',
+    data:{
+      'changes' : data,
+      'item_name': item_name,
+      'item_price': item_price,
+      'item_quantity': item_quantity,
+    },
+    success: function (data){
+       if(data["success"] == 'True' ){
+        $('#changePasswordModal').modal('hide');
+        update_messages(data.messages);         
+      }
+      else{
+        update_messages(data.error_msg);
+      }
+    }
+  });
+
+
+});
+
+// $('#textAreaEditor').editableTableWidget({editor: $('<textarea>')});
+window.prettyPrint && prettyPrint();
+</script>
+{% endblock %}

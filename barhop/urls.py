@@ -22,7 +22,7 @@ from managed_account.views import *
 import main
 
 urlpatterns = [
-    url(r'^$', index, name='index'),
+    url(r'^$', HomeView.as_view(), name='index'),
     url(r'^how_it_works/$', main.how_it_works, name='how_it_works'),
     url(r'^about_us/$', main.about_us, name='about_us'),
     url(r'^contact_us/$', main.contact_us, name='contact_us'),

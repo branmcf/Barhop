@@ -1,70 +1,99 @@
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
+
+from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.template.loader import render_to_string
-import stripe
 
+import stripe
+import json
+
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
 from payment.models import PaymentModel,ManagedAccountStripeCredentials
-from t_auth.utils import send_email_auth
-from t_auth.models import CustomUser, DealerEmployeMapping
+from route.models import Conversation, Message
 from trophy.models import TrophyModel
 from .models import  Trigger, MenuItems, PurchaseOrder
+from t_auth.models import CustomUser, DealerEmployeMapping
+
 from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm
 from t_auth.forms import CustomUserCreationForm
-from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
-from django.http import HttpResponse
-from django.utils.decorators import method_decorator
-import json
-from django.core import serializers
+
+from t_auth.utils import send_email_auth
+from managed_account import utils
 
 
+class HomeView(TemplateView):
+    template_name = "dealer/index.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(HomeView, self).get_context_data(**kwargs)
+        return context
 
-def index(request):
-    """
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        """
 
-    :param request:
-    :return:
-    """
-    data = {}
-    if request.user.is_authenticated():
-        trophies = TrophyModel.objects.filter(dealer=request.user).order_by('-date')
-        c_messages = []
-        if trophies:
-            conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
-                'date')
-            c_messages = [(item, Message.objects.filter(conversation=item).order_by('-id')[0]) for item in
-                          conversations]
-        try :
-            login_user = request.user
-            if login_user.is_dealer:
-                dealer = login_user
-            else:
-                user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
-                dealer = user_mapping_obj.dealer
+        :param request:
+        :return:
+        """
+        data = {}
+        if request.user.is_authenticated():
+            trophies = TrophyModel.objects.filter(dealer=request.user).order_by('-date')
+            c_messages = []
+            if trophies:
+                conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
+                    'date')
+                c_messages = [(item, Message.objects.filter(conversation=item).order_by('-id')[0]) for item in
+                              conversations]
+            try :
+                dealer = utils.get_dealer(request.user)
+                trigger_id = request.GET.get('trigger')
+                
+                if trigger_id:
+                    trigger = Trigger.objects.get(id=trigger_id)
+                    purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=trigger)
+                    purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', trigger=trigger)
+                else:
+                    purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID')
+                    purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')
+                
+                triggers = Trigger.objects.filter(dealer=dealer)
+                context['triggers'] = triggers
+                context['trophies'] = trophies
+                context['con_messages'] = c_messages
+                context['purchase_paid_orders'] = purchase_paid_orders
+                context['purchase_ready_orders'] = purchase_ready_orders
+                return render(request,self.template_name ,context)
+            except:
+                pass
+        return render(request, 'landing.html')
 
-            trigger_id = request.GET.get('trigger')
-            if trigger_id:
-                trigger = Trigger.objects.get(id=trigger_id)
-                purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=trigger)
-                purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', trigger=trigger)
-            else:
-                purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID')
-                purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')
-            
-            triggers = Trigger.objects.filter(dealer=dealer)
-            data['triggers'] = triggers
-            data['trophies'] = trophies
-            data['con_messages'] = c_messages
-            data['purchase_paid_orders'] = purchase_paid_orders
+    # def post(self, request):
+    #     order_code = request.POST['order_code']
+    #     return None
+
+    def post(self, request):
+        data = {}
+        django_messages = []
+        try:
+            order_code = request.POST['order_code']
+
+            dealer = utils.get_dealer(request.user)
+
+            purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', order_code__icontains=order_code)
             data['purchase_ready_orders'] = purchase_ready_orders
-            return render(request, 'dealer/index.html',data)
+            html = render_to_string('managed_account/orders_to_close.html',data)
+            return HttpResponse(html)
         except:
-            pass
-    return render(request, 'landing.html')
-
+            data['success'] = "False"
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 @login_required
 def account_home(request):
@@ -99,6 +128,24 @@ def account_status(request):
 
 class BankingView(TemplateView):
     template_name = "managed_account/banking.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(BankingView, self).get_context_data(**kwargs)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        login_user = request.user
+        dealer = utils.get_dealer(login_user)
+        # if login_user.is_dealer:
+        #     dealer = login_user
+        # else:
+        #     user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+        #     dealer = user_mapping_obj.dealer
+
+        payment_list = PaymentModel.objects.filter(dealer=dealer)
+        context['payment_list'] = payment_list
+        return render(request, self.template_name,context)
 
 class GridView(TemplateView):
     template_name = "managed_account/grid.html"
@@ -269,6 +316,10 @@ class UsersView(FormView):
             
         context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True).exclude(employe=login_user)
         return self.render_to_response(context)
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(UsersView, self).dispatch(*args, **kwargs)
 
 class DeleteEmployeView(View):
 
