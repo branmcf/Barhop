@@ -1,4 +1,7 @@
 
+
+
+
 body{
   background: #28313A;
   font-family: Menlo;
@@ -18,6 +21,11 @@ body{
 }*/
 
 /*LANDING ROUTE*/
+
+
+
+
+
 #landingContent{
   height:80vh;
   width: 100vw;
@@ -163,6 +171,27 @@ body{
   overflow: scroll;
 }
 
+#trigger_container{
+    width:525px;
+}
+
+#select_trigger{
+    color:white;
+    text-align: center;
+}
+#list_group{
+    max-height: 300px;
+    overflow-y:scroll;
+}
+
+.list_item{
+    text-align:center;
+}
+
+.list_item a{
+  text-decoration:none;
+  font-size:large
+}
 
 @media (min-width: 992px) {
 #orderView {
@@ -456,7 +485,47 @@ body{
   border-radius: 0px;
 }
 
+.trigger1{
 
+
+    border-radius: 0px;
+    width: 292px;
+    font-size: 41px;
+    text-transform: capitalize;
+    border-radius: 3px;
+        background:#dedede !important;
+}
+#addTriggerModal h4{
+    font-size: 29px;
+    text-align: center;
+}
+#addTriggerModal p
+{
+    text-align: center;
+    font-size: 17px;
+    border-bottom: 1px solid #c1c1c1;
+    padding: 10px;
+    margin:0;
+}
+#addTriggerModal .form-group{
+margin:0
+}
+#addTriggerModal p:last-child{
+border-bottom: none;
+}
+#addTriggerModal .modal-body{
+
+padding:0 !important;
+
+}
+#addTriggerModal a:hover{
+color:#c1c1c1;
+}
+#addTriggerModal a{
+color:#0099cc;
+text-decoration:none;
+
+}
 /*BANKING ROUTE*/
 #bankingContent{
   height: 45vh;

@@ -10,8 +10,8 @@ from payment.models import PaymentModel,ManagedAccountStripeCredentials
 from t_auth.utils import send_email_auth
 from t_auth.models import CustomUser, DealerEmployeMapping
 from trophy.models import TrophyModel
-from .models import  Trigger
-from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm
+from .models import  Trigger,Grid,GridDetails
+from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm
 from t_auth.forms import CustomUserCreationForm
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 from django.http import HttpResponse
@@ -54,7 +54,74 @@ class BankingView(TemplateView):
     template_name = "managed_account/banking.html"
 
 class GridView(TemplateView):
+    template_name = "managed_account/select_trigger.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(GridView, self).get_context_data(**kwargs)
+        login_user = self.request.user
+
+        if login_user.is_dealer:
+            dealer = login_user
+        else:
+            user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+            dealer = user_mapping_obj.dealer
+        try:
+            context['trigger'] = Trigger.objects.filter(dealer=dealer)
+        except Trigger.DoesNotExist:
+            context['trigger'] = None
+
+        return context
+
+class EditGridView(FormView):
     template_name = "managed_account/grid.html"
+    form_class = GridForm
+    success_url = '/'
+    model = Grid
+
+    def get_context_data(self, **kwargs):
+        context = super(EditGridView, self).get_context_data(**kwargs)
+        trigger_id = self.kwargs.get('pk')
+        context['trigger_id'] = trigger_id
+        try:
+            trigger = Trigger.objects.get(id=trigger_id)
+            grid = Grid.objects.get(trigger=trigger)
+            context['grid'] = grid
+        except:
+            grid = ''
+
+        return context
+
+    def form_valid(self, form):
+        trigger_id = self.request.POST.get('trigger_id')
+        login_user = self.request.user
+        trigger = Trigger.objects.get(id=trigger_id)
+
+        grid, created = Grid.objects.get_or_create(trigger=trigger)
+        grid.grid_row = r = form.cleaned_data['grid_row']
+        grid.grid_column = c = form.cleaned_data['grid_column']
+
+        if login_user.is_dealer:
+            dealer = login_user
+        else:
+            user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+            dealer = user_mapping_obj.dealer
+
+        grid.dealer = dealer
+        grid.created_by = login_user
+        grid.save()
+
+        if not created:
+            GridDetails.objects.filter(grid=grid).delete()
+
+        m = r*c
+        for gridDetail in range(m):
+            gridDetailobj= GridDetails(grid=grid)
+            gridDetailobj.save()
+        return super(EditGridView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 class TriggerView(FormView):
     model = Trigger
