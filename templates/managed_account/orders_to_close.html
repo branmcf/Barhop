@@ -1,17 +1,17 @@
 
 {% if purchase_ready_orders %}
   {% for order in purchase_ready_orders %}
-  <div class="row" id="unassignedOrderRow">
-    <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">            
-      <div class="row unassignedOrderTicketRow" id="orderDataList">
-        <div class="col-md-10 unassignedOrderTicketText" id="">
-          <p class="item_det"><span class="span1">Item : {{ order.menu_item.item_name }}</span></p>
-          <p class="item_det"><span class="span2">Price : {{ order.menu_item.item_price }}</span></p>
-          <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
-          <span class="span2">Expires : {{ order.expires }}</span></p>
+  <div class="row" id="assignedOrderRow">
+    <div class="col-md-10 col-md-offset-1" id="assignedOrderTicket">
+      <div class="row" id="assignedOrderTicketRow">
+        <div class="col-md-10" id="assignedOrderTicketNum">
+          Order number: {{order.order_code}}
+        </div>
+        <div class="col-md-10" id="assignedOrderTicketLocation">
+          Location:{{order.location}}
         </div>
         <a href="">
-        <div class="col-md-2 assigned-order closeOrder" id={{order.id}}>
+        <div class="col-md-2 closeOrderCol" id="{{order.id}}">
           Close Order
         </div>
         </a>
