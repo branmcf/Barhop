@@ -551,14 +551,12 @@ font-size: 13px;
 }
 
 .trigger1{
-
-
     border-radius: 0px;
     width: 292px;
     font-size: 41px;
     text-transform: capitalize;
     border-radius: 3px;
-        background:#dedede !important;
+    background:#dedede !important;
 }
 #addTriggerModal h4{
     font-size: 29px;
@@ -755,3 +753,8 @@ input[type="radio"] {
   color: #28313A;
 }
 
+#trigger_name {
+    color: white;
+    font-size: xx-large;
+    text-align: center;
+}

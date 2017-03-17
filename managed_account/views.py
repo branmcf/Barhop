@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
+from django.contrib import messages
+
 import stripe
 import json
 
@@ -170,15 +172,28 @@ class GridView(TemplateView):
 class EditGridView(FormView):
     template_name = "managed_account/grid.html"
     form_class = GridForm
-    success_url = '/'
+    success_url = '/account/grid/'
     model = Grid
 
     def get_context_data(self, **kwargs):
         context = super(EditGridView, self).get_context_data(**kwargs)
         trigger_id = self.kwargs.get('pk')
+        login_user = self.request.user
         context['trigger_id'] = trigger_id
+
+        if login_user.is_dealer:
+            dealer = login_user
+        else:
+            user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
+            dealer = user_mapping_obj.dealer
+        try:
+            context['trigger'] = Trigger.objects.filter(dealer=dealer)
+        except Trigger.DoesNotExist:
+            context['trigger'] = None
+
         try:
             trigger = Trigger.objects.get(id=trigger_id)
+            context['trigger_name'] = trigger.trigger_name
             grid = Grid.objects.get(trigger=trigger)
             context['grid'] = grid
         except:
@@ -192,8 +207,8 @@ class EditGridView(FormView):
         trigger = Trigger.objects.get(id=trigger_id)
 
         grid, created = Grid.objects.get_or_create(trigger=trigger)
-        grid.grid_row = r = form.cleaned_data['grid_row']
-        grid.grid_column = c = form.cleaned_data['grid_column']
+        grid.grid_row = row = form.cleaned_data['grid_row']
+        grid.grid_column = col = form.cleaned_data['grid_column']
 
         if login_user.is_dealer:
             dealer = login_user
@@ -203,15 +218,19 @@ class EditGridView(FormView):
 
         grid.dealer = dealer
         grid.created_by = login_user
-        grid.save()
 
         if not created:
             GridDetails.objects.filter(grid=grid).delete()
 
-        m = r*c
+        m = row * col
+
         for gridDetail in range(m):
             gridDetailobj= GridDetails(grid=grid)
             gridDetailobj.save()
+
+        message = "Updated the grid details for the trigger : %s"%(trigger.trigger_name)
+        messages.success(self.request, message)
+
         return super(EditGridView, self).form_valid(form)
 
     def form_invalid(self, form):
