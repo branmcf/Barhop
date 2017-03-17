@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http.response import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 
@@ -7,8 +8,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-
-from django.contrib import messages
 
 import stripe
 import json
@@ -320,7 +319,37 @@ class TriggerDeleteView(DeleteView):
     success_url = '/account/triggers/'
 
     def post(self, *args, **kwargs):
+        trigger_id = kwargs['pk']
+
+        '''
+        There may not be a grid created
+        '''
+
+        try:
+            grid = Grid.objects.get(trigger__id=trigger_id)
+            griddetails = GridDetails.objects.filter(grid=grid)
+            grid.delete()
+            griddetails.delete()
+
+        except:
+            pass
+
         return self.delete(*args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
+
+        self.object = trigger = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+
+        message = "Deleted the trigger : %s"%(trigger.trigger_name)
+        messages.success(self.request, message)
+
+        return HttpResponseRedirect(success_url)
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
