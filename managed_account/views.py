@@ -140,11 +140,6 @@ class BankingView(TemplateView):
         context = self.get_context_data(**kwargs)
         login_user = request.user
         dealer = utils.get_dealer(login_user)
-        # if login_user.is_dealer:
-        #     dealer = login_user
-        # else:
-        #     user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
-        #     dealer = user_mapping_obj.dealer
 
         payment_list = PaymentModel.objects.filter(dealer=dealer)
         context['payment_list'] = payment_list
@@ -530,6 +525,7 @@ class OrderReadyView(View):
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
         return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 class OrderCloseView(View):
     def post(self, request):
