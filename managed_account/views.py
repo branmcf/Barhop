@@ -14,15 +14,16 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.generic.edit import UpdateView
 
-from payment.models import PaymentModel,ManagedAccountStripeCredentials
+from payment.models import PaymentModel,ManagedAccountStripeCredentials, BankAccount
 from route.models import Conversation, Message
 from trophy.models import TrophyModel
 
 from t_auth.models import CustomUser, DealerEmployeMapping
 from .models import  Trigger,Grid,GridDetails, MenuItems, PurchaseOrder
 
-from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm
+from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm,BankAccountEditForm
 from t_auth.forms import CustomUserCreationForm
 
 from t_auth.utils import send_email_auth
@@ -142,6 +143,7 @@ class BankingView(TemplateView):
 
         payment_list = PaymentModel.objects.filter(dealer=dealer)
         context['payment_list'] = payment_list
+        context['bankaccount'] = BankAccount.objects.get(dealer=dealer)
         return render(request, self.template_name,context)
 
 class GridView(TemplateView):
@@ -631,3 +633,66 @@ class MenuListView(FormView):
         except:
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+class AddBankAccountView(FormView):
+    template_name = 'managed_account/add_bank_account.html'
+    form_class = BankAccountCreationForm
+    success_url = '/account/add_bank_account/'
+    model = BankAccount
+
+    def form_valid(self, form):
+        country = form.cleaned_data['country']
+        currency = form.cleaned_data['currency']
+        routing_number = form.cleaned_data['routing_number']
+        account_number = form.cleaned_data['account_number']
+        name = form.cleaned_data['name']
+        account_holder_type = form.cleaned_data['account_holder_type']
+        dealer = utils.get_dealer(self.request.user)
+
+        bankaccount = BankAccount(dealer=dealer,country=country,currency=currency,routing_number=routing_number,account_number=account_number,name=name,account_holder_type=account_holder_type)
+        bankaccount.save()
+        return super(AddBankAccountView, self).form_valid(form)
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AddBankAccountView, self).dispatch(*args, **kwargs)
+
+class EditBankAccount(UpdateView):
+    template_name = 'managed_account/add_bank_account.html'
+    form_class = BankAccountEditForm
+    model = BankAccount
+    success_url = "/account/"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(EditBankAccount, self).dispatch(*args, **kwargs)
+    # def get_initial(self):
+    #     super(EditBankAccount, self).get_initial()
+    #     dealer = utils.get_dealer(self.request.user)
+    #     bankaccount= BankAccount.objects.get(dealer=dealer)
+    #     self.initial = {'country':bankaccount.country,'account_number':bankaccount.account_number,'routing_number':bankaccount.routing_number,'name':bankaccount.name}
+    #     return self.initial
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(EditBankAccount, self).get_context_data(**kwargs)
+    #     dealer = utils.get_dealer(self.request.user)
+    #
+    #     try:
+    #         bankaccount = BankAccount.objects.get(dealer=dealer)
+    #         context['form'] = BankAccountCreationForm(initial={'country':bankaccount.country,'account_number':bankaccount.account_number,'routing_number':bankaccount.routing_number,'name':bankaccount.name})
+    #     except:
+    #         pass
+    #     return context
+    # #
+    # def get(self, request, *args, **kwargs):
+    #     """
+    #     Handles GET requests and instantiates a blank version of the form.
+    #     """
+    #     form = BankAccountCreationForm
+    #     return render(request,'managed_account/edit_bank_account.html',{'form':form})
+
+
+
+
+

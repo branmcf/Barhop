@@ -32,6 +32,18 @@ class ManagedAccountStripeCredentials(models.Model):
         verbose_name_plural = 'ManagedAccountStripeCredentials'
 
 
+class BankAccount(models.Model):
+    dealer = models.ForeignKey(CustomUser,unique=True)
+    country = models.CharField(max_length=40, null=True, blank=True)
+    currency = models.CharField(max_length=10, null=True, blank=True)
+    routing_number = models.CharField(max_length=40, null=True, blank=True)
+    account_number = models.CharField(max_length=40, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    account_holder_type = models.CharField(max_length=15, null=True, blank=True)
+    stripeToken = models.CharField(max_length=40, null=True, blank=True)
+    date = models.DateTimeField(default=timezone.now)
+
+
 class PaymentModel(models.Model):
     order = models.ForeignKey(PurchaseOrder, related_name='order')
     dealer = models.ForeignKey(CustomUser, related_name='dealer')

@@ -1,17 +1,71 @@
-{% extends 'index.html'%}
-{%block js_content%}
-<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-{%endblock%}
-{%block content %}
-<form enctype="multipart/form-data" action="" method="post" id="add_bank_account_form" novalidate="">
-    {%csrf_token%}
-    <div>
-        <p class="bank-errors" style="color: red;"></p>
-        {{form.as_p}}
-    </div>
 
-    <button class="btn btn-primary pull-center" type="submit">Submit</button>
-</form>
+
+
+<!-- new changes-->
+{% extends "base_inner.html" %}
+{% block content %}
+<div class="container1" style="color: #fff">
+    <div class="row1">
+        <div class="col-md-3"></div>
+
+        <div class="col-md-6">
+            <h2>Add BankAccount :</h2>
+            <div class="form-top">
+                <div class="form-top-right">
+                    <i class="fa fa-key"></i>
+                </div>
+            </div>
+            <div class="form-bottom">
+                <form role="form" style="color: #607D8B" method="POST" action="{{ app_path }}">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label >Country:</label>
+                      <div class="errormsg" ></div>
+                      {{ form.country }}
+                  </div>
+                  <div class="form-group">
+                      <label >Currency :</label>
+                      <div class="errormsg"></div>
+                      {{ form.currency }}
+                  </div>
+                  <div class="form-group">
+                      <label>Routing Number :</label>
+                      <div class="errormsg"></div>
+                      {{ form.routing_number}}
+                  </div>
+                  <div class="form-group">
+                      <label >Account Number :</label>
+                      <div class="errormsg"></div>
+                      {{ form.account_number }}
+                  </div>
+                  <div class="form-group">
+                      <label>Name :</label>
+                      <div class="errormsg"></div>
+                      {{ form.name }}
+                  </div>
+                  <div class="form-group">
+                      <label>Account Holder Type :</label>
+                      <div class="errormsg"></div>
+                      {{ form.account_holder_type }}
+                  </div>
+                  <br>
+
+                  <div class="v-wrap">
+                      <button type="submit" id="cu-btn" class="btn btn-primary vbox">Submit</button>
+                  </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+
+        </div>
+
+    </div>
+</div>
+
+<!-- end -->
+
 
 <script type="text/javascript">
     $(function () {
@@ -49,4 +103,4 @@
 
     });
 </script>
-{%endblock %}
+{% endblock %}

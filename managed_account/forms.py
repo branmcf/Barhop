@@ -1,3 +1,5 @@
+from payment.models import BankAccount
+
 __author__ = 'nibesh'
 
 from django import forms
@@ -12,6 +14,7 @@ CURRENCY_CHOICES = [('AUD', 'Australian Dollar'), ('CAD', 'Canadian Dollar'), ('
 
 
 class BankAccountCreationForm(forms.Form):
+
     country = forms.ChoiceField(choices=COUNTRY_CHOICES)
     currency = forms.ChoiceField(choices=CURRENCY_CHOICES)
     routing_number = forms.CharField()
@@ -43,3 +46,13 @@ class GridForm(forms.ModelForm):
     class Meta:
         model = Grid
         fields = ('__all__')
+
+
+
+class BankAccountEditForm(forms.ModelForm):
+    country = forms.ChoiceField(choices=COUNTRY_CHOICES)
+    currency = forms.ChoiceField(choices=CURRENCY_CHOICES)
+    account_holder_type = forms.ChoiceField(choices=[('individual', 'Individual'), ('company', 'Company')])
+    class Meta:
+        model = BankAccount
+        fields = ('country','currency','routing_number','account_number','name','account_holder_type')

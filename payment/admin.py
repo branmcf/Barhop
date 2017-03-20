@@ -1,7 +1,7 @@
 __author__ = 'nibesh'
 
 from django.contrib import admin
-from .models import RevenueModel, PaymentModel
+from .models import RevenueModel, PaymentModel,BankAccount
 
 
 class RevenueModelAdmin(admin.ModelAdmin):
@@ -23,3 +23,4 @@ class PaymentModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(PaymentModel, PaymentModelAdmin)
+admin.site.register(BankAccount)
