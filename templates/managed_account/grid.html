@@ -9,7 +9,7 @@
         <div>
           {% csrf_token %}
             {{form.errors}}
-          <p></p>
+          <p id="error_grid"></p>
           {% if grid %}
           <input id="id_grid_row" min="0" name="grid_row" type="number" value="{{grid.grid_row}}"  style="color:black;"/>
           X
@@ -75,7 +75,7 @@
     $(document).ready(function(){
         $("form").submit(function(){
             if ( $("#id_grid_row").val() == 0 || $("#id_grid_column").val() == 0 || $("#id_grid_row").val() == '' || $("#id_grid_column").val() == ''){
-                $("p").text("Row or Column cannot be zero/empty");
+                $("#error_grid").text("Row or Column cannot be zero/empty");
                 return false;
             }
         });

@@ -139,11 +139,6 @@ class BankingView(TemplateView):
         context = self.get_context_data(**kwargs)
         login_user = request.user
         dealer = utils.get_dealer(login_user)
-        # if login_user.is_dealer:
-        #     dealer = login_user
-        # else:
-        #     user_mapping_obj = DealerEmployeMapping.objects.get(employe=login_user)
-        #     dealer = user_mapping_obj.dealer
 
         payment_list = PaymentModel.objects.filter(dealer=dealer)
         context['payment_list'] = payment_list
@@ -217,14 +212,16 @@ class EditGridView(FormView):
 
         grid.dealer = dealer
         grid.created_by = login_user
+        grid.save()
 
         if not created:
             GridDetails.objects.filter(grid=grid).delete()
 
         m = row * col
 
-        for gridDetail in range(m):
+        for gridDetail in range(m):            
             gridDetailobj= GridDetails(grid=grid)
+            gridDetailobj.grid_counter = gridDetail
             gridDetailobj.save()
 
         message = "Updated the grid details for the trigger : %s"%(trigger.trigger_name)
@@ -534,12 +531,30 @@ class ChangeAccessLeveView(View):
 class OrderReadyView(View):
 
     def post(self, request):
+
         data = {}
         django_messages = []
         try:
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'READY'
+
+            trigger = Trigger.objects.get(id=purchase_order_obj.trigger.id)            
+            grid = trigger.grid_trgger.all()[0]
+            grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
+
+            counter_list = []
+            for grid_detail in grid_detail_obj:
+                counter_list.append(grid_detail.grid_counter)
+            counter = min(counter_list)
+            
+            grid_detail = GridDetails.objects.get(grid_counter=counter)
+            grid_detail.grid = grid
+            grid_detail.order = purchase_order_obj
+            grid_detail.grid_counter = counter
+            grid_detail.is_active = True
+            grid_detail.save()
+
             purchase_order_obj.save()
 
             data['error_msg'] = ""
@@ -559,6 +574,7 @@ class OrderReadyView(View):
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
         return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 class OrderCloseView(View):
     def post(self, request):

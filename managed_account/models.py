@@ -65,7 +65,7 @@ class PurchaseOrder(models.Model):
 
 class Grid(models.Model):
     dealer = models.ForeignKey(CustomUser,blank=True, null=True)
-    trigger = models.ForeignKey(Trigger,blank=True, null=True)
+    trigger = models.ForeignKey(Trigger,blank=True, null=True, related_name="grid_trgger")
     grid_row = models.PositiveIntegerField(default=0, blank=True, null=True)
     grid_column = models.PositiveIntegerField(default=0, blank=True, null=True)
     created_by = models.ForeignKey(CustomUser, related_name="created_employee",blank=True, null=True)
@@ -79,10 +79,11 @@ class Grid(models.Model):
         verbose_name_plural = 'Grids'
 
 class GridDetails(models.Model):
-    grid = models.ForeignKey(Grid)
+    grid = models.ForeignKey(Grid, related_name="grid_details")
     order = models.ForeignKey(PurchaseOrder, blank=True, null=True)
     created = models.DateTimeField(default=timezone.now, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    grid_counter = models.PositiveIntegerField(default=0, blank=True, null=True)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.grid)

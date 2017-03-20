@@ -5,6 +5,7 @@
   <div class="row" style="text-align:center;">
     <div id="orderView">
       <div class="col-md-6" id="unassignedCol" style="overflow:auto;">
+        {% if purchase_paid_orders %}
         {% for order in purchase_paid_orders %}
         <div class="row" id="unassignedOrderRow">
           <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">
@@ -26,7 +27,9 @@
           </div>
         </div>
         {% endfor %}
-
+        {% else %}
+          <p>There are no orders to show</p>
+        {% endif %}
       </div>
 
       <div class="col-md-6" id="assignedCol" style="overflow:auto;">
@@ -36,24 +39,25 @@
               <input type="text" id="order_code" class="form-control"  placeholder="Search" >
               <span class="input-group-addon">
                   <button id="searchButton">
-                      <span class="glyphicon glyphicon-search"></span>
+                    <span class="glyphicon glyphicon-search"></span>
                   </button>  
               </span>
           </div>
         </div>
         <div id="orderListToClose">
+        {% if purchase_ready_orders %}
         {% for order in purchase_ready_orders %}
-        <div class="row" id="unassignedOrderRow" >
-          <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">            
-            <div class="row unassignedOrderTicketRow" id="orderDataList">
-              <div class="col-md-10 unassignedOrderTicketText" id="">
-                <p class="item_det"><span class="span1">Item : {{ order.menu_item.item_name }}</span></p>
-                <p class="item_det"><span class="span2">Price : {{ order.menu_item.item_price }}</span></p>
-                <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
-                <span class="span2">Expires : {{ order.expires }}</span></p>
+        <div class="row" id="assignedOrderRow">
+          <div class="col-md-10 col-md-offset-1" id="assignedOrderTicket">
+            <div class="row" id="assignedOrderTicketRow">
+              <div class="col-md-10" id="assignedOrderTicketNum">
+                Order number: {{order.order_code}}
+              </div>
+              <div class="col-md-10" id="assignedOrderTicketLocation">
+                Location:{{order.location}}
               </div>
               <a href="">
-              <div class="col-md-2 assigned-order closeOrder" id={{order.id}}>
+              <div class="col-md-2 closeOrderCol" id="{{order.id}}">
                 Close Order
               </div>
               </a>
@@ -61,14 +65,18 @@
           </div>
         </div>
         {% endfor %}
+        {% else %}
+          <p>There are no orders to show  </p>
+        {% endif %}
         </div>
       </div>
+
     </div> <!-- order view-->
   </div> <!-- main row-->
 
 <div class="row" style="margin-top: 30px;">
   <div class="col-md-3" id="loggedInAt">
-    Logged in @trigger
+    <!-- Logged in @trigger -->
   </div>
   <div class="col-md-4" id="changeTrigger">
     <a id="ctid" data-toggle="modal" data-target="#myTriggerModal" class="btn btn-primary">Change Trigger</a>
@@ -86,7 +94,7 @@
         </div>
         <div class="modal-body">
           {% for trigger in triggers %}
-          <div class="row" id={{trigger.id}}>
+          <div class="row" id="triggerModalRow">
             <a href="/?trigger={{trigger.id}}" class="btn btn-link">{{trigger.trigger_name}}</a>
           </div>
           {% endfor %}
@@ -116,7 +124,8 @@
     });
   });
 
-  $('.closeOrder').click(function(event){
+  $('.closeOrderCol').click(function(event){
+
     order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_close/',
@@ -126,6 +135,7 @@
       },
       success: function (data){
         if(data["success"] == 'True' ){
+          alert("aaaaaa");
           update_messages(data.messages);
         }
         else{
