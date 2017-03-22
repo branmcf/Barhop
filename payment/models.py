@@ -22,7 +22,7 @@ class ManagedAccountStripeCredentials(models.Model):
     scope = models.CharField(max_length=200, null=True, blank=True)
     refresh_token = models.CharField(max_length=500, null=True, blank=True)
     account_user_id = models.CharField(max_length=300, null=True, blank=True)
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return "%s" % (self.access_token)
@@ -41,7 +41,7 @@ class BankAccount(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     account_holder_type = models.CharField(max_length=15, null=True, blank=True)
     stripeToken = models.CharField(max_length=40, null=True, blank=True)
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now=True)
 
 
 
@@ -50,7 +50,7 @@ class PaymentModel(models.Model):
     dealer = models.ForeignKey(CustomUser, related_name='dealer')
     customer = models.ForeignKey(CustomUser, related_name='customer')
     charge_id = models.CharField(max_length=40, blank=True, null=True)
-    payment_date = models.DateTimeField(default=timezone.now)
+    payment_date = models.DateTimeField(auto_now=True)
     total_amount = models.FloatField(help_text='Amount in cents')
     order_amount = models.FloatField(help_text='Atual item amount')
     sales_tax = models.IntegerField(help_text='Amounts in cents', default=0)
@@ -71,7 +71,7 @@ class RevenueModel(models.Model):
     dealer = models.ForeignKey(CustomUser)
     transaction_amount = models.IntegerField(help_text='Amount in Cents')
     charge_amount = models.IntegerField(help_text='Amount in Cents')
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Revenue'

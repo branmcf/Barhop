@@ -20,7 +20,7 @@ class Conversation(models.Model):
     trigger = models.ForeignKey(Trigger, related_name='trigger')
     process_stage = models.PositiveIntegerField(default=0, blank=True, null=True)
     closed = models.BooleanField(default=False)
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now=True)
     has_new_message = models.BooleanField(default=True)
 
     class Meta:
@@ -29,7 +29,7 @@ class Conversation(models.Model):
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation)
     message = models.CharField(max_length=160)
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now=True)
     direction = models.BooleanField(default=False)
     from_client = models.BooleanField(default=False)
     from_dealer = models.BooleanField(default=False)

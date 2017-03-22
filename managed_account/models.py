@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+
+from route.models import Conversation
 from t_auth.models import CustomUser
 from django.utils.translation import ugettext_lazy as _
 
@@ -44,12 +46,13 @@ class MenuItems(models.Model):
 
 class PurchaseOrder(models.Model):
     order_code = models.CharField(max_length=250, unique=True)
+    conversation = models.ForeignKey(Conversation,related_name="order_conversation")
     dealer = models.ForeignKey(CustomUser, related_name = "purchase_order_dealer", blank=True, null=True)
     customer = models.ForeignKey(CustomUser, related_name = "purchase_order_customer", blank=True, null=True)
     trigger = models.ForeignKey(Trigger,blank=True, null=True)
     order_status = models.CharField(_('Status'), choices=ORDER_CHOICES, max_length=10)
     total_amount_paid = models.FloatField(blank=True, null=True)
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now=True)
     expires = models.DateTimeField(blank=True, null=True)
     ip_address = models.FloatField(blank=True, null=True)
     location = models.CharField(max_length=500, blank=True, null=True)
@@ -96,7 +99,7 @@ class Grid(models.Model):
 class GridDetails(models.Model):
     grid = models.ForeignKey(Grid, related_name="grid_details")
     order = models.ForeignKey(PurchaseOrder, blank=True, null=True)
-    created = models.DateTimeField(default=timezone.now, blank=True, null=True)
+    created = models.DateTimeField(auto_now=True)
     grid_counter = models.PositiveIntegerField(default=0, blank=True, null=True)
     is_active = models.BooleanField(default=False)
 
