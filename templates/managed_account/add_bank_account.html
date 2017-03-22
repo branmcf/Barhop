@@ -6,10 +6,8 @@
 {% block content %}
 <div class="container1" style="color: #fff">
     <div class="row1">
-        <div class="col-md-3"></div>
-
-        <div class="col-md-6">
-            <h2>Add BankAccount :</h2>
+        <div class="container-mid">
+            <center><h2>Add Bank Account :</h2></center>
             <div class="form-top">
                 <div class="form-top-right">
                     <i class="fa fa-key"></i>
@@ -19,39 +17,47 @@
                 <form role="form" style="color: #607D8B" method="POST" action="{{ app_path }}">
                   {% csrf_token %}
                   <div class="form-group">
-                      <label >Country:</label>
+                      <label class="labelform floatleft">Country:</label>
                       <div class="errormsg" ></div>
-                      {{ form.country }}
+                      <div class="fieldform">{{ form.country }}</div>
+                      <div class="clear"></div>
+                  </div>
+                  <div class="clear"></div>
+                  <div class="form-group">
+                      <label class="labelform floatleft">Currency :</label>
+                      <div class="errormsg"></div>
+                      <div class="fieldform">{{ form.currency }}</div>
+                      <div class="clear"></div>
                   </div>
                   <div class="form-group">
-                      <label >Currency :</label>
+                      <label class="labelform floatleft">Routing Number :</label>
                       <div class="errormsg"></div>
-                      {{ form.currency }}
+                      <div class="fieldform">{{ form.routing_number}}</div>
+                      <div class="clear"></div>
                   </div>
                   <div class="form-group">
-                      <label>Routing Number :</label>
+                      <label class="labelform floatleft">Account Number :</label>
                       <div class="errormsg"></div>
-                      {{ form.routing_number}}
+                      <div class="fieldform">{{ form.account_number }}</div>
+                      <div class="clear"></div>
                   </div>
                   <div class="form-group">
-                      <label >Account Number :</label>
+                      <label class="labelform floatleft">Name :</label>
                       <div class="errormsg"></div>
-                      {{ form.account_number }}
+                      <div class="fieldform">{{ form.name }}</div>
+                      <div class="clear"></div>
                   </div>
                   <div class="form-group">
-                      <label>Name :</label>
+                      <label class="labelform floatleft">Account Holder Type :</label>
                       <div class="errormsg"></div>
-                      {{ form.name }}
+                      <div class="fieldform">{{ form.account_holder_type }}</div>
+                      <div class="clear"></div>
                   </div>
-                  <div class="form-group">
-                      <label>Account Holder Type :</label>
-                      <div class="errormsg"></div>
-                      {{ form.account_holder_type }}
-                  </div>
+
                   <br>
 
                   <div class="v-wrap">
-                      <button type="submit" id="cu-btn" class="btn btn-primary vbox">Submit</button>
+                      <p id="buton"><button type="submit" id="cu-btn" class="btn btn-primary vbox">Submit</button></p>
                   </div>
                 </form>
             </div>
