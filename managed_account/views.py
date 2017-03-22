@@ -143,7 +143,10 @@ class BankingView(TemplateView):
 
         payment_list = PaymentModel.objects.filter(dealer=dealer)
         context['payment_list'] = payment_list
-        context['bankaccount'] = BankAccount.objects.get(dealer=dealer)
+        try:
+            context['bankaccount'] = BankAccount.objects.get(dealer=dealer)
+        except:
+            pass
         return render(request, self.template_name,context)
 
 class GridView(TemplateView):
@@ -386,6 +389,7 @@ class UsersView(FormView):
     def form_invalid(self, form, **kwargs):
         context = self.get_context_data(**kwargs)
         user = self.request.user
+        dealer = utils.get_dealer(self.request.user)
         context['employe_list'] = DealerEmployeMapping.objects.filter(dealer=dealer, is_active=True).exclude(employe__id=user.id)
         context['form'] = form
         return self.render_to_response(context)
@@ -638,7 +642,7 @@ class MenuListView(FormView):
 class AddBankAccountView(FormView):
     template_name = 'managed_account/add_bank_account.html'
     form_class = BankAccountCreationForm
-    success_url = '/account/add_bank_account/'
+    success_url = '/account/banking/'
     model = BankAccount
 
     def form_valid(self, form):
@@ -667,31 +671,6 @@ class EditBankAccount(UpdateView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(EditBankAccount, self).dispatch(*args, **kwargs)
-    # def get_initial(self):
-    #     super(EditBankAccount, self).get_initial()
-    #     dealer = utils.get_dealer(self.request.user)
-    #     bankaccount= BankAccount.objects.get(dealer=dealer)
-    #     self.initial = {'country':bankaccount.country,'account_number':bankaccount.account_number,'routing_number':bankaccount.routing_number,'name':bankaccount.name}
-    #     return self.initial
-
-    # def get_context_data(self, **kwargs):
-    #     context = super(EditBankAccount, self).get_context_data(**kwargs)
-    #     dealer = utils.get_dealer(self.request.user)
-    #
-    #     try:
-    #         bankaccount = BankAccount.objects.get(dealer=dealer)
-    #         context['form'] = BankAccountCreationForm(initial={'country':bankaccount.country,'account_number':bankaccount.account_number,'routing_number':bankaccount.routing_number,'name':bankaccount.name})
-    #     except:
-    #         pass
-    #     return context
-    # #
-    # def get(self, request, *args, **kwargs):
-    #     """
-    #     Handles GET requests and instantiates a blank version of the form.
-    #     """
-    #     form = BankAccountCreationForm
-    #     return render(request,'managed_account/edit_bank_account.html',{'form':form})
-
 
 
 
