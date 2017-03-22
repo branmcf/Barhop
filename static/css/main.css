@@ -21,9 +21,32 @@ body{
 }*/
 
 /*LANDING ROUTE*/
+.floatleft{
+    float: left;
+}
+.clear{
+    clear:both;
+}
+.labelform{
+    width: 154px;
+}
+.fieldform {
+}
 
+.fieldform input,select{
+    width: 154px;
+}
+.container-mid{
+    width: 24%;
+    margin: 0 auto;
+}
+.form-bottom{
+    margin-top: 60px;
+}
 
-
+#buton{
+    text-align:center;
+}
 
 
 #landingContent{
