@@ -549,15 +549,19 @@ class OrderReadyView(View):
             grid = trigger.grid_trgger.all()[0]
             grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
 
+            # ================================ #
+            # Finidng the least counter grid
+            # ================================ #
             counter_list = []
             for grid_detail in grid_detail_obj:
                 counter_list.append(grid_detail.grid_counter)
             counter = min(counter_list)
             
-            grid_detail = GridDetails.objects.get(grid_counter=counter)
-            grid_detail.grid = grid
+            # ==================================== #
+            # Updating the grid with purchase order
+            # ==================================== #
+            grid_detail = GridDetails.objects.get(grid_counter=counter, grid=grid)
             grid_detail.order = purchase_order_obj
-            grid_detail.grid_counter = counter
             grid_detail.is_active = True
             grid_detail.save()
 
@@ -591,6 +595,12 @@ class OrderCloseView(View):
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'CLOSED'
             purchase_order_obj.save()
+
+            #====== Close Conversation =====
+            customer = purchase_order_obj.customer
+            conversation = Conversation.objects.get(customer=customer, closed=False)
+            conversation.closed = True
+            conversation.save()
 
             data['error_msg'] = ""
             data['success'] = "True"

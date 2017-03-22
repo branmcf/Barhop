@@ -13,7 +13,7 @@ ORDER_CHOICES = (
 
 
 class Trigger(models.Model):
-    dealer = models.ForeignKey(CustomUser)
+    dealer = models.ForeignKey(CustomUser, related_name='trigger_dealer')
     trigger_name = models.CharField(max_length=250, unique=True)
     active = models.BooleanField(default=True)
     created_by = models.ForeignKey(CustomUser, related_name='trigger_created_by')
@@ -47,7 +47,6 @@ class PurchaseOrder(models.Model):
     dealer = models.ForeignKey(CustomUser, related_name = "purchase_order_dealer", blank=True, null=True)
     customer = models.ForeignKey(CustomUser, related_name = "purchase_order_customer", blank=True, null=True)
     trigger = models.ForeignKey(Trigger,blank=True, null=True)
-    menu_item = models.ForeignKey(MenuItems, null=True, blank=True)
     order_status = models.CharField(_('Status'), choices=ORDER_CHOICES, max_length=10)
     total_amount_paid = models.FloatField(blank=True, null=True)
     created = models.DateTimeField(default=timezone.now)
@@ -62,6 +61,22 @@ class PurchaseOrder(models.Model):
         db_table = 'PurchaseOrder'
         verbose_name = 'PurchaseOrder'
         verbose_name_plural = 'PurchaseOrders'
+
+class OrderMenuMapping(models.Model):
+    order = models.ForeignKey(PurchaseOrder, related_name = "order_menu_datar", blank=True, null=True)
+    menu_item = models.ForeignKey(MenuItems, null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=0, blank=True, null=True)
+    total_item_amount = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return self.order
+
+    class Meta:
+        db_table = 'OrderMenuMapping'
+        verbose_name = 'OrderMenuMapping'
+        verbose_name_plural = 'OrderMenuMappings'
+
+
 
 class Grid(models.Model):
     dealer = models.ForeignKey(CustomUser,blank=True, null=True)

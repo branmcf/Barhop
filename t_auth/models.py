@@ -7,6 +7,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 from t_auth.utils import phone_regex
 from django.core.mail import send_mail
+# from managed_account.models import Trigger
+
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(_('username'), max_length=30, unique=True,
@@ -86,7 +88,7 @@ class RefNewUser(models.Model):
     dealer = models.ForeignKey(CustomUser, related_name='user_creator')
     dealer_mobile = models.CharField(max_length=15)
     mobile = models.CharField(max_length=15)
-    trigger = models.CharField(max_length=30)
+    current_trigger = models.ForeignKey('managed_account.Trigger', blank=True, null=True)
     date = models.DateTimeField(default=timezone.now)
 
     class Meta:

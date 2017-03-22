@@ -28,6 +28,8 @@ from route.models import Conversation, Message
 from trophy.models import TrophyModel
 from t_auth.forms import LoginForm
 from payment.models import ManagedAccountStripeCredentials
+from managed_account.models import GridDetails, Grid
+
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -97,23 +99,44 @@ def activate_account(request, uidb64=None, token=None,
 
             ref_user = RefNewUser.objects.get(mobile=user.mobile)
             dealer = ref_user.dealer
+            current_trigger = ref_user.current_trigger
 
             try:
                 trophy_data = TrophyModel.objects.get(dealer=dealer)
             except TrophyModel.DoesNotExist:
                 return Http404
 
-            c = Conversation(dealer=dealer, customer=user, trophy=trophy_data)
-            c.save()
+            conversation = Conversation(dealer=dealer, customer=user, trophy=trophy_data, trigger=current_trigger)
+            conversation.process_stage = 0
+            conversation.save()
 
-            m = Message(conversation=c, message=ref_user.trigger, date=ref_user.date, direction=True)
-            m.save()
-            message = 'Thanks for Signing Up.'
+            msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
+            msg_data.save()
+            del msg_data
 
-            reply = trophy_data.message
-            message = reply
-            m = Message(conversation=c, message=message, direction=False)
-            m.save()
+            #==============================#
+            # Checking Grid availability   #
+            #==============================#
+            try:
+                grid = Grid.objects.filter(trigger=current_trigger)
+                grid_detail = 
+
+
+
+            # ===================================== #
+            # To Do need to add Menu list here
+            # ==================================== #
+
+            message = "Welcome to Barhop! here is the menu for [trigger]. Reply 'START' to start your order"
+            msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
+            msg_data.save()
+
+            # ================================= #
+            # Changing the process stage to 1 
+            # ================================= #
+            conversation.process_stage = 1
+            conversation.save()
+
             send_message(settings.BARHOP_NUMBER, user.mobile, message)
 
         else:
@@ -122,7 +145,10 @@ def activate_account(request, uidb64=None, token=None,
             user.is_staff = True
             user.is_dealer = True
             user.save()
-            #For dealers only
+
+            # =============== #
+            # For dealers only
+            # =============== #
             trohpy = TrophyModel(dealer=user, message=user.username, default_order_response="Thanks for ordering.", enabled=True).save()
 
             # acc = stripe.Account.create(country='US', managed=True)
