@@ -2,6 +2,7 @@
 {% block content %}
 
   <div id="triggerContent">
+    <div>
     {% for trigger in trigger_data %}
       <div class="container-fluid" style="padding-left:0px; padding-right:0px; height:20%; border-bottom: 2px solid white;">
         <div class="col-md-8" style="background: #444954; height:100%; padding-top:3%; text-align:left;">{{ trigger.trigger_name }}</div>
@@ -11,6 +12,7 @@
         </div>
       </div>
     {% endfor %}
+    </div>
       <button type="button" class="btn" id="saveGridBtn" data-toggle="modal" data-target="#addTriggerModal" style="margin-top: 20px;">Add Trigger</button>
 
   <!-- Modal Add Trigger -->
