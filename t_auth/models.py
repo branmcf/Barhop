@@ -89,7 +89,7 @@ class RefNewUser(models.Model):
     dealer_mobile = models.CharField(max_length=15)
     mobile = models.CharField(max_length=15)
     current_trigger = models.ForeignKey('managed_account.Trigger', blank=True, null=True)
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'new_user'
