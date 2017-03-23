@@ -1,0 +1,40 @@
+{% extends "base_user.html" %}
+{% block content%}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 no-float" style="color:#fff">
+            <h2> Invoice </h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in order_details %}
+                <tr>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.total }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Grand Total </th>
+                    <th>{{grand_total}}</th>
+                </tr>
+                </tbody>
+            </table>
+            <div style="margin-left: 89%;">
+                <button class="btn btn-default" style="width: 107px;"> PAY</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock%}

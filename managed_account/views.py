@@ -1,4 +1,5 @@
 from django.conf import settings
+
 from django.http.response import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
@@ -601,6 +602,12 @@ class OrderCloseView(View):
             conversation = Conversation.objects.get(customer=customer, closed=False)
             conversation.closed = True
             conversation.save()
+
+            #========== Send Message =============
+            from_ = '+12145714438'
+            message = "Your Order is Ready. Come to the bar, Thank you"
+            vendor_number = settings.BARHOP_NUMBER
+            send_message(vendor_number, from_, message)
 
             data['error_msg'] = ""
             data['success'] = "True"

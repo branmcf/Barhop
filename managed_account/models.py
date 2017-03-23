@@ -73,7 +73,7 @@ class OrderMenuMapping(models.Model):
     total_item_amount = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return self.order
+        return str(self.order)
 
     class Meta:
         db_table = 'OrderMenuMapping'
@@ -113,6 +113,8 @@ class GridDetails(models.Model):
         verbose_name_plural = 'GridDetails'
 
 
-
-
+class MenuListImages(models.Model):
+    trigger = models.ForeignKey(Trigger,blank=True, null=True)
+    image = models.FileField(upload_to='MenuImages/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 

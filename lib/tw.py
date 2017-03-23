@@ -22,6 +22,16 @@ def send_message(from_, to, message):
     """
     client.messages.create(from_=from_, to=to, body=message)
 
+def send_multimedia_message(from_, to, message, media_url):
+    """
+
+    :param from_:
+    :param to:
+    :param message:
+    :return:
+    """
+    client.messages.create(from_=from_, to=to, body=message, media_url=media_url)
+
 
 def send_new_user_message(request, from_, to, ref_id):
     """

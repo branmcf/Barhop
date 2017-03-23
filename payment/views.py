@@ -1,5 +1,5 @@
 __author__ = 'nibesh'
-
+from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
@@ -19,9 +19,9 @@ from .models import ManagedAccountStripeCredentials
 
 from .models import PaymentModel, RevenueModel
 from .forms import PriceSubmissionForm
-
+from lib.tw import send_message
 from route.models import Conversation, Message
-
+from managed_account.models import PurchaseOrder, OrderMenuMapping
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 CHARGE_AMOUNT = 50
@@ -160,4 +160,48 @@ def process_payment(request):
 
     return render(request, 'payment/payment.html', {'data': data})
 
+class PaymentInvoiceView(TemplateView):
+    template_name = "payment/order_invoice.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(PaymentInvoiceView, self).get_context_data(**kwargs)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        data = []
+        context = self.get_context_data(**kwargs)
+        purchase_id = self.kwargs.get('pk')
+        purchase_order = PurchaseOrder.objects.get(id=purchase_id)
+        order_details = OrderMenuMapping.objects.filter(order=purchase_order)
+
+        grand_total = 0
+        for order in order_details:
+            item = {}
+            item['item_name'] = order.menu_item.item_name
+            item['quantity'] = order.quantity
+            item['price'] = order.menu_item.item_price
+            item['total'] = order.total_item_amount
+            grand_total += order.total_item_amount
+            data.append(item)
+        context['order_details'] = data
+        context['grand_total'] = grand_total
+
+        return render(request, self.template_name, context)
+
+
+class PaymentSuccessView(TemplateView):
+    template_name = "payment/payment_success.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(PaymentSuccessView, self).get_context_data(**kwargs)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+
+        from_ = '+12145714438'
+        message = "Your payment of '100$' has recieved.Your order number is [ORDER NUMBER]. We'll text you when your drink is ready! "
+        vendor_number = settings.BARHOP_NUMBER
+        send_message(vendor_number, from_, message)
+
+        return render(request, self.template_name, context)

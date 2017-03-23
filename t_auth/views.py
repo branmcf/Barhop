@@ -14,9 +14,11 @@ from django.contrib.auth import logout as auth_logout
 from django.views.decorators.csrf import csrf_exempt
 import stripe
 
-from lib.tw import send_message
+from lib.tw import send_message, send_multimedia_message
+from lib.utils import get_current_url
 from lib.image_handler import is_image, is_valid_image, ProfileImageUploader
 
+from route.utils import check_grid_availability
 from t_auth import forms
 from t_auth import utils
 
@@ -33,7 +35,7 @@ from managed_account.models import GridDetails, Grid
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
 stripe.api_key = settings.STRIPE_SECRET_KEY
-
+vendor_number = settings.BARHOP_NUMBER
 
 def new_user_signup(request):
     form = forms.NewUserSignUpForm(request.POST or None)
@@ -110,23 +112,38 @@ def activate_account(request, uidb64=None, token=None,
             conversation.process_stage = 0
             conversation.save()
 
-            msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
-            msg_data.save()
-            del msg_data
 
             #==============================#
             # Checking Grid availability   #
             #==============================#
+            trigger_id = current_trigger.id
+            grid_availability = check_grid_availability(trigger_id)            
+
+            if not grid_availability:
+                message = "Sorry, Too many orders in server. Please try after few minutes, Thank you."
+                msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
+                msg_data.save()
+                del msg_data
+                msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
+                msg_data.save()
+                send_message(vendor_number, user.mobile, message)
+
+
+
+            # =============#
+            #   Menu list  #
+            # =============#
             try:
-                grid = Grid.objects.filter(trigger=current_trigger)
-                grid_detail = 
+                menu_image = MenuListImages.objects.get(trigger=trigger)
+                image_url = menu_image.image.url
+                url = get_current_url(request)
+                media_url = url+image_url
+            except:
+                media_url = ""
 
-
-
-            # ===================================== #
-            # To Do need to add Menu list here
-            # ==================================== #
-
+            msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
+            msg_data.save()
+            del msg_data
             message = "Welcome to Barhop! here is the menu for [trigger]. Reply 'START' to start your order"
             msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
             msg_data.save()
@@ -137,7 +154,7 @@ def activate_account(request, uidb64=None, token=None,
             conversation.process_stage = 1
             conversation.save()
 
-            send_message(settings.BARHOP_NUMBER, user.mobile, message)
+            send_multimedia_message(vendor_number, user.mobile, message, media_url)
 
         else:
 
