@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-from route.models import Conversation
 from t_auth.models import CustomUser
 from django.utils.translation import ugettext_lazy as _
 
@@ -44,6 +43,8 @@ class MenuItems(models.Model):
         verbose_name = 'MenuItem'
         verbose_name_plural = 'MenuItems'
 
+
+from route.models import Conversation
 class PurchaseOrder(models.Model):
     order_code = models.CharField(max_length=250, unique=True)
     conversation = models.ForeignKey(Conversation,related_name="order_conversation")
