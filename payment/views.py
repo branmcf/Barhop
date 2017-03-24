@@ -303,6 +303,6 @@ class PaymentSuccessView(TemplateView):
 
         message = "Your payment of '$"+str(payment_obj.total_amount)+"' has recieved.Your order number is '"+str(payment_obj.order.order_code)+"' . We'll text you when your drink is ready! "
         vendor_number = settings.BARHOP_NUMBER
-        send_message(vendor_number, '+919946341903', message)
+        send_message(vendor_number, customer_mob, message)
 
         return render(request, self.template_name, context)
