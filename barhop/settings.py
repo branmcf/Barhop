@@ -153,21 +153,18 @@ EMAIL_HOST_PASSWORD = 'dfvyubjkcjppdtvd'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@barhop.com'
 
-# Twilio
 
-# Test
-# TWILIO_ACCOUNT_SID = 'AC9ea0771ec11bed99895df1744c191445'
-# TWILIO_AUTH_TOKEN = '9acc4a78f61401c992d213862375077e'
-# BARHOP_NUMBER = '+12145714438'
 
-#development
-TWILIO_ACCOUNT_SID = 'ACcffb21a7aa455f328e522856741b8fe8'
-TWILIO_AUTH_TOKEN = '482858ebebffcf4c951c03960d428768'
-BARHOP_NUMBER = '+17605136261'
+#################### development #########################
+# TWILIO_ACCOUNT_SID = 'ACcffb21a7aa455f328e522856741b8fe8'
+# TWILIO_AUTH_TOKEN = '482858ebebffcf4c951c03960d428768'
+# BARHOP_NUMBER = '+17605136261'
 
-# Live
-# TWILIO_ACCOUNT_SID = 'AC471c5467918a8a7d7a96460312c4eb44'
-# TWILIO_AUTH_TOKEN = '5bc6f4e25d91e42b8785b022ec1217cd'
+########################## Stagging #####################
+TWILIO_ACCOUNT_SID = 'AC471c5467918a8a7d7a96460312c4eb44'
+TWILIO_AUTH_TOKEN = '5bc6f4e25d91e42b8785b022ec1217cd'
+BARHOP_NUMBER = '+12145714438'
+
 
 # Live
 # ACCOUNT_SID = 'SK24c9ab44f74d5e3095578fc73dcbd8bb'
@@ -175,14 +172,21 @@ BARHOP_NUMBER = '+17605136261'
 
 # STRIPE
 
-# Test
-#STRIPE_SECRET_KEY = 'sk_test_FkiPFFIuSj3OQdoXkcQJLDyg'
-#STRIPE_PUBLIC_KEY = 'pk_test_3dUAb8qI7WYyvZSkH0ewibc8'
+############ DEV #################################### 
+# STRIPE_SECRET_KEY = 'sk_test_grh6SBR6cCz3ewKGAJqLA6iN'
+# STRIPE_PUBLIC_KEY = 'pk_test_DeV2O9iccNljVHoJNu7IrHs8'
 
-# Live
-STRIPE_SECRET_KEY = 'sk_live_CHevdKfuLlI7oBnD1EOZSWD7'
-STRIPE_PUBLIC_KEY = 'pk_live_vPahI3p8aXltdaC31013tFqt'
+############### Test ################################
+STRIPE_SECRET_KEY = 'sk_test_FkiPFFIuSj3OQdoXkcQJLDyg'
+STRIPE_PUBLIC_KEY = 'pk_test_3dUAb8qI7WYyvZSkH0ewibc8'
 
+############### Live ##################################
+# STRIPE_SECRET_KEY = 'sk_live_CHevdKfuLlI7oBnD1EOZSWD7'
+# STRIPE_PUBLIC_KEY = 'pk_live_vPahI3p8aXltdaC31013tFqt'
+
+
+SALES_TAX_PERCENT = 8.25  #8.25%
+BARHOP_TIP = 18    #18%
 
 # BITLY
 BITLY_ACCESS_TOKEN = '31d7102dad05bf73b9dfd1bdffdfefc65a17b6df'

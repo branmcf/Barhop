@@ -56,7 +56,7 @@ class HomeView(TemplateView):
                               conversations]
             try :
                 dealer = utils.get_dealer(request.user)
-                trigger_id = request.GET.get('trigger')
+                trigger_id = request.GET.get('trigger',None)
                 
                 if trigger_id:
                     trigger = Trigger.objects.get(id=trigger_id)
@@ -566,7 +566,16 @@ class OrderReadyView(View):
             grid_detail.is_active = True
             grid_detail.save()
 
+
             purchase_order_obj.save()
+
+            #========== Send Message =============
+            customer = purchase_order_obj.customer
+            customer_mob = customer.mobile
+            message = "Your Order is Ready.Your Order Code is '"+ str(purchase_order_obj.order_code) +"' Come to the bar, Thank you"
+            vendor_number = settings.BARHOP_NUMBER
+            send_message(vendor_number, from_, message)
+
 
             data['error_msg'] = ""
             data['success'] = "True"
@@ -602,12 +611,6 @@ class OrderCloseView(View):
             conversation = Conversation.objects.get(customer=customer, closed=False)
             conversation.closed = True
             conversation.save()
-
-            #========== Send Message =============
-            from_ = '+12145714438'
-            message = "Your Order is Ready. Come to the bar, Thank you"
-            vendor_number = settings.BARHOP_NUMBER
-            send_message(vendor_number, from_, message)
 
             data['error_msg'] = ""
             data['success'] = "True"

@@ -40,7 +40,7 @@ def handle_sms(request):
     vendor_number = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)
 
-    from_ = '+919946341903'
+    # from_ = '+919946341903'
 
 
     if body:
@@ -175,6 +175,7 @@ def handle_sms(request):
         process_stage = conversation.process_stage
         dealer = conversation.dealer
         customer = conversation.customer
+        purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id)
 
         if process_stage == 1 and client_message.lower() == "start" :                        
             message_to_client = "Text in the drink number of the first drink you want"
@@ -255,7 +256,7 @@ def handle_sms(request):
 
         elif process_stage == 4 and client_message.lower() == "done" :
             url = get_current_url(request)
-            payment_url = str(url) +"/payment/invoice"
+            payment_url = str(url) +"/payment/purchase_invoice/"+str(purchaseOrder.id)
             message_to_client = "Pay for your drinks here "+ str(payment_url)
             message_recieved_dealer = client_message
 

@@ -25,15 +25,40 @@
                 <tr>
                     <th></th>
                     <th></th>
+                    <th>TAX </th>
+                    <th>{{tax}}</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>TIP</th>
+                    <th>{{tip}}</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
                     <th>Grand Total </th>
-                    <th>{{grand_total}}</th>
+                    <th>${{grand_total}}</th>
                 </tr>
                 </tbody>
             </table>
-            <div style="margin-left: 89%;">
-                <button class="btn btn-default" style="width: 107px;"> PAY</button>
-            </div>
-            
+            <div style="margin-left: 85%;">
+                <div class="container">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{data.id}}">
+                        <script
+                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                            data-key="{{data.data_key}}"
+                            data-amount="{{data.data_amount}}"
+                            data-name="{{data.data_name}}"
+                            data-description="{{data.data_description}}"
+                            data-image="/static/images/barhop_icon.png"
+                            data-locale="auto">
+                        </script>
+                    </form>
+                </div>
+            </div>            
         </div>
     </div>
 </div>

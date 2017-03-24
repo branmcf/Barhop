@@ -7,8 +7,9 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-
+import uuid
 import stripe
+import shortuuid
 
 from lib.utils import json_response
 from lib.tw import send_price_message, send_message
@@ -22,14 +23,26 @@ from .forms import PriceSubmissionForm
 from lib.tw import send_message
 from route.models import Conversation, Message
 from managed_account.models import PurchaseOrder, OrderMenuMapping
+from django.http import HttpResponseRedirect
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-CHARGE_AMOUNT = 50
+APPLICATION_FEE = 10
 CHARGE_PERCENT = 0.18
 STRIPE_CHARGE_PERCENT = 0.029
 STRIPE_CHARGE_AMOUNT = 30
 SALES_TAX_PERCENT = 0.0825
 
+
+def get_tax(amount):
+    tax_percent = settings.SALES_TAX_PERCENT
+    tax = (amount*tax_percent)/100
+    return tax
+
+def get_tip(amount):
+    tip_percent = settings.BARHOP_TIP
+    tip = (amount*tip_percent)/100
+    return tip
 
 @login_required
 @csrf_exempt
@@ -160,6 +173,7 @@ def process_payment(request):
 
     return render(request, 'payment/payment.html', {'data': data})
 
+
 class PaymentInvoiceView(TemplateView):
     template_name = "payment/order_invoice.html"
 
@@ -174,20 +188,96 @@ class PaymentInvoiceView(TemplateView):
         purchase_order = PurchaseOrder.objects.get(id=purchase_id)
         order_details = OrderMenuMapping.objects.filter(order=purchase_order)
 
-        grand_total = 0
+        total_amount = 0
         for order in order_details:
             item = {}
             item['item_name'] = order.menu_item.item_name
             item['quantity'] = order.quantity
             item['price'] = order.menu_item.item_price
             item['total'] = order.total_item_amount
-            grand_total += order.total_item_amount
+            total_amount += order.total_item_amount
             data.append(item)
+
+        #========== Tax and Tip ===========#
+        tax = get_tax(total_amount)
+        tip = get_tip(total_amount)
+
+        #==========Grand Total===========#
+        grand_total = float(total_amount) + float(tax) + float(tip)
+        grand_total = int(round(grand_total))
+
+        #======== Payment Model ===========#
+        uuid_code = uuid.uuid1()
+        short_code = shortuuid.encode(uuid_code)
+        bill_number = str(short_code)
+
+        payment_obj = PaymentModel.objects.create(order=purchase_order,
+            dealer=purchase_order.dealer,
+            customer=purchase_order.customer,
+            total_amount=grand_total,
+            order_amount=total_amount,
+            sales_tax=tax,
+            tip=tip,
+            bill_number=bill_number,
+            )
+
+        # ====================================================== #
+        # This is to get the whole value in stripe. For example 
+        # if we do not add *100 , stripe will convert $126 into
+        # 1.26 dollors.
+        # ====================================================== #
+        stripe_checkout_data = {
+            'id': payment_obj.id,
+            'data_key': settings.STRIPE_PUBLIC_KEY,
+            'data_amount': grand_total*100,
+            'data_name': 'Barhop',
+            'data_description': "test",
+        }
+
         context['order_details'] = data
-        context['grand_total'] = grand_total
+        context['data'] = stripe_checkout_data
+        context['tax'] = tax
+        context['tip'] = tip
+        context['grand_total'] = grand_total 
 
         return render(request, self.template_name, context)
 
+    def post(self, request, *args, **kwargs):
+        payment_id = self.request.POST['id']
+        stripe_token = self.request.POST['stripeToken']
+        token_type = self.request.POST['stripeTokenType']
+        email = self.request.POST['stripeEmail']
+        
+        payment_obj = PaymentModel.objects.get(id=payment_id)
+
+        try:
+            if payment_obj:
+                
+                total_amount = int(payment_obj.total_amount)
+                dealer = payment_obj.dealer
+                customer = payment_obj.customer
+                
+                try:
+                    dealer_stripe_account = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
+                    account_id = dealer_stripe_account.account_id
+                except:
+                    account_id = None
+                
+                stripe_charge = stripe.Charge.create(amount=total_amount, currency='usd', source=stripe_token, description="payment",
+                                       application_fee=APPLICATION_FEE, stripe_account=account_id,receipt_email=email)
+
+                payment_obj.stripeToken = stripe_token
+                payment_obj.stripeTokenType = token_type
+                payment_obj.stripeEmail = email
+                payment_obj.charge_id = stripe_charge.id
+                payment_obj.processed = True
+                payment_obj.save()
+
+
+                return HttpResponseRedirect('/payment_success/'+str(payment_obj.bill_number))
+
+        except stripe.error.CardError:
+            return render(request, 'payment/payment_failed.html', {'_id': _id})
 
 class PaymentSuccessView(TemplateView):
     template_name = "payment/payment_success.html"
@@ -198,10 +288,21 @@ class PaymentSuccessView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
+        bill_number = self.kwargs.get('bill_num')
+        try:
+            payment_obj = PaymentModel.objects.get(bill_number=bill_number)
+            customer_mob = payment_obj.customer.mobile
+            context['payment_data'] = payment_obj
 
-        from_ = '+12145714438'
-        message = "Your payment of '100$' has recieved.Your order number is [ORDER NUMBER]. We'll text you when your drink is ready! "
+            conversation = Conversation.objects.get(customer=payment_obj.customer, dealer=payment_obj.dealer, closed=False)
+            conversation.process_stage = 7
+            conversation.save()
+        except:
+            context['payment_data'] = ''
+            pass
+
+        message = "Your payment of '$"+str(payment_obj.total_amount)+"' has recieved.Your order number is '"+str(payment_obj.order.order_code)+"' . We'll text you when your drink is ready! "
         vendor_number = settings.BARHOP_NUMBER
-        send_message(vendor_number, from_, message)
+        send_message(vendor_number, '+919946341903', message)
 
         return render(request, self.template_name, context)

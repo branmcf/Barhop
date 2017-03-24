@@ -5,7 +5,7 @@
         <div class="col-md-9 no-float" style="color:#fff">
             <div style="margin-left: 100px;">
                 <h2> Payment Successfull</h2>
-                <p>We have sent you the order details to your Mobile</p>
+                <p>Your payment has been processed. We will let you know when your drink is ready.</p>
                 <hr>
                 <table>
                     <thead>
@@ -16,41 +16,16 @@
                     <tbody>
                     <tr>
                         <td></td>
-                        <td><b>Payment ID</b> : QR0054N5FT52111 </td>
+                        <td><b>Order No:</b> : {{payment_data.order.order_code}} </td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td><b>Paid To</b> : BarHop </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><b>Amount Paid</b> : 200 $ </td>
+                        <td><b>Amount Paid</b> : ${{payment_data.total_amount}}  </td>
                     </tr>
                     </tbody>
                 </table>
                 
-            </div>
-            <!-- <table class="table">
-                <thead>
-                <tr>
-                    <td> </td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td></td>
-                    <td><b>Payment ID</b> : QR0054N5FT52111 </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><b>Paid To</b> : BarHop </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><b>Amount Paid</b> : 200 $ </td>
-                </tr>
-                </tbody>
-            </table> -->            
+            </div>      
         </div>
     </div>
 </div>
