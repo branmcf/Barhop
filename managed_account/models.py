@@ -44,10 +44,10 @@ class MenuItems(models.Model):
         verbose_name_plural = 'MenuItems'
 
 
-from route.models import Conversation
+# from route.models import Conversation
 class PurchaseOrder(models.Model):
-    order_code = models.CharField(max_length=250, unique=True)
-    conversation = models.ForeignKey(Conversation,related_name="order_conversation")
+    # order_code = models.CharField(max_length=250, unique=True)
+    # conversation = models.ForeignKey(Conversation,related_name="order_conversation")
     dealer = models.ForeignKey(CustomUser, related_name = "purchase_order_dealer", blank=True, null=True)
     customer = models.ForeignKey(CustomUser, related_name = "purchase_order_customer", blank=True, null=True)
     trigger = models.ForeignKey(Trigger,blank=True, null=True)

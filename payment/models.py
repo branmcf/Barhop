@@ -16,16 +16,12 @@ class StripeData(models.Model):
 
 class ManagedAccountStripeCredentials(models.Model):
     dealer = models.ForeignKey(CustomUser)
-    publishable_key = models.CharField(max_length=500, null=True, blank=True)
-    livemode = models.BooleanField()
-    access_token = models.CharField(max_length=500, null=True, blank=True)
-    scope = models.CharField(max_length=200, null=True, blank=True)
-    refresh_token = models.CharField(max_length=500, null=True, blank=True)
-    account_user_id = models.CharField(max_length=300, null=True, blank=True)
+    account_id = models.CharField(max_length=300, null=True, blank=True)
+    managed = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return "%s" % (self.access_token)
+        return "%s" % (self.dealer)
 
     class Meta:
         verbose_name = 'ManagedAccountStripeCredentials'
