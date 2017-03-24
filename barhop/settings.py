@@ -15,6 +15,9 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -155,12 +158,16 @@ DEFAULT_FROM_EMAIL = 'no-reply@barhop.com'
 # Test
 # TWILIO_ACCOUNT_SID = 'AC9ea0771ec11bed99895df1744c191445'
 # TWILIO_AUTH_TOKEN = '9acc4a78f61401c992d213862375077e'
-TEST_NUMBER = '+19722157985'
-BARHOP_NUMBER = '+12145714438'
+# BARHOP_NUMBER = '+12145714438'
+
+#development
+TWILIO_ACCOUNT_SID = 'ACcffb21a7aa455f328e522856741b8fe8'
+TWILIO_AUTH_TOKEN = '482858ebebffcf4c951c03960d428768'
+BARHOP_NUMBER = '+17605136261'
 
 # Live
-TWILIO_ACCOUNT_SID = 'AC471c5467918a8a7d7a96460312c4eb44'
-TWILIO_AUTH_TOKEN = '5bc6f4e25d91e42b8785b022ec1217cd'
+# TWILIO_ACCOUNT_SID = 'AC471c5467918a8a7d7a96460312c4eb44'
+# TWILIO_AUTH_TOKEN = '5bc6f4e25d91e42b8785b022ec1217cd'
 
 # Live
 # ACCOUNT_SID = 'SK24c9ab44f74d5e3095578fc73dcbd8bb'
@@ -204,3 +211,4 @@ LOGGING = {
         },
     },
 }
+
