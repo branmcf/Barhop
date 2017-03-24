@@ -14,50 +14,51 @@
                 </div>
             </div>
             <div class="form-bottom">
-                <form role="form" style="color: #607D8B" method="POST" action="{{ app_path }}">
+                <form role="form" style="color: #607D8B" method="POST" action="{{ app_path }}" id="add_bank_account_form">
                   {% csrf_token %}
+                  <p class="bank-errors"></p>
                   <div class="form-group">
                       <label class="labelform floatleft">Country:</label>
-                      <div class="errormsg" ></div>
                       <div class="fieldform">{{ form.country }}</div>
+                      <div class="errormsg" >{{ form.country.errors }}</div>
                       <div class="clear"></div>
                   </div>
                   <div class="clear"></div>
                   <div class="form-group">
                       <label class="labelform floatleft">Currency :</label>
-                      <div class="errormsg"></div>
                       <div class="fieldform">{{ form.currency }}</div>
+                      <div class="errormsg">{{ form.currency.errors }}</div>
                       <div class="clear"></div>
                   </div>
                   <div class="form-group">
                       <label class="labelform floatleft">Routing Number :</label>
-                      <div class="errormsg"></div>
                       <div class="fieldform">{{ form.routing_number}}</div>
+                      <div class="errormsg">{{ form.routing_number.errors }}</div>
                       <div class="clear"></div>
                   </div>
                   <div class="form-group">
                       <label class="labelform floatleft">Account Number :</label>
-                      <div class="errormsg"></div>
                       <div class="fieldform">{{ form.account_number }}</div>
+                       <div class="errormsg">{{ form.account_number.errors }}</div>
                       <div class="clear"></div>
                   </div>
                   <div class="form-group">
                       <label class="labelform floatleft">Name :</label>
-                      <div class="errormsg"></div>
                       <div class="fieldform">{{ form.name }}</div>
+                      <div class="errormsg">{{ form.name.errors }}</div>
                       <div class="clear"></div>
                   </div>
                   <div class="form-group">
                       <label class="labelform floatleft">Account Holder Type :</label>
-                      <div class="errormsg"></div>
                       <div class="fieldform">{{ form.account_holder_type }}</div>
+                      <div class="errormsg">{{ form.account_holder_type.errors }}</div>
                       <div class="clear"></div>
                   </div>
 
                   <br>
 
                   <div class="v-wrap">
-                      <p id="buton"><button type="submit" id="cu-btn" class="btn btn-primary vbox">Submit</button></p>
+                      <input type="button" id="cu-btn" class="btn btn-primary vbox" value="Submit">
                   </div>
                 </form>
             </div>
@@ -72,9 +73,10 @@
 
 <!-- end -->
 
-
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
     $(function () {
+
         Stripe.setPublishableKey("{{stripe_public_key}}");
 
         function stripeResponseHandler(status, response) {
@@ -85,17 +87,22 @@
                 $form.find('.bank-errors').text(response.error.message);
                 $form.find('button').prop('disabled', false);
             } else {
+
                 // response contains id and bank_account, which contains additional bank account details
                 var token = response.id;
                 // Insert the token into the form so it gets submitted to the server
-                $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+                $('<input />').attr('type', 'hidden').attr('name', "stripeToken").attr('value', token).appendTo('#add_bank_account_form');
                 // and submit
                 $form.get(0).submit();
             }
+
+
+
         }
 
-        $('#add_bank_account_form').submit(function (ev) {
-            ev.preventDefault();
+
+        $('#cu-btn').click(function(e){
+            e.preventDefault();
             Stripe.bankAccount.createToken({
                 country: $('#id_country').val(),
                 currency: 'usd',
@@ -104,7 +111,8 @@
                 name: $('#id_name').val(),
                 account_holder_type: $('#id_account_holder_type').val()
             }, stripeResponseHandler);
-        });
+
+        })
 
 
     });

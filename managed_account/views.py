@@ -662,7 +662,14 @@ class AddBankAccountView(FormView):
     success_url = '/account/banking/'
     model = BankAccount
 
+    def get_context_data(self, **kwargs):
+        context = super(AddBankAccountView, self).get_context_data(**kwargs)
+        context['stripe_public_key'] = settings.STRIPE_PUBLIC_KEY
+        return context
+
     def form_valid(self, form):
+
+
         country = form.cleaned_data['country']
         currency = form.cleaned_data['currency']
         routing_number = form.cleaned_data['routing_number']
@@ -671,8 +678,25 @@ class AddBankAccountView(FormView):
         account_holder_type = form.cleaned_data['account_holder_type']
         dealer = utils.get_dealer(self.request.user)
 
-        bankaccount = BankAccount(dealer=dealer,country=country,currency=currency,routing_number=routing_number,account_number=account_number,name=name,account_holder_type=account_holder_type)
-        bankaccount.save()
+        # ================================================= #
+        # Creating managed account for the dealer in barhop
+        # stripe platform
+        # ================================================= #
+        try:
+            stripe_token = self.request.POST['stripeToken']
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            stripe_account = stripe.Account.create(country=country, managed=True, external_account=stripe_token)
+            a = ManagedAccountStripeCredentials(dealer=dealer, account_id=stripe_account['id'])
+            a.save()
+
+            bankaccount = BankAccount(dealer=dealer,country=country,currency=currency,routing_number=routing_number,
+                                      account_number=account_number,name=name,account_holder_type=account_holder_type,stripeToken=stripe_token)
+            bankaccount.save()
+        except:
+            pass
+
+        message = "Successfully added account details"
+        messages.success(self.request, message)
         return super(AddBankAccountView, self).form_valid(form)
 
     @method_decorator(login_required)
@@ -683,7 +707,30 @@ class EditBankAccount(UpdateView):
     template_name = 'managed_account/add_bank_account.html'
     form_class = BankAccountEditForm
     model = BankAccount
-    success_url = "/account/"
+    success_url = "/account/banking/"
+
+    def get_context_data(self, **kwargs):
+        context = super(EditBankAccount, self).get_context_data(**kwargs)
+        context['stripe_public_key'] = settings.STRIPE_PUBLIC_KEY
+        return context
+
+    def form_valid(self, form):
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        dealer = utils.get_dealer(self.request.user)
+        stripe_token = self.request.POST['stripeToken']
+
+        managedaccount = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
+        account_id = managedaccount.account_id
+
+        account = stripe.Account.retrieve(account_id)
+        account.external_account = stripe_token
+        account.save()
+
+
+        message = "Successfully updated account details"
+        messages.success(self.request, message)
+
+        return super(EditBankAccount, self).form_valid(form)
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):

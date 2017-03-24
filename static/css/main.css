@@ -43,11 +43,18 @@ body{
 .form-bottom{
     margin-top: 60px;
 }
+.bank-errors{
+    color: red;
+}
 
 #buton{
     text-align:center;
 }
 
+.errormsg ul{
+    text-align: right;
+    list-style-type: none;
+}
 
 #landingContent{
   height:80vh;

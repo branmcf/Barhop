@@ -116,8 +116,10 @@ def activate_account(request, uidb64=None, token=None,
             #==============================#
             # Checking Grid availability   #
             #==============================#
+
             trigger_id = current_trigger.id
             grid_availability = check_grid_availability(trigger_id)            
+
 
             if not grid_availability:
                 message = "Sorry, Too many orders in server. Please try after few minutes, Thank you."

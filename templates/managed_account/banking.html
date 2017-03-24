@@ -35,9 +35,9 @@
     <div class="container">
       <div class="row bankingBottom">
         {% if bankaccount %}
-        <a href="{% url 'managed_account:edit_bank_account' bankaccount.id %}"><button class="btn btn-primary">Edit</button></a>
+        <a href="{% url 'managed_account:edit_bank_account' bankaccount.id %}"><button class="btn btn-primary">Edit Bank Account</button></a>
         {% else %}
-        <a href="{% url 'managed_account:add_bank_account' %}"><button class="btn btn-primary">Add account details</button></a>
+        <a href="{% url 'managed_account:add_bank_account' %}"><button class="btn btn-primary">Add Bank Account</button></a>
         {% endif %}
       </div>        
     </div>
