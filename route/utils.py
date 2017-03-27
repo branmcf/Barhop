@@ -83,11 +83,13 @@ def check_grid_availability(trigger_id):
     #==============================#
     # Checking Grid availability   #
     #==============================#
-
-    trigger = Trigger.objects.get(id=trigger_id)
-    grid = trigger.grid_trgger.all()[0]
-    grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
-    grid_detail_count = grid_detail_obj.count()
+    try:
+        trigger = Trigger.objects.get(id=trigger_id)
+        grid = trigger.grid_trgger.all()[0]
+        grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
+        grid_detail_count = grid_detail_obj.count()
+    except:
+        grid_detail_count = 0
 
     if grid_detail_count > 0 :
         # ================================ #

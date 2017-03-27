@@ -30,7 +30,7 @@ from route.models import Conversation, Message
 from trophy.models import TrophyModel
 from t_auth.forms import LoginForm
 from payment.models import ManagedAccountStripeCredentials
-from managed_account.models import GridDetails, Grid
+from managed_account.models import GridDetails, Grid, MenuListImages, PurchaseOrder
 
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
@@ -94,7 +94,6 @@ def activate_account(request, uidb64=None, token=None,
     if user is not None and user.is_active is False and token_generator.check_token(user, token):
         
         if user.is_ref_user:
-
             user.is_active = True
             user.is_staff = False
             user.save()
@@ -112,11 +111,9 @@ def activate_account(request, uidb64=None, token=None,
             conversation.process_stage = 0
             conversation.save()
 
-
             #==============================#
             # Checking Grid availability   #
             #==============================#
-
             trigger_id = current_trigger.id
             grid_availability = check_grid_availability(trigger_id)            
 
@@ -129,34 +126,45 @@ def activate_account(request, uidb64=None, token=None,
                 msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
                 msg_data.save()
                 send_message(vendor_number, user.mobile, message)
-
-
+                return
 
             # =============#
             #   Menu list  #
             # =============#
             try:
-                menu_image = MenuListImages.objects.get(trigger=trigger)
+                menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
                 image_url = menu_image.image.url
                 url = get_current_url(request)
                 media_url = url+image_url
             except:
-                media_url = ""
+                media_url = get_current_url(request)
 
             msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
             msg_data.save()
             del msg_data
-            message = "Welcome to Barhop! here is the menu for [trigger]. Reply 'START' to start your order"
+            message = "Welcome to Barhop! here is the menu for "+ str(current_trigger.trigger_name) +". Reply 'START' to start your order"
             msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
-            msg_data.save()
+            msg_data.save()            
 
             # ================================= #
             # Changing the process stage to 1 
             # ================================= #
             conversation.process_stage = 1
             conversation.save()
+            
+            purchaseOrder = PurchaseOrder.objects.create(order_code=conversation.id,
+                conversation=conversation,
+                dealer=dealer,
+                customer=user,
+                trigger=current_trigger,
+                order_status='PENDING'
+                )
 
-            send_multimedia_message(vendor_number, user.mobile, message, media_url)
+
+
+            to = str(user.mobile)
+            send_multimedia_message(vendor_number, to, message, media_url)
+            return render(request, 'authentication/customer_signUp_success.html')
 
         else:
 
@@ -173,8 +181,8 @@ def activate_account(request, uidb64=None, token=None,
             # acc = stripe.Account.create(country='US', managed=True)
             # ma = ManagedAccountStripeCredentials(dealer=user, account_user_id=acc['id'], publishable_key=acc['keys']['publishable'], secret_key=acc['keys']['secret'])
             # ma.save()
-
-        return render(request, 'authentication/sign_up_successful.html')
+            return render(request, 'authentication/sign_up_successful.html')
+        
     return render(request, 'authentication/invalid_link.html')
 
 class LoginView(View):
