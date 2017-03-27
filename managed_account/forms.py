@@ -35,7 +35,6 @@ class AddTriggerForm(forms.ModelForm):
 class GridForm(forms.ModelForm):
 
     # def __init__(self,user=None, *args, **kwargs):
-    #     # import pdb;pdb.set_trace()
     #     super(GridForm, self).__init__(*args, **kwargs)
     #     obj = Grid.objects.filter(dealer__id=user).first()
     #     print obj
