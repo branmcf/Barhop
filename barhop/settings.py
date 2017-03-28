@@ -173,6 +173,7 @@ BARHOP_NUMBER = '+17605136261'
 
 # STRIPE
 
+
 ############ DEV #################################### 
 # STRIPE_SECRET_KEY = 'sk_test_grh6SBR6cCz3ewKGAJqLA6iN'
 # STRIPE_PUBLIC_KEY = 'pk_test_DeV2O9iccNljVHoJNu7IrHs8'
@@ -216,4 +217,9 @@ LOGGING = {
         },
     },
 }
+
+
+# media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
