@@ -46,35 +46,53 @@ class HomeView(TemplateView):
         :return:
         """
         data = {}
+        warning_message = ""
         if request.user.is_authenticated():
             trophies = TrophyModel.objects.filter(dealer=request.user).order_by('-date')
             c_messages = []
-            if trophies:
-                conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
-                    'date')
-                c_messages = [(item, Message.objects.filter(conversation=item).order_by('-id')[0]) for item in
-                              conversations]
+            # if trophies:
+            #     conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
+            #         'date')
+            #     c_messages = [(item, Message.objects.filter(conversation=item).order_by('-id')[0]) for item in
+            #                   conversations]
             try :
                 dealer = utils.get_dealer(request.user)
-                trigger_id = request.GET.get('trigger',None)
-                
+                trigger_id = request.GET.get('trigger')
+
+                dealer_grid = Grid.objects.filter(dealer=dealer)
+                warning_message = ''
+                if not dealer_grid:
+                    warning_message += "Kindly add the Grid details to process your orders.<br>"
+
+                dealer_bankaccount = BankAccount.objects.filter(dealer=dealer)
+                if not dealer_bankaccount:
+                    warning_message += "Kindly add the bank account details.<br>"
+
+                dealer_triggers = Trigger.objects.filter(dealer=dealer)
+                if not dealer_triggers:
+                    warning_message += "Kindly add Triggers to get orders.<br>"
+
                 if trigger_id:
-                    trigger = Trigger.objects.get(id=trigger_id)
-                    purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=trigger)
-                    purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', trigger=trigger)
+                    current_trigger = Trigger.objects.get(id=int(trigger_id))
+                    purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=current_trigger)
+                    purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', trigger=current_trigger)
                 else:
                     purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID')
                     purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')
-                
-                triggers = Trigger.objects.filter(dealer=dealer)
-                context['triggers'] = triggers
+
+                context['triggers'] = dealer_triggers
                 context['trophies'] = trophies
                 context['con_messages'] = c_messages
                 context['purchase_paid_orders'] = purchase_paid_orders
                 context['purchase_ready_orders'] = purchase_ready_orders
-                return render(request,self.template_name ,context)
+
+                context['warning_message'] = warning_message
+                return render(request, self.template_name, context)
             except:
                 pass
+            return render(request, self.template_name, context)
+
+
         return render(request, 'landing.html')
 
     # def post(self, request):
@@ -142,8 +160,23 @@ class BankingView(TemplateView):
         login_user = request.user
         dealer = utils.get_dealer(login_user)
 
+        pending_amount = 0
+        available_amount = 0
+
         payment_list = PaymentModel.objects.filter(dealer=dealer)
+
+        # if payment_list:
+        #     pending_obj = payment_list.filter(order__order_status="PENDING")
+        #     available_obj = payment_list.filter(order__order_status="PAID")
+        #     if pending_obj:
+        #         pending_amount = pending_obj.aggregate(Sum('total_amount'))
+        #     if available_obj:
+        #         available_amount = available_obj.aggregate(Sum('total_amount'))
+
         context['payment_list'] = payment_list
+        context['pending_amount'] = pending_amount
+        context['available_amount'] = available_amount
+
         try:
             context['bankaccount'] = BankAccount.objects.get(dealer=dealer)
         except:
