@@ -104,6 +104,30 @@
   </div>
   </div>
   <!-- END MODAL -->
+
+  {% if warning_message %}
+  <!-- Modal pop up-->
+  <div class="modal fade" id="popUp" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content" id="triggerModalStyle">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"><center>Warning!!!</center></h4>
+        </div>
+        <div class="modal-body">
+          {% if warning_message %}
+               <center>{{ warning_message|safe }}</center>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- END MODAL -->
+ {% endif %}
+
+
 <script type="text/javascript">
   $('.orderReadyCol').click(function(event){
     order_id = $(this).attr('id');
@@ -165,6 +189,14 @@ $('#searchButton').click(function(){
   }
 
 });
+
+<!--modal pop up-->
+
+  $(window).load(function(){
+      {% if warning_message %}
+      $('#popUp').modal('show');
+      {% endif %}
+  });
 
 </script>
 

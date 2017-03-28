@@ -1,3 +1,11 @@
+
+# ================================================================= #
+# Conjob to close a conversation if the user doesn't respond for
+# more than 30 minutes .
+# ================================================================= #
+
+
+
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
@@ -7,7 +15,9 @@ from datetime import datetime, timedelta
 
 
 class Command(BaseCommand):
+
     def handle(self, *args, **options):
+
         current_time = timezone.now()
         time_threshold = current_time - timedelta(minutes=30)
         conversations = Conversation.objects.filter(date__lt=time_threshold,closed=False)

@@ -785,7 +785,6 @@ input[type="radio"] {
 }
 
 #trigger_name {
-    color: white;
-    font-size: xx-large;
+    color: black;
     text-align: center;
 }

@@ -1,6 +1,12 @@
+# ================================================================= #
+# Cronjob to remove all expored orders
+# ================================================================= #
+
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from managed_account.models import PurchaseOrder
+from managed_account.models import PurchaseOrder, GridDetails
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -17,6 +23,12 @@ class Command(BaseCommand):
                 conversation = order.conversation
                 conversation.closed = True
                 conversation.save()
+
+                griddetail = GridDetails.objects.get(order=order)
+                griddetail.order = None
+                griddetail.is_active = False
+                griddetail.save()
+
 
 
 
