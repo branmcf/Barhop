@@ -173,14 +173,14 @@ BARHOP_NUMBER = '+17605136261'
 
 # STRIPE
 
-
-############ DEV #################################### 
+############ DEV ####################################
 # STRIPE_SECRET_KEY = 'sk_test_grh6SBR6cCz3ewKGAJqLA6iN'
 # STRIPE_PUBLIC_KEY = 'pk_test_DeV2O9iccNljVHoJNu7IrHs8'
 
 ############### Test ################################
 STRIPE_SECRET_KEY = 'sk_test_FkiPFFIuSj3OQdoXkcQJLDyg'
 STRIPE_PUBLIC_KEY = 'pk_test_3dUAb8qI7WYyvZSkH0ewibc8'
+
 
 ############### Live ##################################
 # STRIPE_SECRET_KEY = 'sk_live_CHevdKfuLlI7oBnD1EOZSWD7'
