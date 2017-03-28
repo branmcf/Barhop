@@ -27,7 +27,6 @@ from django.http import HttpResponseRedirect
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-APPLICATION_FEE = 10
 CHARGE_PERCENT = 0.18
 STRIPE_CHARGE_PERCENT = 0.029
 STRIPE_CHARGE_AMOUNT = 30
@@ -203,7 +202,7 @@ class PaymentInvoiceView(TemplateView):
         tip = get_tip(total_amount)
 
         #==========Grand Total===========#
-        grand_total = float(total_amount) + float(tax) + float(tip)
+        grand_total = float(total_amount) + float(tax) + float(tip) + float(settings.APPLICATION_FEE)
         grand_total = int(round(grand_total))
 
         #======== Payment Model ===========#
@@ -256,6 +255,7 @@ class PaymentInvoiceView(TemplateView):
                 total_amount = int(payment_obj.total_amount)
                 dealer = payment_obj.dealer
                 customer = payment_obj.customer
+                order_id = payment_obj.order.id
                 
                 try:
                     dealer_stripe_account = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
@@ -264,15 +264,20 @@ class PaymentInvoiceView(TemplateView):
                     account_id = None
                 
                 stripe_charge = stripe.Charge.create(amount=total_amount, currency='usd', source=stripe_token, description="payment",
-                                       application_fee=APPLICATION_FEE, stripe_account=account_id,receipt_email=email)
+                                       application_fee=settings.APPLICATION_FEE, stripe_account=account_id,receipt_email=email)
 
                 payment_obj.stripeToken = stripe_token
                 payment_obj.stripeTokenType = token_type
                 payment_obj.stripeEmail = email
                 payment_obj.charge_id = stripe_charge.id
+                payment_obj.detail = "Payment Successful"
                 payment_obj.processed = True
                 payment_obj.save()
 
+                order_obj = PurchaseOrder.objects.get(id=order_id)
+                order_obj.order_status = "PAID"
+                order_obj.total_amount_paid = total_amount
+                order_obj.save()
 
                 return HttpResponseRedirect('/payment_success/'+str(payment_obj.bill_number))
 

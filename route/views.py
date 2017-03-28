@@ -34,10 +34,16 @@ def handle_sms(request):
     :param request:
     :return:
     """
+    import pdb; pdb.set_trace()
     trigger = None
     SEND_ERROR = False
     vendor_number = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)
+
+    try:
+        location = request.POST['FromCity']
+    except:
+        location = ''
 
     # from_ = '+919946341903'
 
@@ -164,7 +170,8 @@ def handle_sms(request):
                     dealer=dealer,
                     customer=customer,
                     trigger=trigger_data,
-                    order_status='PENDING'
+                    order_status='PENDING',
+                    location = location
                     )
 
                 message_to_client = "Welcome to Barhop! here is the menu for "+ str(trigger_data.trigger_name) +" Reply 'START' to start your order"
@@ -185,6 +192,9 @@ def handle_sms(request):
         dealer = conversation.dealer
         customer = conversation.customer
         purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id)
+        if not purchaseOrder.location:
+            purchaseOrder.location = location
+            purchaseOrder.save()
 
         if process_stage == 1 and client_message.lower() == "start" :                        
             message_to_client = "Text in the drink number of the first drink you want"

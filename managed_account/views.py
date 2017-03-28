@@ -29,6 +29,7 @@ from t_auth.forms import CustomUserCreationForm
 
 from t_auth.utils import send_email_auth
 from managed_account import utils
+from django.db.models import Sum
 
 
 class HomeView(TemplateView):
@@ -163,17 +164,19 @@ class BankingView(TemplateView):
         pending_amount = 0
         available_amount = 0
 
-        payment_list = PaymentModel.objects.filter(dealer=dealer)
+        payment_obj = PaymentModel.objects.filter(dealer=dealer)
 
-        # if payment_list:
-        #     pending_obj = payment_list.filter(order__order_status="PENDING")
-        #     available_obj = payment_list.filter(order__order_status="PAID")
-        #     if pending_obj:
-        #         pending_amount = pending_obj.aggregate(Sum('total_amount'))
-        #     if available_obj:
-        #         available_amount = available_obj.aggregate(Sum('total_amount'))
+        if payment_obj:
+            pending_obj = payment_obj.filter(order__order_status="PENDING")
+            available_obj = payment_obj.filter(order__order_status="PAID")
+            if pending_obj:
+                pending_amount = pending_obj.aggregate(Sum('total_amount'))
+                pending_amount = pending_amount['total_amount__sum']
+            if available_obj:
+                available_amount = available_obj.aggregate(Sum('total_amount'))
+                available_amount = available_amount['total_amount__sum']
 
-        context['payment_list'] = payment_list
+        context['payment_list'] = payment_obj.filter(order__order_status="PAID",processed=True)
         context['pending_amount'] = pending_amount
         context['available_amount'] = available_amount
 
@@ -568,6 +571,9 @@ class ChangeAccessLeveView(View):
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+#=========================== Order Ready & Close ========================================           
+
 class OrderReadyView(View):
 
     def post(self, request):
@@ -662,6 +668,11 @@ class OrderCloseView(View):
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
         return HttpResponse(json.dumps(data), content_type='application/json')
+# ______________________________________________________________________________________
+
+
+#=================================== MENU ===============================================#
+
 
 class MenuListView(FormView):
     template_name = "managed_account/menu.html"
@@ -682,15 +693,78 @@ class MenuListView(FormView):
 
         return self.render_to_response(context)
 
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        django_messages = []
+        try:
+            table_data = request.POST.getlist("table")
+
+            received_json_data=json.loads(table_data[0])
+
+            for dat in received_json_data:
+                try:
+                    item_id = int(dat['item_id'])
+                    menu_obj = MenuItems.objects.get(id=item_id)
+                    
+                    if dat['item_name'] == '':
+                        data['error_msg'] = "ID : "+ str(item_id) +" , Cannot save this item without name"
+                        data['success'] = "False"
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+
+                    menu_obj.item_name = dat['item_name']                  
+                    menu_obj.item_price = dat['price']
+                    menu_obj.quantity_available = dat['quantity']
+                    menu_obj.save()
+                        
+                except:
+                    pass
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Changes saved successfully.")
+
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "Could not save your changes. Please try again."
+            data['success'] = "False"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(MenuListView, self).dispatch(*args, **kwargs)
+
+
+class AddNewMenuView(View):
+
     def post(self, request):
         data = {}
         django_messages = []
-        try:            
+        try:
+            dealer = utils.get_dealer(self.request.user)
+            MenuItems.objects.create(dealer=dealer, item_name='')
+            data['error_msg'] = ""
+            data['success'] = "True"
+
             return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             data['error_msg'] = "something went WRONG"
+            data['success'] = "False"
             return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
+#_________________________________________________________________________________#
+
+
+# ================================== Banking ==================================== #
 
 class AddBankAccountView(FormView):
     template_name = 'managed_account/add_bank_account.html'
@@ -738,6 +812,7 @@ class AddBankAccountView(FormView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(AddBankAccountView, self).dispatch(*args, **kwargs)
+
 
 class EditBankAccount(UpdateView):
     template_name = 'managed_account/add_bank_account.html'

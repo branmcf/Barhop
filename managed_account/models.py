@@ -29,14 +29,14 @@ class Trigger(models.Model):
 
 class MenuItems(models.Model):
     dealer = models.ForeignKey(CustomUser)
-    item_name = models.CharField(max_length=800, null=False, blank=False)
-    item_price = models.FloatField(null=True, blank=True)
+    item_name = models.CharField(max_length=800, null=True, blank=True)
+    item_price = models.FloatField(default=0, null=True, blank=True)
     quantity_available = models.PositiveIntegerField(default=0, blank=True, null=True)
     created_by = models.ForeignKey(CustomUser, related_name='menu_created_by', blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.item_name
+        return str(self.item_name)
 
     class Meta:
         db_table = 'MenuItems'

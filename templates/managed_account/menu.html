@@ -1,8 +1,6 @@
 {% extends "base_inner.html" %}
 {% block content %}
   <script>
-    var data = [];
-    var change = {};
   </script>
   <div id="menuContent">
     <div>
@@ -14,7 +12,7 @@
               <tr>
                 <td id="{{ data.id }}" class="id" >{{ data.id }}</td>
                 <td id="{{ data.id }}" class="item_name" >{{ data.item_name }}</td>
-                <td id="{{ data.id }}" class="item_price" >{{ data.item_price }}</td>
+                <td id="{{ data.id }}" class="item_price" >${{ data.item_price }}</td>
                 <td id="{{ data.id }}" class="quantity_available" >{{ data.quantity_available }}</td>
               </tr>
             {% endfor %}
@@ -24,9 +22,9 @@
             </tbody>
       </table>
     </div>
-      <button type="button" class="btn" id="saveGridBtn">Edit</button>
+      <button type="button" class="btn saveGridBtn" id="EditMenuBtn">Edit</button>
     <div id="eidtButtons" style="display: none;margin-top: 10px">
-      <button type="button" class="btn saveGridBtn" id="cancel">Cancel</button>
+      <button type="button" class="btn saveGridBtn" id="cancelButton">Cancel</button>
       <button type="button" class="btn saveGridBtn" id="saveMenuButton">Save</button>
       <button type="button" class="btn saveGridBtn" id="addMenuButton">Add</button>      
     </div>
@@ -34,66 +32,90 @@
 
 <script>
 
-$("#saveGridBtn").click(function(){
+// On click Edit show add save
+$("#EditMenuBtn").click(function(){
   if ($('#eidtButtons').css('display') == 'none') {
+    $('#mainTable').editableTableWidget();
     $("#eidtButtons").show();    
   }
   else{
     $("#eidtButtons").hide();
     $("#addMenuButton").show();
   }
-
 });
 
+// Add new empty item
 $("#addMenuButton").click(function(){
-  var new_row = "<tr id='last_row'><td>...</td> <td>...</td> <td id='1223'>...</td> <td>...</td> </tr>"
-  $("#mainTable tbody").append(new_row);
-  $('#mainTable').editableTableWidget();
-  $("#addMenuButton").hide();
-  
-  // $('#mainTable td').on('change', function(evt, newValue) {
-  //   alert("change");
-  // });
-  $('#mainTable td').on('change', function(evt, newValue) {
-    change['id'] = evt.target.id;
-    console.log(evt.target);
-                document.getElementById(evt.target.id).getAttribute("class"); 
-    change['field'] = "item_name";
-    change['value'] = newValue;
-    console.log("Data :");
-    console.log(data);
-  });
-});
-
-$("#saveMenuButton").click(function(){
-  var tr = document.getElementById('last_row');
-  var td = tr.getElementsByTagName("td");
-  var item_name = td[1].innerHTML
-  var item_price = td[2].innerHTML
-  var item_quantity = td[3].innerHTML
-
-   $.ajax({
-    url: '{% url 'menu_view' %}',
+  $.ajax({
+    url: '/account/add_new/',
     type:'POST',
     data:{
-      'changes' : data,
-      'item_name': item_name,
-      'item_price': item_price,
-      'item_quantity': item_quantity,
+      'data' : 'data',
     },
     success: function (data){
-       if(data["success"] == 'True' ){
-        $('#changePasswordModal').modal('hide');
-        update_messages(data.messages);         
+      if(data["success"] == 'True' ){
+        location.reload();
+        // update_messages(data.messages);  
       }
       else{
-        update_messages(data.error_msg);
+        alert("false");
       }
     }
   });
-
-
 });
+
+// Cancel Btn Refresh page & dont save
+$("#cancelButton").click(function(){
+  location.reload();
+})
+
+// Save Complete Table Data
+$("#saveMenuButton").click(function(){
+  var table_data = [];  
+  var table = $('#mainTable');
+  table.find('tr').each(function (i) {
+    var $tds = $(this).find('td');
+    var row_data = {};
+    row_data['item_id'] = $tds.eq(0).text(),
+    row_data['item_name'] = $tds.eq(1).text(),
+    row_data['price'] = $tds.eq(2).text(),
+    row_data['quantity'] = $tds.eq(3).text();
+    table_data.push(row_data);
+  });
+  // console.log("Data :");
+  // console.log(table_data);
+  table_data_a = JSON.stringify(table_data)
+  $.ajax({
+    url: '/account/menu/',
+    type:'POST',
+    data:{
+      'table' : table_data_a,
+    },
+    success: function (data){
+      if(data["success"] == 'True' ){
+        update_messages(data.messages);
+        $("#eidtButtons").hide();
+          
+      }
+      else{
+        alert(data.error_msg);
+      }
+    }
+  });
+});
+
+function update_messages(messages){
+  console.log("update message");
+  $(".message").html("");
+  $.each(messages, function (i, m) {
+      $(".message").append(m.message);
+  });  
+  $('.message').show();
+  setTimeout(function() {
+      $('.message').fadeOut('slow');
+      location.reload();
+  }, 3000);
+}
 
 // $('#textAreaEditor').editableTableWidget({editor: $('<textarea>')});
 window.prettyPrint && prettyPrint();

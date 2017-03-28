@@ -644,6 +644,18 @@ text-decoration:none;
   margin-right: 100px;
   float: right;
 }
+.bankingBottomLeft{
+  margin: 20px;
+  color: #fff;
+  float: left;
+}
+.bankingBottomRight{
+  margin-top: 23px;
+  padding-left: 195px;
+  color: #fff;
+  float: right;
+}
+
 input[type="radio"] {
   -webkit-appearance: checkbox; /* Chrome, Safari, Opera */
   -moz-appearance: checkbox;    /* Firefox */
@@ -664,7 +676,7 @@ input[type="radio"] {
   position: absolute; 
   border: 2px solid white;
   background:;
-  color: white;
+  color: #1b2c3d;
   /*  padding-left: 10vw;*/
 }
 

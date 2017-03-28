@@ -18,9 +18,9 @@
             <tr>
               <td>{{data.charge_id}}</td>
               <td>{{data.detail}}</td>
-              <td>{{data.total_amount}}</td>
-              <td>{{data.sales_tax}}</td>
-              <td>{{data.tip}}</td>
+              <td>${{data.total_amount}}</td>
+              <td>${{data.sales_tax}}</td>
+              <td>${{data.tip}}</td>
               <td>{{data.payment_date}}</td>
             </tr>
             {% endfor %}
@@ -29,12 +29,21 @@
       </div>
     </div>
     <div class="container">
-      <div class="row bankingBottom">
-        {% if bankaccount %}
-        <a href="{% url 'managed_account:edit_bank_account' bankaccount.id %}"><button class="btn btn-primary">Edit Bank Account</button></a>
-        {% else %}
-        <a href="{% url 'managed_account:add_bank_account' %}"><button class="btn btn-primary">Add Bank Account</button></a>
-        {% endif %}
+      <div class="row">
+        <div class="col-sm-4 bankingBottomLeft">
+          <span>Pending Amount : ${{pending_amount}}</span><br>
+          <span>Available Amount : ${{available_amount}}</span>
+        </div>
+        <div class="col-sm-4">
+          
+        </div>
+        <div class="col-sm-4 bankingBottomRight">
+          {% if bankaccount %}
+          <a href="{% url 'managed_account:edit_bank_account' bankaccount.id %}"><button class="btn btn-primary">Edit Bank Account</button></a>
+          {% else %}
+          <a href="{% url 'managed_account:add_bank_account' %}"><button class="btn btn-primary">Add Bank Account</button></a>
+          {% endif %}
+        </div>
       </div>        
     </div>
 

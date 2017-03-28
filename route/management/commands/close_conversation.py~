@@ -1,2 +1,0 @@
-class Command(BaseCommand):
-    help = 'Closes the specified poll for voting'
