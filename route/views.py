@@ -20,7 +20,6 @@ from route.forms import OrderReadyForm
 from route.models import *
 from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mobile, get_ref_user_by_mobile, get_trigger_by_name, save_user_dealer_chat, check_grid_availability)
 
-
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 from django.conf import settings
@@ -49,10 +48,18 @@ def handle_sms(request):
             trigger = body.split('-')[1]
             trigger = trigger.strip()
             client_message = trigger
+        else:
+            trigger = body
+            client_message = body
+
+    print("\n TEXT : ")
+    print(str(client_message)+"\n")
 
     checkType = RepresentsInt(client_message)
     if checkType:
         client_message_number = int(client_message)
+        print("client_message_number")
+        print(client_message_number)
 
     r = twiml.Response()
 
@@ -65,7 +72,7 @@ def handle_sms(request):
     # ============================================ #
     # Check if the user already has a conversation #
     # ============================================ #
-    # import pdb; pdb.set_trace()
+    
     try:
         conversation = Conversation.objects.get(customer=customer, closed=False,)
     except:
@@ -153,23 +160,25 @@ def handle_sms(request):
                 # Need to change order_code #
                 #**************************#
                 purchaseOrder = PurchaseOrder.objects.create(order_code=conversation.id,
-                dealer=dealer,
-                customer=customer,
-                trigger=trigger_data,
-                order_status='PENDING'
-                )
+                    conversation=conversation,
+                    dealer=dealer,
+                    customer=customer,
+                    trigger=trigger_data,
+                    order_status='PENDING'
+                    )
 
                 message_to_client = "Welcome to Barhop! here is the menu for "+ str(trigger_data.trigger_name) +" Reply 'START' to start your order"
                 message_recieved_dealer = client_message
+
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
-                send_multimedia_message(vendor_number, from_, message_to_client, media_url)
+                send_multimedia_message(vendor_number, from_, message_to_client, media_url)                
+
             else:
                 message = 'Your account is not active yet. Please activate your account by following link your in your email.'
                 send_message(vendor_number, from_, message)
                 return HttpResponse(str(r))
 
     else:
-        # import pdb; pdb.set_trace()
         trigger = conversation.trigger
         trigger_name = trigger.trigger_name
         process_stage = conversation.process_stage

@@ -1,11 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-Your account has been activated. Please click the link below to login.
-<li><a href="{% url 'login' %}" >Login</a></li>
-</body>
-</html>
+{% extends "base_user.html" %}
+{% block content%}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 no-float" style="color:#fff">
+            <div style="margin-left: 100px;">
+                Your account has been activated. Please click the link below to login.
+				<a href="{% url 'login' %}" >Login</a>
+            </div>      
+        </div>
+    </div>
+</div>
+{% endblock%}
