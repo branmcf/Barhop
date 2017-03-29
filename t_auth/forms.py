@@ -92,7 +92,7 @@ class NewUserSignUpForm(forms.Form):
         'duplicate_username': "A user with that username already exists.",
         'duplicate_email': 'The email is already registered.'
     }
-    username = forms.CharField(max_length=30)
+    # username = forms.CharField(max_length=30)
     email = forms.EmailField()
     password1 = forms.CharField(label="Password",
                                 widget=forms.PasswordInput)
@@ -100,13 +100,13 @@ class NewUserSignUpForm(forms.Form):
                                 widget=forms.PasswordInput,
                                 help_text="Enter the same password as above, for verification.")
 
-    def clean_username(self):
-        username = self.cleaned_data["username"]
-        try:
-            CustomUser.objects.get(username=username)
-        except CustomUser.DoesNotExist:
-            return username
-        raise forms.ValidationError(self.error_messages['duplicate_username'], code='duplicate_username')
+    # def clean_username(self):
+    #     username = self.cleaned_data["username"]
+    #     try:
+    #         CustomUser.objects.get(username=username)
+    #     except CustomUser.DoesNotExist:
+    #         return username
+    #     raise forms.ValidationError(self.error_messages['duplicate_username'], code='duplicate_username')
 
     def clean_email(self):
         email = self.cleaned_data['email']

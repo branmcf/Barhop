@@ -12,11 +12,22 @@
 
             <div class="row unassignedOrderTicketRow" id="orderDataList">
               <div class="col-md-10 unassignedOrderTicketText" id="">
-                <p class="item_det"><span class="span1">Order Code : {{ order.order_code }}</span></p>
-                <p class="item_det"><span class="span2">Price : {{ order.total_amount_paid }}</span></p>
-                <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
-                <span class="span2">Expires : {{ order.expires }}</span></p>
-              </div>
+                <div class="unassignedOrderItems">
+                  <p class="item_det"><span class="span1">Order Code : {{ order.order_code }}</span></p>
+                  <p class="item_det"><span class="span2">Price : {{ order.total_amount_paid }}</span></p>
+                  <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
+                  <span class="span2">Expires : {{ order.expires }}</span>                
+                  </p>
+                </div>
+                <div class="scrolls">
+                  {% for item in order.items %}
+                    <div class="itemDiv">
+                      <span class="span1"> Name : {{item.menu_item.item_name}} </span><br>
+                      <span class="span1">Quantity : {{item.quantity}} </span>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>              
               <a href="">
               <div class="col-md-2 orderReadyCol" id={{order.id}}>
                 Order Ready
@@ -54,7 +65,7 @@
                 Order Code: {{order.order_code}}
               </div>
               <div class="col-md-10" id="assignedOrderTicketLocation">
-                Location:{{order.location}}
+                Location : {{order.location}}
               </div>
               <a href="">
               <div class="col-md-2 closeOrderCol" id="{{order.id}}">

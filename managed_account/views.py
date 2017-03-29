@@ -22,7 +22,7 @@ from route.models import Conversation, Message
 from trophy.models import TrophyModel
 
 from t_auth.models import CustomUser, DealerEmployeMapping
-from .models import  Trigger,Grid,GridDetails, MenuItems, PurchaseOrder
+from .models import  Trigger,Grid,GridDetails, MenuItems, PurchaseOrder, OrderMenuMapping 
 
 from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm,BankAccountEditForm
 from t_auth.forms import CustomUserCreationForm
@@ -51,6 +51,7 @@ class HomeView(TemplateView):
         if request.user.is_authenticated():
             trophies = TrophyModel.objects.filter(dealer=request.user).order_by('-date')
             c_messages = []
+            data = []
             # if trophies:
             #     conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
             #         'date')
@@ -71,20 +72,40 @@ class HomeView(TemplateView):
 
                 dealer_triggers = Trigger.objects.filter(dealer=dealer)
                 if not dealer_triggers:
-                    warning_message += "Kindly add Triggers to get orders.<br>"
-
+                    warning_message += "Kindly add Triggers to get orders.<br>"    
                 if trigger_id:
                     current_trigger = Trigger.objects.get(id=int(trigger_id))
                     purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=current_trigger)
                     purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY', trigger=current_trigger)
+
+                    for order in purchase_paid_orders:
+                        order_details = {}
+                        items = OrderMenuMapping.objects.filter(order=order)
+                        order_details['id'] = order.id
+                        order_details['items'] = items
+                        order_details['order_code'] = order.order_code
+                        order_details['total_amount_paid'] = order.total_amount_paid
+                        order_details['order_status'] = order.order_status
+                        order_details['expires'] = order.expires
+                        data.append(order_details)
                 else:
                     purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID')
                     purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')
 
+                    for order in purchase_paid_orders:
+                        order_details = {}
+                        items = OrderMenuMapping.objects.filter(order=order)
+                        order_details['id'] = order.id
+                        order_details['items'] = items
+                        order_details['order_code'] = order.order_code
+                        order_details['total_amount_paid'] = order.total_amount_paid
+                        order_details['order_status'] = order.order_status
+                        order_details['expires'] = order.expires
+                        data.append(order_details)
                 context['triggers'] = dealer_triggers
                 context['trophies'] = trophies
-                context['con_messages'] = c_messages
-                context['purchase_paid_orders'] = purchase_paid_orders
+                # context['con_messages'] = c_messages
+                context['purchase_paid_orders'] = data
                 context['purchase_ready_orders'] = purchase_ready_orders
 
                 context['warning_message'] = warning_message
@@ -573,11 +594,9 @@ class ChangeAccessLeveView(View):
 
 
 #=========================== Order Ready & Close ========================================           
-
 class OrderReadyView(View):
 
     def post(self, request):
-
         data = {}
         django_messages = []
         try:
@@ -650,6 +669,12 @@ class OrderCloseView(View):
             conversation = Conversation.objects.get(customer=customer, closed=False)
             conversation.closed = True
             conversation.save()
+
+            #=========== Grid Updation ============ 
+            grid_detail = GridDetails.objects.get(order=purchase_order_obj, is_active=True)
+            grid_detail.is_active = False
+            grid_detail.order = None
+            grid_detail.save()
 
             data['error_msg'] = ""
             data['success'] = "True"

@@ -286,7 +286,7 @@ body{
 
 #unassignedOrderRow{
 /*  background: red;*/
-  height: 10vh;
+  height: 20vh;
   margin-bottom: 10px;
 }
 
@@ -349,10 +349,39 @@ body{
   color:white;
 }
 
+/*unassigned Order items Detail*/
+.unassignedOrderItems{
+  width: 100%;
+  height: 50%;
+  float: left;
+}
+
+.scrolls { 
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 100%;
+  height: 50%;
+  white-space:nowrap
+} 
+.itemDiv{
+  float: left;
+  font-size: 12px;
+  margin-top: 2px;
+  margin-left: 0px;
+  width:30%;
+  max-height: 50px; 
+  /*cursor: pointer;*/
+  display:inline-block;
+  *display:inline;
+  *zoom:1;
+  vertical-align:top;
+}
+/*_________________________*/
+
 .orderReadyCol{
   height: 100%;
   background:#1f381b;
-  padding: 17px 0px;
+  padding: 7% 0%;
 text-transform: uppercase;
 font-size: 13px;
 }

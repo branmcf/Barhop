@@ -34,7 +34,6 @@ def handle_sms(request):
     :param request:
     :return:
     """
-    import pdb; pdb.set_trace()
     trigger = None
     SEND_ERROR = False
     vendor_number = settings.BARHOP_NUMBER
@@ -58,14 +57,13 @@ def handle_sms(request):
             trigger = body
             client_message = body
 
-    print("\n TEXT : ")
-    print(str(client_message)+"\n")
-
+    #====== Checks text or number ==========
     checkType = RepresentsInt(client_message)
     if checkType:
         client_message_number = int(client_message)
-        print("client_message_number")
-        print(client_message_number)
+    else:
+        client_message_number = client_message
+    #=======================================
 
     r = twiml.Response()
 

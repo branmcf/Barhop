@@ -47,7 +47,7 @@ def new_user_signup(request):
             except RefNewUser.DoesNotExist:
                 raise Http404
             cleaned_data = form.cleaned_data
-            u = CustomUser(mobile=o.mobile, username=cleaned_data['username'], email=cleaned_data['email'],
+            u = CustomUser(mobile=o.mobile, username=o.mobile, email=cleaned_data['email'],
                            is_active=False, is_staff=False, is_ref_user=True)
             u.set_password(cleaned_data['password1'])
             u.save()
@@ -159,8 +159,6 @@ def activate_account(request, uidb64=None, token=None,
                 trigger=current_trigger,
                 order_status='PENDING'
                 )
-
-
 
             to = str(user.mobile)
             send_multimedia_message(vendor_number, to, message, media_url)
