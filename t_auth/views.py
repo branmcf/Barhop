@@ -136,6 +136,7 @@ def activate_account(request, uidb64=None, token=None,
                 image_url = menu_image.image.url
                 url = get_current_url(request)
                 media_url = url+image_url
+                print("Media_url : "+str(media_url))
             except:
                 media_url = get_current_url(request)
 

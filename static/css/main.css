@@ -809,6 +809,11 @@ input[type="radio"] {
   width:25vw;
 }
 
+.modal-dialog{
+  margin: 29vh auto;
+  width:40%;
+}
+
 #myBootModal {
   color: rgba(255,255,255,1);
 

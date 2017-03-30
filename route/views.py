@@ -44,7 +44,7 @@ def handle_sms(request):
     except:
         location = ''
 
-    # from_ = '+919946341903'
+    from_ = '+919946341903'
 
 
     if body:
@@ -157,8 +157,17 @@ def handle_sms(request):
                     image_url = menu_image.image.url
                     url = get_current_url(request)
                     media_url = url+image_url
+                    print("\n Media_url :"+str(media_url))
                 except:
-                    media_url = ""
+                    message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                    message_recieved_dealer = client_message
+
+                    save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                    send_message(vendor_number, from_, message_to_client)
+                    conversation.closed = True
+                    conversation.save()
+                    return HttpResponse(str(r))
+
 
                 #****************************#
                 # Need to change order_code #
