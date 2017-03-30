@@ -23,8 +23,9 @@ from .forms import PriceSubmissionForm
 from lib.tw import send_message
 from route.models import Conversation, Message
 from managed_account.models import PurchaseOrder, OrderMenuMapping
+from t_auth.models import CustomUser
 from django.http import HttpResponseRedirect
-
+import json
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 CHARGE_PERCENT = 0.18
@@ -169,9 +170,28 @@ def process_payment(request):
         'data_name': 'Barhop',
         'data_description': o.detail,
     }
-
     return render(request, 'payment/payment.html', {'data': data})
 
+class PasswordAuthentication(View):
+    def post(self, request):
+        data = {}
+        try:
+            password = self.request.POST['password']
+            user_id = self.request.POST['user_id']
+
+            user = CustomUser.objects.get(id=user_id)
+            if user.check_password(password):
+                data['error_msg'] = ""
+                data['success'] = "True"
+                return HttpResponse(json.dumps(data), content_type='application/json')
+            else:
+                data['error_msg'] = ""
+                data['success'] = "False"
+                data['error_msg'] = "wrong password!."
+                return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
 
 class PaymentInvoiceView(TemplateView):
     template_name = "payment/order_invoice.html"
@@ -183,62 +203,75 @@ class PaymentInvoiceView(TemplateView):
     def get(self, request, *args, **kwargs):
         data = []
         context = self.get_context_data(**kwargs)
-        purchase_id = self.kwargs.get('pk')
-        purchase_order = PurchaseOrder.objects.get(id=purchase_id)
-        order_details = OrderMenuMapping.objects.filter(order=purchase_order)
+        try:            
+            purchase_id = self.kwargs.get('pk')
+            purchase_order = PurchaseOrder.objects.get(id=purchase_id)
+            order_details = OrderMenuMapping.objects.filter(order=purchase_order)
 
-        total_amount = 0
-        for order in order_details:
-            item = {}
-            item['item_name'] = order.menu_item.item_name
-            item['quantity'] = order.quantity
-            item['price'] = order.menu_item.item_price
-            item['total'] = order.total_item_amount
-            total_amount += order.total_item_amount
-            data.append(item)
+            #=============== Checking already processed or Not =========================
+            try:
+                payment_obj = PaymentModel.objects.get(order=purchase_order)
+                if payment_obj.processed == True:
+                    return HttpResponse("This is not a valid link.")
+            except:
+                pass
 
-        #========== Tax and Tip ===========#
-        tax = get_tax(total_amount)
-        tip = get_tip(total_amount)
+            total_amount = 0
+            for order in order_details:
+                item = {}
+                item['item_name'] = order.menu_item.item_name
+                item['quantity'] = order.quantity
+                item['price'] = order.menu_item.item_price
+                item['total'] = order.total_item_amount
+                total_amount += order.total_item_amount
+                data.append(item)
 
-        #==========Grand Total===========#
-        grand_total = float(total_amount) + float(tax) + float(tip) + float(settings.APPLICATION_FEE)
-        grand_total = int(round(grand_total))
+            #========== Tax and Tip ===========#
+            tax = get_tax(total_amount)
+            tip = get_tip(total_amount)
 
-        #======== Payment Model ===========#
-        uuid_code = uuid.uuid1()
-        short_code = shortuuid.encode(uuid_code)
-        bill_number = str(short_code)
+            #==========Grand Total===========#
+            grand_total = float(total_amount) + float(tax) + float(tip)
+            grand_total = int(round(grand_total))
 
-        payment_obj = PaymentModel.objects.create(order=purchase_order,
-            dealer=purchase_order.dealer,
-            customer=purchase_order.customer,
-            total_amount=grand_total,
-            order_amount=total_amount,
-            sales_tax=tax,
-            tip=tip,
-            bill_number=bill_number,
-            )
+            #======== Payment Model ===========#
+            uuid_code = uuid.uuid1()
+            short_code = shortuuid.encode(uuid_code)
+            bill_number = str(short_code)
 
-        # ====================================================== #
-        # This is to get the whole value in stripe. For example 
-        # if we do not add *100 , stripe will convert $126 into
-        # 1.26 dollors.
-        # ====================================================== #
-        stripe_checkout_data = {
-            'id': payment_obj.id,
-            'data_key': settings.STRIPE_PUBLIC_KEY,
-            'data_amount': grand_total*100,
-            'data_name': 'Barhop',
-            'data_description': "test",
-        }
+            payment_obj, created = PaymentModel.objects.get_or_create(order=purchase_order,
+                dealer=purchase_order.dealer,
+                customer=purchase_order.customer,
+                total_amount=grand_total,
+                order_amount=total_amount,
+                sales_tax=tax,
+                tip=tip,
+                )
+            if created:
+                payment_obj.bill_number=bill_number
+                payment_obj.save()
 
-        context['order_details'] = data
-        context['data'] = stripe_checkout_data
-        context['tax'] = tax
-        context['tip'] = tip
-        context['grand_total'] = grand_total 
+            # ====================================================== #
+            # This is to get the whole value in stripe. For example 
+            # if we do not add *100 , stripe will convert $126 into
+            # 1.26 dollors.
+            # ====================================================== #
+            stripe_checkout_data = {
+                'id': payment_obj.id,
+                'data_key': settings.STRIPE_PUBLIC_KEY,
+                'data_amount': grand_total*100,
+                'data_name': 'Barhop',
+                'data_description': "test",
+            }
 
+            context['order_details'] = data
+            context['data'] = stripe_checkout_data
+            context['tax'] = tax
+            context['tip'] = tip
+            context['user_id'] = purchase_order.customer.id
+            context['grand_total'] = grand_total
+        except:
+            pass
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
