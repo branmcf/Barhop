@@ -1,7 +1,7 @@
 
 import datetime
 
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
@@ -126,7 +126,9 @@ def activate_account(request, uidb64=None, token=None,
                 msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
                 msg_data.save()
                 send_message(vendor_number, user.mobile, message)
-                return
+                conversation.closed = True
+                conversation.save()
+                return render(request, 'authentication/customer_signUp_success.html', {'message': message})
 
             # =============#
             #   Menu list  #
