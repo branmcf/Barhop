@@ -30,8 +30,9 @@ def send_multimedia_message(from_, to, message, media_url):
     :param message:
     :return:
     """
-    media_url = shorten(media_url)
+
     client.messages.create(from_=from_, to=to, body=message, media_url=media_url)
+    
 
 
 def send_new_user_message(request, from_, to, ref_id):
