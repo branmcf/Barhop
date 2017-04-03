@@ -1,7 +1,7 @@
 
 import datetime
 
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
@@ -47,7 +47,7 @@ def new_user_signup(request):
             except RefNewUser.DoesNotExist:
                 raise Http404
             cleaned_data = form.cleaned_data
-            u = CustomUser(mobile=o.mobile, username=cleaned_data['username'], email=cleaned_data['email'],
+            u = CustomUser(mobile=o.mobile, username=o.mobile, email=cleaned_data['email'],
                            is_active=False, is_staff=False, is_ref_user=True)
             u.set_password(cleaned_data['password1'])
             u.save()
@@ -126,7 +126,9 @@ def activate_account(request, uidb64=None, token=None,
                 msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
                 msg_data.save()
                 send_message(vendor_number, user.mobile, message)
-                return
+                conversation.closed = True
+                conversation.save()
+                return render(request, 'authentication/customer_signUp_success.html', {'message': message})
 
             # =============#
             #   Menu list  #
@@ -136,6 +138,7 @@ def activate_account(request, uidb64=None, token=None,
                 image_url = menu_image.image.url
                 url = get_current_url(request)
                 media_url = url+image_url
+                print("Media_url : "+str(media_url))
             except:
                 media_url = get_current_url(request)
 
@@ -159,8 +162,6 @@ def activate_account(request, uidb64=None, token=None,
                 trigger=current_trigger,
                 order_status='PENDING'
                 )
-
-
 
             to = str(user.mobile)
             send_multimedia_message(vendor_number, to, message, media_url)

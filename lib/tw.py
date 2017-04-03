@@ -30,7 +30,9 @@ def send_multimedia_message(from_, to, message, media_url):
     :param message:
     :return:
     """
+
     client.messages.create(from_=from_, to=to, body=message, media_url=media_url)
+    
 
 
 def send_new_user_message(request, from_, to, ref_id):
@@ -42,7 +44,10 @@ def send_new_user_message(request, from_, to, ref_id):
     message = 'Welcome to Barhop, We see you are new ! Please Signup here. '
     url = get_current_url(request) + reverse('new_register')
     url += '?id=' + str(ref_id)
-    #url = shorten(url)
+    #====== for developments only ===============
+    # url = 'http://127.0.0.1:8000/accounts/register/?id='+ str(ref_id)
+    #============================================
+    url = shorten(url)
     message += ' ' + url
     send_message(from_, to, message)
 

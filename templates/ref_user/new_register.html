@@ -13,12 +13,7 @@
                 <form role="form" style="color: #fff" method="POST" action="{{ app_path }}">
                         {% csrf_token %}
                     <input type="hidden" name="id" value="{{id}}">
-                        <div class="form-group">
-                            <input for="id_mobile" type="text" name="username" class="form-control"
-                                   value="{% if form.username.value %}{{form.username.value}}{% endif %}"
-                                   placeholder="Username"/>
-                            <div class="errormsg">{{ form.username.errors }}</div>
-                        </div>
+                        
                         <div class="form-group">
                             <input for="id_mobile" type="text" name="email" class="form-control"
                                    value="{% if form.email.value %}{{form.email.value}}{% endif %}"

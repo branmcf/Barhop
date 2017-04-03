@@ -62,4 +62,77 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="authanticationPopup" role="dialog">
+<div class="modal-dialog modal_mob">
+
+<!-- Modal content-->
+  <div class="modal-content" id="triggerModalStyle">
+
+    <div class="modal-header">
+      <h4 class="modal-title" style="text-align: center;">Authentication</h4>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+          <label>Enter Password</label>
+          <input type="password" id="password" class="form-control" required></input>
+          <input type="hidden" id="user_id" value={{user_id}}></input>
+          <label style="color: #b22222;
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: center;
+    width: 100%;" id="errorMessage"></label>
+          <p class="p_form"><button id="userAuthButton" class="btn btn-primary">Click Here</button></p>
+          <script type="text/javascript">
+            $('#userAuthButton').click(function(){
+                var password = $("#password").val();
+                var user_id = $("#user_id").val();
+                if (password != ''){
+                    $.ajax({
+                        url: '/payment/user_Authentication/',
+                        type:'POST',
+                        data:{
+                            password:password,
+                            user_id:user_id
+                        },
+                        success: function (data){
+                            if(data["success"] == 'True' ){                            
+                                $('#authanticationPopup').modal('hide');
+                            }
+                            else{
+                                $('#errorMessage').text(data["error_msg"]);
+                                $('#errorMessage').show();
+                            }
+                        }
+                    });
+                }
+                else{
+                    $('#errorMessage').text('please enter your password');
+                    $('#errorMessage').show();;
+                }
+            });
+          </script>        
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<style>
+.p_form{
+    text-align: center;
+    margin-top: 10px;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+    // $(".ui-widget-overlay").css({background: 'black', opacity: '.5'});
+    $("#authanticationPopup").modal({
+        backdrop: 'static',
+        keyboard: false
+    });  
+});
+
+</script>
 {% endblock%}

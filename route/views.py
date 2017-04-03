@@ -23,6 +23,7 @@ from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mob
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 from django.conf import settings
+from lib.bitly import shorten
 
 
 @require_POST
@@ -34,7 +35,6 @@ def handle_sms(request):
     :param request:
     :return:
     """
-    import pdb; pdb.set_trace()
     trigger = None
     SEND_ERROR = False
     vendor_number = settings.BARHOP_NUMBER
@@ -45,7 +45,7 @@ def handle_sms(request):
     except:
         location = ''
 
-    # from_ = '+919946341903'
+    from_ = '+919946341903'
 
 
     if body:
@@ -58,14 +58,13 @@ def handle_sms(request):
             trigger = body
             client_message = body
 
-    print("\n TEXT : ")
-    print(str(client_message)+"\n")
-
+    #====== Checks text or number ==========
     checkType = RepresentsInt(client_message)
     if checkType:
         client_message_number = int(client_message)
-        print("client_message_number")
-        print(client_message_number)
+    else:
+        client_message_number = client_message
+    #=======================================
 
     r = twiml.Response()
 
@@ -148,6 +147,8 @@ def handle_sms(request):
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
                     send_message(vendor_number, from_, message_to_client)
+                    conversation.closed = True
+                    conversation.save()
 
                     return HttpResponse(str(r))
 
@@ -159,8 +160,17 @@ def handle_sms(request):
                     image_url = menu_image.image.url
                     url = get_current_url(request)
                     media_url = url+image_url
+                    # print("\n Media_url :"+str(media_url))
                 except:
-                    media_url = ""
+                    message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                    message_recieved_dealer = client_message
+
+                    save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                    send_message(vendor_number, from_, message_to_client)
+                    conversation.closed = True
+                    conversation.save()
+                    return HttpResponse(str(r))
+
 
                 #****************************#
                 # Need to change order_code #
@@ -276,7 +286,8 @@ def handle_sms(request):
         elif process_stage == 4 and client_message.lower() == "done" :
             url = get_current_url(request)
             payment_url = str(url) +"/payment/purchase_invoice/"+str(purchaseOrder.id)
-            message_to_client = "Pay for your drinks here "+ str(payment_url)
+            url_shorten = shorten(payment_url)
+            message_to_client = "Pay for your drinks here "+ str(url_shorten)
             message_recieved_dealer = client_message
 
             purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id,dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
