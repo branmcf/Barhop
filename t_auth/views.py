@@ -1,5 +1,6 @@
 
 import datetime
+from twilio import twiml
 
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
@@ -149,6 +150,7 @@ def activate_account(request, uidb64=None, token=None,
                 send_message(vendor_number, ref_user.mobile, message_to_client)
                 conversation.closed = True
                 conversation.save()
+                r = twiml.Response()
                 return HttpResponse(str(r))
 
             msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
