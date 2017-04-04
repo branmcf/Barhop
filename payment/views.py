@@ -49,6 +49,7 @@ def get_tip(amount):
 
 class PasswordAuthentication(View):
     def post(self, request):
+        data = {}
 
         try:
             password = self.request.POST['password']
