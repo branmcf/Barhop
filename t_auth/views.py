@@ -145,7 +145,7 @@ def activate_account(request, uidb64=None, token=None,
                 message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
                 message_recieved_dealer = ref_user.current_trigger.trigger_name
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
-                send_message(vendor_number, from_, message_to_client)
+                send_message(vendor_number, ref_user.mobile, message_to_client)
                 conversation.closed = True
                 conversation.save()
                 return HttpResponse(str(r))
