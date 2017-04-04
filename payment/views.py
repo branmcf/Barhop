@@ -1,4 +1,4 @@
-__author__ = 'nibesh'
+
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -26,6 +26,7 @@ from managed_account.models import PurchaseOrder, OrderMenuMapping
 from t_auth.models import CustomUser
 from django.http import HttpResponseRedirect
 import json
+from datetime import datetime, timedelta
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -153,6 +154,7 @@ class PaymentInvoiceView(TemplateView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+
         application_fee = 0
         payment_id = self.request.POST['id']
         stripe_token = self.request.POST['stripeToken']
@@ -160,6 +162,9 @@ class PaymentInvoiceView(TemplateView):
         email = self.request.POST['stripeEmail']
         
         payment_obj = PaymentModel.objects.get(id=payment_id)
+
+        current_date = datetime.now()
+        time_threshold = current_date + timedelta(hours=1)
 
         try:
             if payment_obj:
@@ -178,9 +183,9 @@ class PaymentInvoiceView(TemplateView):
                 # ====================================== #
                 # This id for stripe charge . 
                 # ====================================== #
-                total_amount = total_amount * 100
+                stripe_total_amount = total_amount * 100
                 application_fee = int(settings.APPLICATION_FEE*100)
-                stripe_charge = stripe.Charge.create(amount=total_amount, currency='usd', source=stripe_token, description="Process Payment",
+                stripe_charge = stripe.Charge.create(amount=stripe_total_amount, currency='usd', source=stripe_token, description="Process Payment",
                                        application_fee=application_fee, stripe_account=account_id,receipt_email=email)
 
                 payment_obj.stripeToken = stripe_token
@@ -193,6 +198,7 @@ class PaymentInvoiceView(TemplateView):
 
                 order_obj = PurchaseOrder.objects.get(id=order_id)
                 order_obj.order_status = "PAID"
+                order_obj.expires = time_threshold
                 order_obj.total_amount_paid = total_amount
                 order_obj.save()
 
