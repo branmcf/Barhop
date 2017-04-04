@@ -18,7 +18,7 @@ from lib.tw import send_message, send_multimedia_message
 from lib.utils import get_current_url
 from lib.image_handler import is_image, is_valid_image, ProfileImageUploader
 
-from route.utils import check_grid_availability
+from route.utils import check_grid_availability, get_menu_image
 from t_auth import forms
 from t_auth import utils
 
@@ -134,13 +134,21 @@ def activate_account(request, uidb64=None, token=None,
             #   Menu list  #
             # =============#
             try:
-                menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
+                # menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
+                menu_image = get_menu_image(current_trigger)
+
                 image_url = menu_image.image.url
                 url = get_current_url(request)
                 media_url = url+image_url
                 print("Media_url : "+str(media_url))
             except:
-                media_url = get_current_url(request)
+                message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                message_recieved_dealer = client_message
+                save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                send_message(vendor_number, from_, message_to_client)
+                conversation.closed = True
+                conversation.save()
+                return HttpResponse(str(r))
 
             msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
             msg_data.save()
