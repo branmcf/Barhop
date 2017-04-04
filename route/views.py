@@ -19,7 +19,7 @@ from lib.tw import send_new_user_message, send_message, send_multimedia_message
 from route.forms import OrderReadyForm
 from route.models import *
 from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mobile, get_ref_user_by_mobile, get_trigger_by_name, save_user_dealer_chat, check_grid_availability)
-
+# from route.utils import get_menu_image
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 from django.conf import settings
@@ -156,11 +156,12 @@ def handle_sms(request):
                 # Menu list   #
                 #============#
                 try:
-                    menu_image = MenuListImages.objects.get(trigger=trigger_data)
+                    # menu_image = MenuListImages.objects.get(trigger=trigger_data)
+                    menu_image = get_menu_image(trigger_data)
                     image_url = menu_image.image.url
                     url = get_current_url(request)
                     media_url = url+image_url
-                    # print("\n Media_url :"+str(media_url))
+                    print("\n Media_url :"+str(media_url))
                 except:
                     message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
                     message_recieved_dealer = client_message
@@ -257,31 +258,40 @@ def handle_sms(request):
 
         elif process_stage == 3 and type(client_message_number) == int :
 
-            #================================#
-            # Update quantity in order table #
-            #================================#
-            purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id, dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
-            order_menu_mapping = OrderMenuMapping.objects.get(order=purchaseOrder)
-            order_menu_mapping.quantity = client_message
+            
+            if client_message_number > 0:
 
-            #=============================#
-            # Toatal amount for each item #
-            #=============================#
-            price = order_menu_mapping.menu_item.item_price
-            quantity = client_message
-            total_amount = float(price) * float(quantity)
+                #================================#
+                # Update quantity in order table #
+                #================================#
+                purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id, dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
+                order_menu_mapping = OrderMenuMapping.objects.get(order=purchaseOrder)
+                order_menu_mapping.quantity = client_message
 
-            order_menu_mapping.total_item_amount = total_amount
-            order_menu_mapping.save()
+                #=============================#
+                # Toatal amount for each item #
+                #=============================#
+                price = order_menu_mapping.menu_item.item_price
+                quantity = client_message
+                total_amount = float(price) * float(quantity)
 
-            message_to_client = "Text in the drink number of the second drink you want or reply 'DONE' to checkout"
-            message_recieved_dealer = client_message
+                order_menu_mapping.total_item_amount = total_amount
+                order_menu_mapping.save()
 
-            save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
-            send_message(vendor_number, from_, message_to_client)
+                message_to_client = "Text in the drink number of the second drink you want or reply 'DONE' to checkout"
+                message_recieved_dealer = client_message
 
-            conversation.process_stage = 4 
-            conversation.save()
+                save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                send_message(vendor_number, from_, message_to_client)
+
+                conversation.process_stage = 4 
+                conversation.save()
+            else:
+                message_to_client = "Please enter a valid quantity."
+                message_recieved_dealer = client_message
+
+                save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                send_message(vendor_number, from_, message_to_client)
 
         elif process_stage == 4 and client_message.lower() == "done" :
             url = get_current_url(request)
@@ -313,7 +323,7 @@ def handle_sms(request):
                     conversation.process_stage = 3
                     conversation.save()
                     
-                    message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(item.item_name) +" is "+str(available_quantity)
+                    message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)

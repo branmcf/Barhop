@@ -136,8 +136,8 @@ def activate_account(request, uidb64=None, token=None,
             #   Menu list  #
             # =============#
             try:
-                # menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
-                menu_image = get_menu_image(current_trigger)
+                menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
+                # menu_image = get_menu_image(current_trigger)
 
                 image_url = menu_image.image.url
                 url = get_current_url(request)
