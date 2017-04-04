@@ -48,7 +48,7 @@ def get_tip(amount):
 
 class PasswordAuthentication(View):
     def post(self, request):
-        data = {}
+
         try:
             password = self.request.POST['password']
             user_id = self.request.POST['user_id']
@@ -67,6 +67,7 @@ class PasswordAuthentication(View):
             data['error_msg'] = "Something went wrong.."
             return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 class PaymentInvoiceView(TemplateView):
     template_name = "payment/order_invoice.html"
 
@@ -75,6 +76,7 @@ class PaymentInvoiceView(TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
+
         data = []
         context = self.get_context_data(**kwargs)
         try:            
@@ -151,7 +153,6 @@ class PaymentInvoiceView(TemplateView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-
         application_fee = 0
         payment_id = self.request.POST['id']
         stripe_token = self.request.POST['stripeToken']
@@ -174,7 +175,7 @@ class PaymentInvoiceView(TemplateView):
                 except:
                     account_id = None
                 
-                application_fee = settings.APPLICATION_FEE*100
+                application_fee = int(settings.APPLICATION_FEE*100)
                 stripe_charge = stripe.Charge.create(amount=total_amount, currency='usd', source=stripe_token, description="Process Payment",
                                        application_fee=application_fee, stripe_account=account_id,receipt_email=email)
 
@@ -191,7 +192,7 @@ class PaymentInvoiceView(TemplateView):
                 order_obj.total_amount_paid = total_amount
                 order_obj.save()
 
-                return HttpResponseRedirect('/payment_success/'+str(payment_obj.bill_number))
+                return HttpResponseRedirect('/payment/payment_success/'+str(payment_obj.bill_number))
 
         except stripe.error.CardError:
             return render(request, 'payment/payment_failed.html', {'_id': _id})

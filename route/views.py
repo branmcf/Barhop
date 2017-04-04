@@ -19,7 +19,7 @@ from lib.tw import send_new_user_message, send_message, send_multimedia_message
 from route.forms import OrderReadyForm
 from route.models import *
 from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mobile, get_ref_user_by_mobile, get_trigger_by_name, save_user_dealer_chat, check_grid_availability)
-# from route.utils import get_menu_image
+from route.utils import get_menu_image
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 from django.conf import settings
@@ -45,7 +45,7 @@ def handle_sms(request):
     except:
         location = ''
 
-    from_ = '+919946341903'
+    # from_ = '+919946341903'
 
 
     if body:
@@ -386,88 +386,6 @@ def handle_sms(request):
             return HttpResponse(str(r))
 
     return HttpResponse(str(r))
-
-
-
-@login_required
-@require_GET
-def close_conversation(request, conversation_id):
-    """
-
-    :param request:
-    :param conversation_id:
-    :return:
-    """
-    try:
-        c = Conversation.objects.get(pk=conversation_id)
-        c.closed = True
-        c.save()
-    except Conversation.DoesNotExist:
-        pass
-    return json_response(success=True)
-
-
-@login_required
-@require_GET
-def view_conversation(request, conversation_id):
-    try:
-        c = Conversation.objects.get(pk=conversation_id)
-        c.has_new_message = False
-        c.save()
-    except Conversation.DoesNotExist:
-        raise Http404
-    ms = Message.objects.filter(conversation=c).order_by('-date')
-    messages = [{'message': _.message, 'date': _.date, 'direction': _.direction} for _ in ms]
-    customer = c.customer
-    return render(request, 'inside_convo.html',
-                  {'customer': customer, 'messages': messages, 'conv_id': conversation_id})
-
-
-@login_required
-@require_GET
-def ajax_conversation(request, conversation_id):
-    try:
-        c = Conversation.objects.get(pk=conversation_id)
-        c.has_new_message = False
-        c.save()
-    except Conversation.DoesNotExist:
-        raise json_response(sucess=False, data=[])
-
-    ms = Message.objects.filter(conversation=c).order_by('-date')
-    messages = [{'message': _.message, 'direction': _.direction} for _ in ms]
-
-    return json_response(success=True, data=messages)
-
-
-@csrf_exempt
-@login_required
-@require_POST
-def order_ready(request):
-    """
-
-    :param request:
-    :return:
-    """
-    form = OrderReadyForm(request.POST)
-    if form.is_valid():
-        try:
-            customer_id = int(request.POST['customer_id'])
-            conversation_id = int(request.POST['conversation_id'])
-            c = Conversation.objects.get(pk=conversation_id)
-
-        except (ValueError, KeyError, Conversation.DoesNotExist):
-            form.add_error('message', 'Invalid Form')
-            return json_response(success=False, errors=form.errors)
-
-        message = form.cleaned_data['message']
-        customer = CustomUser.objects.get(pk=customer_id)
-
-        m = Message(conversation=c, message=message, direction=False)
-        m.save()
-        send_message(c.trophy.twilio_mobile, customer.mobile, message)
-        return json_response(success=True, message='Order Ready Message Sent.')
-    return json_response(success=False, errors=form.errors)
-
 
 def prettify_number(number):
     """

@@ -633,7 +633,7 @@ class OrderReadyView(View):
             customer_mob = customer.mobile
             message = "Your Order is Ready.Your Order Code is '"+ str(purchase_order_obj.order_code) +"' Come to the bar, Thank you"
             vendor_number = settings.BARHOP_NUMBER
-            send_message(vendor_number, from_, message)
+            send_message(vendor_number, customer_mob, message)
 
 
             data['error_msg'] = ""
@@ -730,15 +730,18 @@ class AddBankAccountView(FormView):
         # stripe platform
         # ================================================= #
         try:
+            
             stripe_token = self.request.POST['stripeToken']
             stripe.api_key = settings.STRIPE_SECRET_KEY
-            stripe_account = stripe.Account.create(country=country, managed=True, external_account=stripe_token)
-            a = ManagedAccountStripeCredentials(dealer=dealer, account_id=stripe_account['id'])
-            a.save()
-
+            
             bankaccount = BankAccount(dealer=dealer,country=country,currency=currency,routing_number=routing_number,
                                       account_number=account_number,name=name,account_holder_type=account_holder_type,stripeToken=stripe_token)
             bankaccount.save()
+
+            stripe_account = stripe.Account.create(country=country, managed=True, external_account=stripe_token)
+            stripe_acct = ManagedAccountStripeCredentials(bank_account=bankaccount, dealer=dealer, account_id=stripe_account['id'])
+            stripe_acct.save()
+
         except:
             pass
 
@@ -766,8 +769,8 @@ class EditBankAccount(UpdateView):
         stripe.api_key = settings.STRIPE_SECRET_KEY
         dealer = utils.get_dealer(self.request.user)
         stripe_token = self.request.POST['stripeToken']
-
-        managedaccount = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
+        bank_id = self.kwargs['pk']
+        managedaccount = ManagedAccountStripeCredentials.objects.get(bank_account__id=int(bank_id))
         account_id = managedaccount.account_id
 
         account = stripe.Account.retrieve(account_id)
