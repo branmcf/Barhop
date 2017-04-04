@@ -19,7 +19,7 @@ from lib.tw import send_new_user_message, send_message, send_multimedia_message
 from route.forms import OrderReadyForm
 from route.models import *
 from route.utils import (parse_sms, get_user_by_mobile, get_trophy_by_twilio_mobile, get_ref_user_by_mobile, get_trigger_by_name, save_user_dealer_chat, check_grid_availability)
-from route.utils import get_menu_image
+# from route.utils import get_menu_image
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 from django.conf import settings

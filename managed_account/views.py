@@ -27,6 +27,7 @@ from .models import  Trigger,Grid,GridDetails, MenuItems, PurchaseOrder, OrderMe
 from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm,BankAccountEditForm
 from t_auth.forms import CustomUserCreationForm
 
+from lib.tw import send_new_user_message, send_message, send_multimedia_message
 from t_auth.utils import send_email_auth
 from managed_account import utils
 from django.db.models import Sum

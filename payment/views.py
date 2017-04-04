@@ -174,7 +174,11 @@ class PaymentInvoiceView(TemplateView):
                     account_id = dealer_stripe_account.account_id
                 except:
                     account_id = None
-                
+
+                # ====================================== #
+                # This id for stripe charge . 
+                # ====================================== #
+                total_amount = total_amount * 100
                 application_fee = int(settings.APPLICATION_FEE*100)
                 stripe_charge = stripe.Charge.create(amount=total_amount, currency='usd', source=stripe_token, description="Process Payment",
                                        application_fee=application_fee, stripe_account=account_id,receipt_email=email)
