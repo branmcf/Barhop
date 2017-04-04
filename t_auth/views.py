@@ -19,8 +19,8 @@ from lib.tw import send_message, send_multimedia_message
 from lib.utils import get_current_url
 from lib.image_handler import is_image, is_valid_image, ProfileImageUploader
 
-from route.utils import check_grid_availability, get_menu_image, save_user_dealer_chat
-
+from route.utils import check_grid_availability, save_user_dealer_chat
+#from route.utils import get_menu_image
 from t_auth import forms
 from t_auth import utils
 
