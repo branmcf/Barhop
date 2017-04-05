@@ -12,18 +12,13 @@
 
             <div class="row unassignedOrderTicketRow" id="orderDataList">
               <div class="col-md-10 unassignedOrderTicketText" id="">
-                <div class="unassignedOrderItems">
-                  <p class="item_det"><span class="span1">Order Code : {{ order.order_code }}</span></p>
-                  <p class="item_det"><span class="span2">Price : {{ order.total_amount_paid }}</span></p>
-                  <p class="item_det1"><span class="span1">Status :{{ order.order_status }}</span>
-                  <span class="span2">Expires : {{ order.expires }}</span>                
-                  </p>
+                <div class="unassignedOrderItems">                  
                 </div>
                 <div class="scrolls">
                   {% for item in order.items %}
                     <div class="itemDiv">
-                      <span class="span1"> Item : {{item.menu_item.item_name}} </span><br>
-                      <span class="span1">Quantity : {{item.quantity}} </span>
+                      <div class="order_span"> Item : {{item.menu_item.item_name}}</div><br>
+                      <div class="order_span"> Quantity : {{item.quantity}} </div>
                     </div>
                   {% endfor %}
                 </div>
@@ -150,7 +145,7 @@
       },
       success: function (data){
         if(data["success"] == 'True' ){
-          update_messages(data.messages);
+          window.location.reload();
         }
         else{
           update_messages(data.error_msg);
@@ -170,8 +165,7 @@
       },
       success: function (data){
         if(data["success"] == 'True' ){
-          alert("aaaaaa");
-          update_messages(data.messages);
+          window.location.reload();
         }
         else{
           update_messages(data.error_msg);
@@ -203,12 +197,15 @@ $('#searchButton').click(function(){
 
 <!--modal pop up-->
 
-  $(window).load(function(){
-      {% if warning_message %}
-      $('#popUp').modal('show');
-      {% endif %}
-  });
+$(window).load(function(){
+    {% if warning_message %}
+    $('#popUp').modal('show');
+    {% endif %}
+});
 
+setTimeout(function(){
+  window.location.reload();
+},15000)
 </script>
 
 {% endblock %}
