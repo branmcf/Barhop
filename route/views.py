@@ -23,7 +23,7 @@ from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 from django.conf import settings
 from lib.bitly import shorten
-
+from django.utils.crypto import get_random_string
 
 @require_POST
 @csrf_exempt
@@ -172,10 +172,12 @@ def handle_sms(request):
                     return HttpResponse(str(r))
 
 
-                #****************************#
-                # Need to change order_code #
-                #**************************#
-                purchaseOrder = PurchaseOrder.objects.create(order_code=conversation.id,
+                #************************************#
+                # random number creation order_code #
+                #**********************************#
+                random_num = get_random_string(length=4, allowed_chars='QWERTYUIOP123ASDFGHJKL456ZXCVBNM7890')
+                order_code = str(random_num)+str(conversation.id)
+                purchaseOrder = PurchaseOrder.objects.create(order_code=order_code,
                     conversation=conversation,
                     dealer=dealer,
                     customer=customer,
@@ -201,7 +203,7 @@ def handle_sms(request):
         process_stage = conversation.process_stage
         dealer = conversation.dealer
         customer = conversation.customer
-        purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id)
+        purchaseOrder = PurchaseOrder.objects.get(conversation=conversation)
         if not purchaseOrder.location:
             purchaseOrder.location = location
             purchaseOrder.save()
@@ -241,7 +243,7 @@ def handle_sms(request):
             #==================================#
             # Update menu item in order table #
             #================================#
-            purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id,dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
+            purchaseOrder = PurchaseOrder.objects.get(conversation=conversation,dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
 
             order_menu_mapping = OrderMenuMapping.objects.create(order=purchaseOrder,
                 menu_item=menu_object)
@@ -263,7 +265,7 @@ def handle_sms(request):
                 #================================#
                 # Update quantity in order table #
                 #================================#
-                purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id, dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
+                purchaseOrder = PurchaseOrder.objects.get(conversation=conversation, dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
                 order_menu_mapping = OrderMenuMapping.objects.get(order=purchaseOrder)
                 order_menu_mapping.quantity = client_message
 
@@ -299,7 +301,7 @@ def handle_sms(request):
             message_to_client = "Pay for your drinks here "+ str(url_shorten)
             message_recieved_dealer = client_message
 
-            purchaseOrder = PurchaseOrder.objects.get(order_code=conversation.id,dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
+            purchaseOrder = PurchaseOrder.objects.get(conversation=conversation, dealer=dealer, customer=customer,trigger=trigger,order_status='PENDING')
             order_menu_mapping = OrderMenuMapping.objects.filter(order=purchaseOrder)
 
             tottal_amount = 0

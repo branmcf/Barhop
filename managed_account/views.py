@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 
 import stripe
 import json
-
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic.edit import UpdateView
@@ -172,6 +172,7 @@ def account_status(request):
                   {'available_amount': available_amount, 'pending_amount': pending_amount,
                    'transactions': transactions})
 
+
 class BankingView(TemplateView):
     template_name = "managed_account/banking.html"
 
@@ -191,7 +192,7 @@ class BankingView(TemplateView):
 
         if payment_obj:
             pending_obj = payment_obj.filter(order__order_status="PENDING")
-            available_obj = payment_obj.filter(order__order_status="PAID")
+            available_obj = payment_obj.filter(Q(order__order_status="PAID") | Q(order__order_status="READY"))
             if pending_obj:
                 pending_amount = pending_obj.aggregate(Sum('total_amount'))
                 pending_amount = pending_amount['total_amount__sum']
@@ -199,7 +200,10 @@ class BankingView(TemplateView):
                 available_amount = available_obj.aggregate(Sum('total_amount'))
                 available_amount = available_amount['total_amount__sum']
 
-        context['payment_list'] = payment_obj.filter(order__order_status="PAID",processed=True)
+        q1 = Q(order__order_status="PAID",processed=True)
+        q2 = Q(order__order_status="READY",processed=True)
+
+        context['payment_list'] = payment_obj.filter(q1 | q2)
         context['pending_amount'] = pending_amount
         context['available_amount'] = available_amount
 

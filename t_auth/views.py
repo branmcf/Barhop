@@ -33,6 +33,7 @@ from trophy.models import TrophyModel
 from t_auth.forms import LoginForm
 from payment.models import ManagedAccountStripeCredentials
 from managed_account.models import GridDetails, Grid, MenuListImages, PurchaseOrder
+from django.utils.crypto import get_random_string
 
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
@@ -165,8 +166,11 @@ def activate_account(request, uidb64=None, token=None,
             # ================================= #
             conversation.process_stage = 1
             conversation.save()
+
+            random_num = get_random_string(length=4, allowed_chars='QWERTYUIOP123ASDFGHJKL456ZXCVBNM7890')
+            order_code = str(random_num)+str(conversation.id)
             
-            purchaseOrder = PurchaseOrder.objects.create(order_code=conversation.id,
+            purchaseOrder = PurchaseOrder.objects.create(order_code=order_code,
                 conversation=conversation,
                 dealer=dealer,
                 customer=user,
