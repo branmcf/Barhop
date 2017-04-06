@@ -1,0 +1,27 @@
+
+{% for order in purchase_paid_orders %}
+<div class="row" id="unassignedOrderRow">
+  <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">
+    <div class="row unassignedOrderTicketRow" id="orderDataList">
+      <div class="col-md-10 unassignedOrderTicketText" id="">
+        <div class="unassignedOrderItems">                  
+        </div>
+        <div class="scrolls" id="paidOrderList">
+          {% for item in order.items %}
+            <div class="itemDiv">
+              <div class="order_span"> Item : {{item.menu_item.item_name}}</div><br>
+              <div class="order_span"> Quantity : {{item.quantity}} </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>              
+      <a href="">
+      <div class="col-md-2 orderReadyCol" id={{order.id}}>
+        Order Ready
+      </div>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endfor %}

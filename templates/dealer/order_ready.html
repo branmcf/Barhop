@@ -1,0 +1,19 @@
+{% for order in purchase_ready_orders %}
+<div class="row close_{{order.id}}" id="assignedOrderRow">
+  <div class="col-md-10 col-md-offset-1" id="assignedOrderTicket">
+    <div class="row" id="assignedOrderTicketRow">
+      <div class="col-md-10" id="assignedOrderTicketNum">
+        Order Code: {{order.order_code}}
+      </div>
+      <div class="col-md-10" id="assignedOrderTicketLocation">
+        Location : {{order.location}}
+      </div>
+      <a href="">
+      <div class="col-md-2 closeOrderCol" id="{{order.id}}">
+        Close Order
+      </div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endfor %}
