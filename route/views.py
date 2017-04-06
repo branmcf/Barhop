@@ -38,7 +38,6 @@ def handle_sms(request):
     SEND_ERROR = False
     vendor_number = settings.BARHOP_NUMBER
     from_, body = parse_sms(request.POST)
-
     try:
         location = request.POST['FromCity']
     except:

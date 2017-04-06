@@ -7,14 +7,13 @@
       <div class="col-md-6" id="unassignedCol" style="overflow:auto;">
         {% if purchase_paid_orders %}
         {% for order in purchase_paid_orders %}
-        <div class="row" id="unassignedOrderRow">
+        <div class="row ready_{{order.id}}" id="unassignedOrderRow">
           <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">
-
             <div class="row unassignedOrderTicketRow" id="orderDataList">
               <div class="col-md-10 unassignedOrderTicketText" id="">
-                <div class="unassignedOrderItems">                  
+                <div class="unassignedOrderItems">               
                 </div>
-                <div class="scrolls">
+                <div class="scrolls" id="paidOrderList">
                   {% for item in order.items %}
                     <div class="itemDiv">
                       <div class="order_span"> Item : {{item.menu_item.item_name}}</div><br>
@@ -29,12 +28,11 @@
               </div>
               </a>
             </div>
-
           </div>
         </div>
         {% endfor %}
         {% else %}
-          <p>There are no orders to show</p>
+          <p id="emptyReady">There are no orders to show</p>
         {% endif %}
       </div>
 
@@ -53,7 +51,7 @@
         <div id="orderListToClose">
         {% if purchase_ready_orders %}
         {% for order in purchase_ready_orders %}
-        <div class="row" id="assignedOrderRow">
+        <div class="row close_{{order.id}}" id="assignedOrderRow">
           <div class="col-md-10 col-md-offset-1" id="assignedOrderTicket">
             <div class="row" id="assignedOrderTicketRow">
               <div class="col-md-10" id="assignedOrderTicketNum">
@@ -72,7 +70,7 @@
         </div>
         {% endfor %}
         {% else %}
-          <p>There are no orders to show  </p>
+          <p id="emptyClose">There are no orders to show  </p>
         {% endif %}
         </div>
       </div>
@@ -135,8 +133,10 @@
 
 
 <script type="text/javascript">
-  $('.orderReadyCol').click(function(event){
-    order_id = $(this).attr('id');
+  
+  $(".orderReadyCol").on("click", function(event){
+    event.preventDefault();
+    var order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_ready/',
       type:'POST',
@@ -144,19 +144,23 @@
         order_id:order_id,
       },
       success: function (data){
-        if(data["success"] == 'True' ){
-          window.location.reload();
+        if (data['error_msg']){
+          console.log("error message");
         }
-        else{
-          update_messages(data.error_msg);
+        else{          
+          order_id = order_id.toString();
+          $(".ready_"+order_id).remove();
+          $("#emptyClose").remove();
+          $('#orderListToClose').append(data);
         }
       }
     });
   });
 
-  $('.closeOrderCol').click(function(event){
-
-    order_id = $(this).attr('id');
+  
+  $(".closeOrderCol").on("click", function(event){
+    event.preventDefault();
+    var order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_close/',
       type:'POST',
@@ -164,15 +168,19 @@
         order_id:order_id,
       },
       success: function (data){
-        if(data["success"] == 'True' ){
-          window.location.reload();
+        order_id = order_id.toString();
+        if (data['error_msg']){
+          console.log("error message");
         }
-        else{
-          update_messages(data.error_msg);
+        else{  
+          $(".close_"+order_id).remove();
         }
       }
     });
   });
+
+
+//______search using order_code__________
 
 $('#searchButton').click(function(){
   $("#searchError").hide();
@@ -192,8 +200,9 @@ $('#searchButton').click(function(){
   else{
     $("#searchError").show();
   }
-
 });
+//____________________________________________
+
 
 <!--modal pop up-->
 
@@ -203,9 +212,32 @@ $(window).load(function(){
     {% endif %}
 });
 
-setTimeout(function(){
-  window.location.reload();
-},15000)
+
+setInterval(function(){
+  order_array = []
+  $('.orderReadyCol').each(function(i, obj) {
+      order_array.push(obj.id);
+  });
+  console.log("setintervel");
+  $.ajax({
+    url: '/account/new_order/',
+    type:'POST',
+    data:{
+      order_data:order_array.toString(),
+    },
+    success: function (data){
+      if (data['error_msg']){
+        console.log("error message");
+      }
+      else{  
+        $("#emptyReady").remove();
+        $('#unassignedCol').append(data);
+      }      
+    }
+  });  
+},50000)
+
+
 </script>
 
 {% endblock %}

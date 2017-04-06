@@ -633,6 +633,13 @@ class OrderReadyView(View):
 
             purchase_order_obj.save()
 
+            data['error_msg'] = ""
+            data['success'] = "True"
+
+            order_closed = PurchaseOrder.objects.filter(id=order_id)
+            data['purchase_ready_orders'] = order_closed
+            html = render_to_string('dealer/order_ready.html', data)
+
             #========== Send Message =============
             customer = purchase_order_obj.customer
             customer_mob = customer.mobile
@@ -640,20 +647,8 @@ class OrderReadyView(View):
             vendor_number = settings.BARHOP_NUMBER
             send_message(vendor_number, customer_mob, message)
 
-
-            data['error_msg'] = ""
-            data['success'] = "True"
-            messages.success(request, "Order Status changed.")
-
-            for message in messages.get_messages(request):
-                django_messages.append({
-                    "level": message.level,
-                    "message": message.message,
-                    "extra_tags": message.tags
-                })
-            data['messages'] = django_messages
-
-            return HttpResponse(json.dumps(data), content_type='application/json')
+            return HttpResponse(html)
+            # return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
@@ -665,6 +660,7 @@ class OrderCloseView(View):
         data = {}
         django_messages = []
         try:
+
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'CLOSED'
@@ -684,21 +680,55 @@ class OrderCloseView(View):
 
             data['error_msg'] = ""
             data['success'] = "True"
-            messages.success(request, "Order Status changed.")
-
-            for message in messages.get_messages(request):
-                django_messages.append({
-                    "level": message.level,
-                    "message": message.message,
-                    "extra_tags": message.tags
-                })
-            data['messages'] = django_messages
-
             return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+class GetNewOrder(View):
+    def post(self, request):
+        data = {}
+        django_messages = []
+        order_list = []
+        try:
+            order_id_data = request.POST.get('order_data')
+            if order_id_data:
+                order_id_data = order_id_data.split(',')
+                order_id_data = [ str(i) for i in order_id_data ]
+                print (order_id_data)
+
+            data['error_msg'] = ""
+            data['success'] = "True"
+
+            dealer = utils.get_dealer(request.user)
+            purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID').exclude(id__in=order_id_data)
+
+            if purchase_paid_orders.count() >= 0:
+                for order in purchase_paid_orders:
+                    order_details = {}
+                    items = OrderMenuMapping.objects.filter(order=order)
+                    order_details['id'] = order.id
+                    order_details['items'] = items
+                    order_details['order_code'] = order.order_code
+                    order_details['total_amount_paid'] = order.total_amount_paid
+                    order_details['order_status'] = order.order_status
+                    order_details['expires'] = order.expires
+                    order_list.append(order_details)
+
+                data['purchase_paid_orders'] = order_list
+                html = render_to_string('dealer/new_order.html',data)
+            else:
+                html = ''
+            return HttpResponse(html)
+            #return HttpResponse(json.dumps(data), content_type='application/json')
+        except :
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 # ______________________________________________________________________________________
 
 
