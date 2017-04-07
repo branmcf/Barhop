@@ -13,21 +13,6 @@ class StripeData(models.Model):
         verbose_name = 'Stripe Credentials'
         verbose_name_plural = 'Stripe Credentials'
 
-
-class ManagedAccountStripeCredentials(models.Model):
-    dealer = models.ForeignKey(CustomUser)
-    account_id = models.CharField(max_length=300, null=True, blank=True)
-    managed = models.BooleanField(default=True)
-    date = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return "%s" % (self.dealer)
-
-    class Meta:
-        verbose_name = 'ManagedAccountStripeCredentials'
-        verbose_name_plural = 'ManagedAccountStripeCredentials'
-
-
 class BankAccount(models.Model):
     dealer = models.OneToOneField(CustomUser)
     country = models.CharField(max_length=40, null=True, blank=True)
@@ -39,6 +24,19 @@ class BankAccount(models.Model):
     stripeToken = models.CharField(max_length=40, null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
 
+class ManagedAccountStripeCredentials(models.Model):
+    dealer = models.ForeignKey(CustomUser)
+    bank_account = models.ForeignKey(BankAccount, null=True, blank=True)
+    account_id = models.CharField(max_length=300, null=True, blank=True)
+    managed = models.BooleanField(default=True)
+    date = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return "%s" % (self.dealer)
+
+    class Meta:
+        verbose_name = 'ManagedAccountStripeCredentials'
+        verbose_name_plural = 'ManagedAccountStripeCredentials'
 
 
 class PaymentModel(models.Model):

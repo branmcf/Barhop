@@ -19,20 +19,26 @@
                     <td>{{ item.item_name }}</td>
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.price }}</td>
-                    <td>{{ item.total }}</td>
+                    <td>${{ item.total }}</td>
                 </tr>
                 {% endfor %}
                 <tr>
                     <th></th>
                     <th></th>
-                    <th>TAX </th>
-                    <th>{{tax}}</th>
+                    <th>Tax </th>
+                    <th>${{tax}}</th>
                 </tr>
                 <tr>
                     <th></th>
                     <th></th>
-                    <th>TIP</th>
-                    <th>{{tip}}</th>
+                    <th>Tip</th>
+                    <th>${{tip}}</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Processing Fee</th>
+                    <th>${{process_fee}}</th>
                 </tr>
                 <tr>
                     <th></th>

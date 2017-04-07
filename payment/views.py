@@ -1,4 +1,4 @@
-__author__ = 'nibesh'
+
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View, DeleteView
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -7,6 +7,7 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+
 import uuid
 import stripe
 import shortuuid
@@ -26,6 +27,8 @@ from managed_account.models import PurchaseOrder, OrderMenuMapping
 from t_auth.models import CustomUser
 from django.http import HttpResponseRedirect
 import json
+from datetime import datetime, timedelta
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 CHARGE_PERCENT = 0.18
@@ -44,137 +47,11 @@ def get_tip(amount):
     tip = (amount*tip_percent)/100
     return tip
 
-@login_required
-@csrf_exempt
-@require_POST
-def send_price(request):
-    """
-
-    :param request:
-    :return:
-    """
-    user = request.user
-
-    form = PriceSubmissionForm(request.POST)
-    try:
-        ManagedAccountStripeCredentials.objects.get(dealer=user)
-    except ManagedAccountStripeCredentials.DoesNotExist:
-        form.add_error('detail', 'Please add Bank Account first in your profile.')
-        return json_response(success=False, errors=form.errors)
-
-    if form.is_valid():
-        try:
-            customer_id = int(request.POST['customer_id'])
-            conversation_id = int(request.POST['conversation_id'])
-            c = Conversation.objects.get(pk=conversation_id)
-        except (KeyError, Conversation.DoesNotExist, ValueError):
-            form.add_error('detail', 'Invalid Form')
-            return json_response(success=False, errors=form.errors)
-
-        cleaned_data = form.cleaned_data
-        try:
-            customer = CustomUser.objects.get(pk=customer_id)
-        except CustomUser.DoesNotExist:
-            raise Http404
-
-        r_amount = cleaned_data['amount']
-
-        p = PaymentModel(dealer=request.user, customer=customer,
-                         amount=r_amount,
-                         detail=cleaned_data['detail'], trophy=c.trophy)
-        p.save()
-
-        sent_message = send_price_message(request, c.trophy.twilio_mobile, customer.mobile, cleaned_data['detail'],
-                                          p.id)
-        m = Message(conversation=c, message=sent_message, direction=False)
-        m.save()
-        return json_response(success=True, message='Price Info has been sent to the client.')
-    return json_response(success=False, errors=form.errors)
-
-
-@login_required
-@csrf_exempt
-def process_payment(request):
-    """
-    :param request:
-    :return:
-    """
-    if request.POST:
-        try:
-            _id = int(request.POST['id'])
-            o = PaymentModel.objects.get(pk=_id, processed=False)
-        except (ValueError, PaymentModel.DoesNotExist):
-            raise Http404
-
-        stripe_token = request.POST['stripeToken']
-        stripe_token_type = request.POST['stripeTokenType']
-        stripe_email = request.POST['stripeEmail']
-
-        r_amount = o.amount
-        d_amount = r_amount + int(r_amount * CHARGE_PERCENT) + CHARGE_AMOUNT + int(r_amount * SALES_TAX_PERCENT)
-        application_fee = CHARGE_AMOUNT
-
-        try:
-            dealer = o.dealer
-            customer = o.customer
-            ma = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
-            stripe_account = ma.account_id
-            res = stripe.Charge.create(amount=d_amount, currency='usd', source=stripe_token, description=o.detail,
-                                       application_fee=application_fee, stripe_account=stripe_account,
-                                       receipt_email=customer.email)
-
-            r = RevenueModel(dealer=dealer, transaction_amount=o.amount, charge_amount=application_fee)
-            r.save()
-
-        except stripe.error.CardError:
-            return render(request, 'payment/payment_failed.html', {'_id': _id})
-
-        o.stripeToken = stripe_token
-        o.stripeTokenType = stripe_token_type
-        o.stripeEmail = stripe_email
-        o.charge_id = res.id
-        o.processed = True
-        o.amount = int(r_amount - STRIPE_CHARGE_AMOUNT - STRIPE_CHARGE_PERCENT * d_amount)
-        o.tip = int(d_amount - r_amount - CHARGE_AMOUNT - r_amount * SALES_TAX_PERCENT)
-        o.sales_tax = int(r_amount * SALES_TAX_PERCENT)
-        o.save()
-
-        try:
-            c = Conversation.objects.get(dealer=o.dealer, customer=o.customer, closed=False, trophy=o.trophy)
-        except Conversation.DoesNotExist:
-            c = Conversation(dealer=o.dealer, customer=o.customer, trophy=o.trophy)
-            c.save()
-
-        message = 'We have received your payment of $%.2f. We will let you know when the order is ready' % (
-            (d_amount / 100.0))
-        m = Message(conversation=c, message=message, direction=False)
-        m.save()
-
-        send_message(o.trophy.twilio_mobile, o.customer.mobile, message)
-        return HttpResponse('Payment Successful.')
-
-    _id = int(request.GET.get('id'))
-    try:
-        o = PaymentModel.objects.get(pk=_id, processed=False)
-    except PaymentModel.DoesNotExist:
-        raise Http404
-
-    r_amount = o.amount
-    d_amount = r_amount + int(r_amount * CHARGE_PERCENT) + CHARGE_AMOUNT + int(r_amount * SALES_TAX_PERCENT)
-    # d_amount = int(d_amount * (100 / 97.1))
-
-    data = {
-        'id': _id,
-        'data_key': settings.STRIPE_PUBLIC_KEY,
-        'data_amount': d_amount,
-        'data_name': 'Barhop',
-        'data_description': o.detail,
-    }
-    return render(request, 'payment/payment.html', {'data': data})
 
 class PasswordAuthentication(View):
     def post(self, request):
         data = {}
+
         try:
             password = self.request.POST['password']
             user_id = self.request.POST['user_id']
@@ -190,8 +67,9 @@ class PasswordAuthentication(View):
                 data['error_msg'] = "wrong password!."
                 return HttpResponse(json.dumps(data), content_type='application/json')
         except:
-            data['error_msg'] = "something went WRONG"
+            data['error_msg'] = "Something went wrong.."
             return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 class PaymentInvoiceView(TemplateView):
     template_name = "payment/order_invoice.html"
@@ -201,6 +79,7 @@ class PaymentInvoiceView(TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
+
         data = []
         context = self.get_context_data(**kwargs)
         try:            
@@ -218,20 +97,21 @@ class PaymentInvoiceView(TemplateView):
 
             total_amount = 0
             for order in order_details:
-                item = {}
-                item['item_name'] = order.menu_item.item_name
-                item['quantity'] = order.quantity
-                item['price'] = order.menu_item.item_price
-                item['total'] = order.total_item_amount
-                total_amount += order.total_item_amount
-                data.append(item)
+                if order.quantity :
+                    item = {}
+                    item['item_name'] = order.menu_item.item_name
+                    item['quantity'] = order.quantity
+                    item['price'] = order.menu_item.item_price
+                    item['total'] = order.total_item_amount
+                    total_amount += order.total_item_amount
+                    data.append(item)
 
             #========== Tax and Tip ===========#
             tax = get_tax(total_amount)
             tip = get_tip(total_amount)
 
-            #==========Grand Total===========#
-            grand_total = float(total_amount) + float(tax) + float(tip)
+            #==========Grand Total===========#grand_total
+            grand_total = float(total_amount) + float(tax) + float(tip) + float(settings.APPLICATION_FEE)
             grand_total = int(round(grand_total))
 
             #======== Payment Model ===========#
@@ -268,6 +148,7 @@ class PaymentInvoiceView(TemplateView):
             context['data'] = stripe_checkout_data
             context['tax'] = tax
             context['tip'] = tip
+            context['process_fee'] = settings.APPLICATION_FEE
             context['user_id'] = purchase_order.customer.id
             context['grand_total'] = grand_total
         except:
@@ -275,12 +156,17 @@ class PaymentInvoiceView(TemplateView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+
+        application_fee = 0
         payment_id = self.request.POST['id']
         stripe_token = self.request.POST['stripeToken']
         token_type = self.request.POST['stripeTokenType']
         email = self.request.POST['stripeEmail']
         
         payment_obj = PaymentModel.objects.get(id=payment_id)
+
+        current_date = datetime.now()
+        time_threshold = current_date + timedelta(hours=1)
 
         try:
             if payment_obj:
@@ -295,9 +181,14 @@ class PaymentInvoiceView(TemplateView):
                     account_id = dealer_stripe_account.account_id
                 except:
                     account_id = None
-                
-                stripe_charge = stripe.Charge.create(amount=total_amount, currency='usd', source=stripe_token, description="payment",
-                                       application_fee=settings.APPLICATION_FEE, stripe_account=account_id,receipt_email=email)
+
+                # ====================================== #
+                # This id for stripe charge . 
+                # ====================================== #
+                stripe_total_amount = total_amount * 100
+                application_fee = int(settings.APPLICATION_FEE*100)
+                stripe_charge = stripe.Charge.create(amount=stripe_total_amount, currency='usd', source=stripe_token, description="Process Payment",
+                                       application_fee=application_fee, stripe_account=account_id,receipt_email=email)
 
                 payment_obj.stripeToken = stripe_token
                 payment_obj.stripeTokenType = token_type
@@ -309,10 +200,11 @@ class PaymentInvoiceView(TemplateView):
 
                 order_obj = PurchaseOrder.objects.get(id=order_id)
                 order_obj.order_status = "PAID"
+                order_obj.expires = time_threshold
                 order_obj.total_amount_paid = total_amount
                 order_obj.save()
 
-                return HttpResponseRedirect('/payment_success/'+str(payment_obj.bill_number))
+                return HttpResponseRedirect('/payment/payment_success/'+str(payment_obj.bill_number))
 
         except stripe.error.CardError:
             return render(request, 'payment/payment_failed.html', {'_id': _id})

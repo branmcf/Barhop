@@ -1,5 +1,6 @@
 
 import datetime
+from twilio import twiml
 
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
@@ -18,7 +19,8 @@ from lib.tw import send_message, send_multimedia_message
 from lib.utils import get_current_url
 from lib.image_handler import is_image, is_valid_image, ProfileImageUploader
 
-from route.utils import check_grid_availability
+from route.utils import check_grid_availability, save_user_dealer_chat
+#from route.utils import get_menu_image
 from t_auth import forms
 from t_auth import utils
 
@@ -31,6 +33,7 @@ from trophy.models import TrophyModel
 from t_auth.forms import LoginForm
 from payment.models import ManagedAccountStripeCredentials
 from managed_account.models import GridDetails, Grid, MenuListImages, PurchaseOrder
+from django.utils.crypto import get_random_string
 
 # added
 from django.views.generic import TemplateView,CreateView, FormView, DetailView, View
@@ -135,12 +138,21 @@ def activate_account(request, uidb64=None, token=None,
             # =============#
             try:
                 menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
+                # menu_image = get_menu_image(current_trigger)
+
                 image_url = menu_image.image.url
                 url = get_current_url(request)
                 media_url = url+image_url
                 print("Media_url : "+str(media_url))
             except:
-                media_url = get_current_url(request)
+                message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                message_recieved_dealer = ref_user.current_trigger.trigger_name
+                save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                send_message(vendor_number, ref_user.mobile, message_to_client)
+                conversation.closed = True
+                conversation.save()
+                r = twiml.Response()
+                return HttpResponse(str(r))
 
             msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
             msg_data.save()
@@ -154,8 +166,11 @@ def activate_account(request, uidb64=None, token=None,
             # ================================= #
             conversation.process_stage = 1
             conversation.save()
+
+            random_num = get_random_string(length=4, allowed_chars='QWERTYUIOP123ASDFGHJKL456ZXCVBNM7890')
+            order_code = str(random_num)+str(conversation.id)
             
-            purchaseOrder = PurchaseOrder.objects.create(order_code=conversation.id,
+            purchaseOrder = PurchaseOrder.objects.create(order_code=order_code,
                 conversation=conversation,
                 dealer=dealer,
                 customer=user,

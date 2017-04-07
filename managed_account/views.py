@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 
 import stripe
 import json
-
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic.edit import UpdateView
@@ -27,6 +27,7 @@ from .models import  Trigger,Grid,GridDetails, MenuItems, PurchaseOrder, OrderMe
 from .forms import BankAccountCreationForm, ManagedAccountCreationForm, AddTriggerForm, GridForm,BankAccountEditForm
 from t_auth.forms import CustomUserCreationForm
 
+from lib.tw import send_new_user_message, send_message, send_multimedia_message
 from t_auth.utils import send_email_auth
 from managed_account import utils
 from django.db.models import Sum
@@ -171,6 +172,7 @@ def account_status(request):
                   {'available_amount': available_amount, 'pending_amount': pending_amount,
                    'transactions': transactions})
 
+
 class BankingView(TemplateView):
     template_name = "managed_account/banking.html"
 
@@ -190,7 +192,7 @@ class BankingView(TemplateView):
 
         if payment_obj:
             pending_obj = payment_obj.filter(order__order_status="PENDING")
-            available_obj = payment_obj.filter(order__order_status="PAID")
+            available_obj = payment_obj.filter(Q(order__order_status="PAID") | Q(order__order_status="READY"))
             if pending_obj:
                 pending_amount = pending_obj.aggregate(Sum('total_amount'))
                 pending_amount = pending_amount['total_amount__sum']
@@ -198,7 +200,10 @@ class BankingView(TemplateView):
                 available_amount = available_obj.aggregate(Sum('total_amount'))
                 available_amount = available_amount['total_amount__sum']
 
-        context['payment_list'] = payment_obj.filter(order__order_status="PAID",processed=True)
+        q1 = Q(order__order_status="PAID",processed=True)
+        q2 = Q(order__order_status="READY",processed=True)
+
+        context['payment_list'] = payment_obj.filter(q1 | q2)
         context['pending_amount'] = pending_amount
         context['available_amount'] = available_amount
 
@@ -628,27 +633,22 @@ class OrderReadyView(View):
 
             purchase_order_obj.save()
 
+            data['error_msg'] = ""
+            data['success'] = "True"
+
+            order_closed = PurchaseOrder.objects.filter(id=order_id)
+            data['purchase_ready_orders'] = order_closed
+            html = render_to_string('dealer/order_ready.html', data)
+
             #========== Send Message =============
             customer = purchase_order_obj.customer
             customer_mob = customer.mobile
             message = "Your Order is Ready.Your Order Code is '"+ str(purchase_order_obj.order_code) +"' Come to the bar, Thank you"
             vendor_number = settings.BARHOP_NUMBER
-            send_message(vendor_number, from_, message)
+            send_message(vendor_number, customer_mob, message)
 
-
-            data['error_msg'] = ""
-            data['success'] = "True"
-            messages.success(request, "Order Status changed.")
-
-            for message in messages.get_messages(request):
-                django_messages.append({
-                    "level": message.level,
-                    "message": message.message,
-                    "extra_tags": message.tags
-                })
-            data['messages'] = django_messages
-
-            return HttpResponse(json.dumps(data), content_type='application/json')
+            return HttpResponse(html)
+            # return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
@@ -660,6 +660,7 @@ class OrderCloseView(View):
         data = {}
         django_messages = []
         try:
+
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'CLOSED'
@@ -679,21 +680,55 @@ class OrderCloseView(View):
 
             data['error_msg'] = ""
             data['success'] = "True"
-            messages.success(request, "Order Status changed.")
-
-            for message in messages.get_messages(request):
-                django_messages.append({
-                    "level": message.level,
-                    "message": message.message,
-                    "extra_tags": message.tags
-                })
-            data['messages'] = django_messages
-
             return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             data['error_msg'] = "something went WRONG"
             return HttpResponse(json.dumps(data), content_type='application/json')
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+class GetNewOrder(View):
+    def post(self, request):
+        data = {}
+        django_messages = []
+        order_list = []
+        try:
+            order_id_data = request.POST.get('order_data')
+            if order_id_data:
+                order_id_data = order_id_data.split(',')
+                order_id_data = [ str(i) for i in order_id_data ]
+                print (order_id_data)
+
+            data['error_msg'] = ""
+            data['success'] = "True"
+
+            dealer = utils.get_dealer(request.user)
+            purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID').exclude(id__in=order_id_data)
+
+            if purchase_paid_orders.count() >= 0:
+                for order in purchase_paid_orders:
+                    order_details = {}
+                    items = OrderMenuMapping.objects.filter(order=order)
+                    order_details['id'] = order.id
+                    order_details['items'] = items
+                    order_details['order_code'] = order.order_code
+                    order_details['total_amount_paid'] = order.total_amount_paid
+                    order_details['order_status'] = order.order_status
+                    order_details['expires'] = order.expires
+                    order_list.append(order_details)
+
+                data['purchase_paid_orders'] = order_list
+                html = render_to_string('dealer/new_order.html',data)
+            else:
+                html = ''
+            return HttpResponse(html)
+            #return HttpResponse(json.dumps(data), content_type='application/json')
+        except :
+            data['error_msg'] = "something went WRONG"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 # ______________________________________________________________________________________
 
 
@@ -730,15 +765,18 @@ class AddBankAccountView(FormView):
         # stripe platform
         # ================================================= #
         try:
+            
             stripe_token = self.request.POST['stripeToken']
             stripe.api_key = settings.STRIPE_SECRET_KEY
-            stripe_account = stripe.Account.create(country=country, managed=True, external_account=stripe_token)
-            a = ManagedAccountStripeCredentials(dealer=dealer, account_id=stripe_account['id'])
-            a.save()
-
+            
             bankaccount = BankAccount(dealer=dealer,country=country,currency=currency,routing_number=routing_number,
                                       account_number=account_number,name=name,account_holder_type=account_holder_type,stripeToken=stripe_token)
             bankaccount.save()
+
+            stripe_account = stripe.Account.create(country=country, managed=True, external_account=stripe_token)
+            stripe_acct = ManagedAccountStripeCredentials(bank_account=bankaccount, dealer=dealer, account_id=stripe_account['id'])
+            stripe_acct.save()
+
         except:
             pass
 
@@ -766,8 +804,8 @@ class EditBankAccount(UpdateView):
         stripe.api_key = settings.STRIPE_SECRET_KEY
         dealer = utils.get_dealer(self.request.user)
         stripe_token = self.request.POST['stripeToken']
-
-        managedaccount = ManagedAccountStripeCredentials.objects.get(dealer=dealer)
+        bank_id = self.kwargs['pk']
+        managedaccount = ManagedAccountStripeCredentials.objects.get(bank_account__id=int(bank_id))
         account_id = managedaccount.account_id
 
         account = stripe.Account.retrieve(account_id)
