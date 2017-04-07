@@ -32,6 +32,7 @@ from t_auth.utils import send_email_auth
 from managed_account import utils
 from django.db.models import Sum
 
+grid_name_list = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 
 class HomeView(TemplateView):
     template_name = "dealer/index.html"
@@ -73,7 +74,7 @@ class HomeView(TemplateView):
 
                 dealer_triggers = Trigger.objects.filter(dealer=dealer)
                 if not dealer_triggers:
-                    warning_message += "Kindly add Triggers to get orders.<br>"    
+                    warning_message += "Kindly add Triggers to get orders.<br>" 
                 if trigger_id:
                     current_trigger = Trigger.objects.get(id=int(trigger_id))
                     purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=current_trigger)
@@ -91,23 +92,24 @@ class HomeView(TemplateView):
                         data.append(order_details)
                 else:
                     purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID')
-                    purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')
-
+                    purchase_ready_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='READY')                    
                     for order in purchase_paid_orders:
                         order_details = {}
                         items = OrderMenuMapping.objects.filter(order=order)
                         order_details['id'] = order.id
-                        order_details['items'] = items
+                        order_details['items'] = items                        
                         order_details['order_code'] = order.order_code
                         order_details['total_amount_paid'] = order.total_amount_paid
                         order_details['order_status'] = order.order_status
                         order_details['expires'] = order.expires
                         data.append(order_details)
+                        
 
                 context['triggers'] = dealer_triggers
                 context['trophies'] = trophies
                 # context['con_messages'] = c_messages
                 context['purchase_paid_orders'] = data
+                # context['location'] = order.order_grid_detail.location
                 context['purchase_ready_orders'] = purchase_ready_orders
 
                 context['warning_message'] = warning_message
@@ -192,7 +194,7 @@ class BankingView(TemplateView):
 
         if payment_obj:
             pending_obj = payment_obj.filter(order__order_status="PENDING")
-            available_obj = payment_obj.filter(Q(order__order_status="PAID") | Q(order__order_status="READY"))
+            available_obj = payment_obj.filter(Q(order__order_status="PAID") | Q(order__order_status="READY") | Q(order__order_status="CLOSED"))
             if pending_obj:
                 pending_amount = pending_obj.aggregate(Sum('total_amount'))
                 pending_amount = pending_amount['total_amount__sum']
@@ -202,8 +204,9 @@ class BankingView(TemplateView):
 
         q1 = Q(order__order_status="PAID",processed=True)
         q2 = Q(order__order_status="READY",processed=True)
+        q3 = Q(order__order_status="CLOSED",processed=True)
 
-        context['payment_list'] = payment_obj.filter(q1 | q2)
+        context['payment_list'] = payment_obj.filter(q1 | q2 | q3)
         context['pending_amount'] = pending_amount
         context['available_amount'] = available_amount
 
@@ -265,6 +268,7 @@ class EditGridView(FormView):
         return context
 
     def form_valid(self, form):
+
         trigger_id = self.request.POST.get('trigger_id')
         login_user = self.request.user
         trigger = Trigger.objects.get(id=trigger_id)
@@ -281,16 +285,36 @@ class EditGridView(FormView):
 
         grid.dealer = dealer
         grid.created_by = login_user
-        grid.save()
+        
 
         if not created:
-            GridDetails.objects.filter(grid=grid).delete()
+            grid_data = GridDetails.objects.filter(grid=grid)
+            active_grid_data = grid_data.filter(is_active=True)
+            if active_grid_data:
+                message = "You cant update grid now. There is a pending order to be deallocated from the grid"
+                messages.success(self.request, message)
+                return super(EditGridView, self).form_valid(form)
+            else:
+                grid.save()
+                GridDetails.objects.filter(grid=grid).delete()
 
-        m = row * col
+        grid_total = row * col
 
-        for gridDetail in range(m):            
+        # =========== Grid Location =============
+        
+        grid_counter_data = []
+        for i in range(row):            
+            for k in range(col):
+                location = grid_name_list[i]
+                location = location + str(k+1)
+                grid_counter_data.append(location)
+
+        #======================================
+
+        for gridDetail in range(grid_total):            
             gridDetailobj= GridDetails(grid=grid)
             gridDetailobj.grid_counter = gridDetail
+            gridDetailobj.location = grid_counter_data[gridDetail]
             gridDetailobj.save()
 
         message = "Updated the grid details for the trigger : %s"%(trigger.trigger_name)
@@ -599,24 +623,42 @@ class ChangeAccessLeveView(View):
             return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-#=========================== Order Ready & Close ========================================           
+#=========================== Order Ready & Close ======================================== 
+
 class OrderReadyView(View):
 
     def post(self, request):
         data = {}
         django_messages = []
         try:
+            # import pdb; pdb.set_trace()
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'READY'
 
             trigger = Trigger.objects.get(id=purchase_order_obj.trigger.id)            
             grid = trigger.grid_trgger.all()[0]
+            
             grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
+            
+            # row = grid.grid_row
+            # column = grid.grid_column
+            # for i in range(row):
+            #     for k in range(column):
+            #         location = list[i]
+            #         location = location + str(k+1)
+            #         select_grid = grid_detail_obj.filter(grid_counter=location,is_active=False)
 
-            # ================================ #
-            # Finidng the least counter grid
-            # ================================ #
+            #         if select_grid.count() > 0:
+            #             select_grid = GridDetails.objects.get(grid_counter=counter, grid=grid)
+            #             select_grid.order = purchase_order_obj
+            #             select_grid.is_active = True
+            #             select_grid.save()
+
+
+            # ================================#
+            # Finidng the least counter grid  #
+            # ================================#
             counter_list = []
             for grid_detail in grid_detail_obj:
                 counter_list.append(grid_detail.grid_counter)
@@ -637,7 +679,7 @@ class OrderReadyView(View):
             data['success'] = "True"
 
             order_closed = PurchaseOrder.objects.filter(id=order_id)
-            data['purchase_ready_orders'] = order_closed
+            data['purchase_ready_orders'] = order_closed 
             html = render_to_string('dealer/order_ready.html', data)
 
             #========== Send Message =============

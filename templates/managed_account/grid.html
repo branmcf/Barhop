@@ -74,11 +74,25 @@
   <script>
     $(document).ready(function(){
         $("form").submit(function(){
-            if ( $("#id_grid_row").val() == 0 || $("#id_grid_column").val() == 0 || $("#id_grid_row").val() == '' || $("#id_grid_column").val() == ''){
-                $("#error_grid").text("Row or Column cannot be zero/empty");
+            if( $("#id_grid_row").val() == 0 || $("#id_grid_column").val() == 0 || $("#id_grid_row").val() == '' || $("#id_grid_column").val() == '' || $('#id_grid_row').val() > 26){
+                if ( $("#id_grid_row").val() == 0 || $("#id_grid_column").val() == 0 || $("#id_grid_row").val() == '' || $("#id_grid_column").val() == ''){
+                    $("#error_grid").text("Row or Column cannot be zero/empty");
+                }
+                if($('#id_grid_row').val() > 26){
+                    $("#error_grid").text("Number of rows cannot exceed 26");
+                }
                 return false;
             }
+
         });
+
+
+
+
+
+
+
+
     });
   </script>
 

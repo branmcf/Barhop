@@ -99,9 +99,10 @@ class Grid(models.Model):
 
 class GridDetails(models.Model):
     grid = models.ForeignKey(Grid, related_name="grid_details")
-    order = models.ForeignKey(PurchaseOrder, blank=True, null=True)
+    order = models.ForeignKey(PurchaseOrder, blank=True, null=True, related_name="order_grid_detail")
     created = models.DateTimeField(auto_now=True)
     grid_counter = models.PositiveIntegerField(default=0, blank=True, null=True)
+    location = models.CharField(max_length=20, blank=True, null=True)
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
