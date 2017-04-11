@@ -47,15 +47,14 @@
   </div>
 
 <script type="text/javascript">    
+  
   window.onload = function() {
     var error = '{{ form.errors }}';
     if ( error != ''){
       $('#myBootModal').modal('show'); 
     }
   };
-</script>
 
-<script type="text/javascript">
   $('.booter').hide();
       $('.booter image').click(function(){
           var target = "#" + $(this).data("target");
@@ -63,5 +62,7 @@
           $(target).show();
       });
   });
+
 </script>
+
 {% endblock %}

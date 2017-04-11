@@ -133,9 +133,11 @@
 
 
 <script type="text/javascript">
-  
-  $(".orderReadyCol").on("click", function(event){
-    event.preventDefault();
+
+$(document).ready(function(){
+    
+  $(".orderReadyCol").on("click", function(e){
+    e.preventDefault();
     var order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_ready/',
@@ -157,7 +159,6 @@
     });
   });
 
-  
   $(".closeOrderCol").on("click", function(event){
     event.preventDefault();
     var order_id = $(this).attr('id');
@@ -178,6 +179,11 @@
       }
     });
   });
+
+
+});
+
+ 
 
 
 //______search using order_code__________
@@ -213,29 +219,29 @@ $(window).load(function(){
 });
 
 
-//setInterval(function(){
-  order_array = []
-  $('.orderReadyCol').each(function(i, obj) {
-      order_array.push(obj.id);
-  });
-  console.log("setintervel");
-  $.ajax({
-    url: '/account/new_order/',
-    type:'POST',
-    data:{
-      order_data:order_array.toString(),
-    },
-    success: function (data){
-      if (data['error_msg']){
-        console.log("error message");
-      }
-      else{  
-        $("#emptyReady").remove();
-        $('#unassignedCol').append(data);
-      }      
-    }
-  });  
-//},50000)
+// setInterval(function(){
+//   order_array = []
+//   $('.orderReadyCol').each(function(i, obj) {
+//       order_array.push(obj.id);
+//   });
+//   console.log("setintervel");
+//   $.ajax({
+//     url: '/account/new_order/',
+//     type:'POST',
+//     data:{
+//       order_data:order_array.toString(),
+//     },
+//     success: function (data){
+//       if (data['error_msg']){
+//         console.log("error message");
+//       }
+//       else{  
+//         $("#emptyReady").remove();
+//         $('#unassignedCol').append(data);
+//       }      
+//     }
+//   });  
+// },50000)
 
 </script>
 

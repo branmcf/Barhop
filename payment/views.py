@@ -167,6 +167,7 @@ class PaymentInvoiceView(TemplateView):
 
         current_date = datetime.now()
         time_threshold = current_date + timedelta(hours=1)
+        # import pdb;pdb.set_trace()
 
         try:
             if payment_obj:
@@ -203,6 +204,17 @@ class PaymentInvoiceView(TemplateView):
                 order_obj.expires = time_threshold
                 order_obj.total_amount_paid = total_amount
                 order_obj.save()
+
+
+                ###################################################################
+                from ws4redis.publisher import RedisPublisher
+                from ws4redis.redis_store import RedisMessage
+                from ws4redis.redis_store import SELF
+
+                redis_publisher = RedisPublisher(facility='barhop', users=[request.user.username])
+                message = RedisMessage('Hello World1212')
+                redis_publisher.publish_message(message)
+                ###################################################################
 
                 return HttpResponseRedirect('/payment/payment_success/'+str(payment_obj.bill_number))
 
