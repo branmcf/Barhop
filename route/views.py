@@ -42,6 +42,8 @@ def handle_sms(request):
     except:
         location = ''
 
+    #from_ = '+919946341903'
+
     if body:
         body = str(body)
         if body.find('-') != -1:
