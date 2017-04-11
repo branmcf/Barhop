@@ -1,6 +1,10 @@
 
 {% extends "base_inner.html" %}
 {% block content %}
+<div id="overlayID" class="overlay" style="display: none;">
+<p> Processing... </p>
+</div>
+
  <div class="container">
   <div class="row" style="text-align:center;">
     <div id="orderView">
@@ -138,6 +142,7 @@ $(document).ready(function(){
     
   $(".orderReadyCol").on("click", function(e){
     e.preventDefault();
+    $("#overlayID").show();
     var order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_ready/',
@@ -154,6 +159,7 @@ $(document).ready(function(){
           $(".ready_"+order_id).remove();
           $("#emptyClose").remove();
           $('#orderListToClose').append(data);
+          $("#overlayID").hide();
         }
       }
     });
@@ -161,6 +167,7 @@ $(document).ready(function(){
 
   $(".closeOrderCol").on("click", function(event){
     event.preventDefault();
+    $("#overlayID").show();
     var order_id = $(this).attr('id');
     $.ajax({
       url: '/account/order_close/',
@@ -175,16 +182,12 @@ $(document).ready(function(){
         }
         else{  
           $(".close_"+order_id).remove();
+          $("#overlayID").show();
         }
       }
     });
   });
-
-
 });
-
- 
-
 
 //______search using order_code__________
 
