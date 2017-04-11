@@ -8,7 +8,7 @@
           Order number: {{order.order_code}}
         </div>
         <div class="col-md-10" id="assignedOrderTicketLocation">
-          Location:{{order.location}}
+          Location:{{order.order_grid_detail.all.0.location}}
         </div>
         <a href="">
         <div class="col-md-2 closeOrderCol" id="{{order.id}}">
