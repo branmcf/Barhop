@@ -43,7 +43,7 @@ def handle_sms(request):
     except:
         location = ''
 
-    from_ = '+919946341903'
+    from_ = '+9562130923'
 
     if body:
         body = str(body)
@@ -148,7 +148,7 @@ def handle_sms(request):
                     conversation.save()
 
                     return HttpResponse(str(r))
-
+                #mport pdb;pdb.set_trace()
                 #==============#
                 # Menu list   #
                 #============#
