@@ -51,14 +51,11 @@ class HomeView(TemplateView):
         data = {}
         warning_message = ""
         if request.user.is_authenticated():
+            
             trophies = TrophyModel.objects.filter(dealer=request.user).order_by('-date')
             c_messages = []
             data = []
-            # if trophies:
-            #     conversations = Conversation.objects.filter(dealer=request.user, closed=False, trophy=trophies[0]).order_by(
-            #         'date')
-            #     c_messages = [(item, Message.objects.filter(conversation=item).order_by('-id')[0]) for item in
-            #                   conversations]
+            
             try :
                 dealer = utils.get_dealer(request.user)
                 trigger_id = request.GET.get('trigger')
@@ -730,7 +727,9 @@ class OrderCloseView(View):
 
 
 class GetNewOrder(View):
+    
     def post(self, request):
+        
         data = {}
         django_messages = []
         order_list = []
@@ -738,6 +737,7 @@ class GetNewOrder(View):
             order_id_data = request.POST.get('order_data')
             if order_id_data:
                 order_id_data = order_id_data.split(',')
+                order_id_data = list(set(order_id_data))
                 order_id_data = [ str(i) for i in order_id_data ]
                 print (order_id_data)
 

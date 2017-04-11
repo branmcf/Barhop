@@ -1,6 +1,8 @@
+
+{% load static %}
+
 <!DOCTYPE html>
 <html>
-{% load static %}
 <head>
   <title>Barhop</title>
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
@@ -11,6 +13,8 @@
   <link rel="icon" type="img/png" href="/static/images/barhop_icon.png">
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
   <script src="/static/js/mindmup-editabletable.js"></script>
+  <script type="text/javascript" src="{% static 'js/ws4redis.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
 </head>
 
 <body>

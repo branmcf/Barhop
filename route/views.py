@@ -30,7 +30,6 @@ from django.utils.crypto import get_random_string
 def handle_sms(request):
     
     """
-
     :param request:
     :return:
     """
@@ -42,8 +41,6 @@ def handle_sms(request):
         location = request.POST['FromCity']
     except:
         location = ''
-
-    # from_ = '+919946341903'
 
 
     if body:
