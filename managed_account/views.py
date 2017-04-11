@@ -628,7 +628,6 @@ class OrderReadyView(View):
         data = {}
         django_messages = []
         try:
-            # import pdb; pdb.set_trace()
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'READY'
@@ -668,8 +667,7 @@ class OrderReadyView(View):
             grid_detail.order = purchase_order_obj
             grid_detail.is_active = True
             grid_detail.save()
-
-
+            
             purchase_order_obj.save()
 
             data['error_msg'] = ""
@@ -775,6 +773,94 @@ class GetNewOrder(View):
 
 
 #=================================== MENU ===============================================#
+
+class MenuListView(FormView):
+    template_name = "managed_account/menu.html"
+
+    def get(self, request, *args, **kwargs):
+        # form_class = self.get_form_class()
+        # form = self.get_form(form_class)
+        context = self.get_context_data(**kwargs)
+        user = self.request.user
+        try:
+            employee_data = DealerEmployeMapping.objects.get(employe=user)
+            if employee_data:
+                dealer = employee_data.dealer
+        except:
+            dealer = user
+
+        context['menu_data'] = MenuItems.objects.filter(dealer=dealer)
+
+        return self.render_to_response(context)
+
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        django_messages = []
+        try:
+            table_data = request.POST.getlist("table")
+
+            received_json_data=json.loads(table_data[0])
+
+            for dat in received_json_data:
+                try:
+                    item_id = int(dat['item_id'])
+                    menu_obj = MenuItems.objects.get(id=item_id)
+                    
+                    if dat['item_name'] == '':
+                        data['error_msg'] = "ID : "+ str(item_id) +" , Cannot save this item without name"
+                        data['success'] = "False"
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+
+                    menu_obj.item_name = dat['item_name']                  
+                    menu_obj.item_price = dat['price']
+                    menu_obj.quantity_available = dat['quantity']
+                    menu_obj.save()
+                        
+                except:
+                    pass
+            data['error_msg'] = ""
+            data['success'] = "True"
+            messages.success(request, "Changes saved successfully.")
+
+            for message in messages.get_messages(request):
+                django_messages.append({
+                    "level": message.level,
+                    "message": message.message,
+                    "extra_tags": message.tags
+                })
+            data['messages'] = django_messages
+
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "Could not save your changes. Please try again."
+            data['success'] = "False"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(MenuListView, self).dispatch(*args, **kwargs)
+
+
+class AddNewMenuView(View):
+
+    def post(self, request):
+        data = {}
+        django_messages = []
+        try:
+            dealer = utils.get_dealer(self.request.user)
+            MenuItems.objects.create(dealer=dealer, item_name='')
+            data['error_msg'] = ""
+            data['success'] = "True"
+
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        except:
+            data['error_msg'] = "something went WRONG"
+            data['success'] = "False"
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
 #_________________________________________________________________________________#
 
 

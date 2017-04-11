@@ -13,6 +13,7 @@ from managed_account.models import *
 
 from block.models import BlockModel
 
+from route.utils import get_menu_image
 from lib.utils import json_response, get_current_url
 from lib.tw import send_new_user_message, send_message, send_multimedia_message
 
@@ -42,7 +43,7 @@ def handle_sms(request):
     except:
         location = ''
 
-    #from_ = '+919946341903'
+    from_ = '+919946341903'
 
     if body:
         body = str(body)
@@ -152,8 +153,9 @@ def handle_sms(request):
                 # Menu list   #
                 #============#
                 try:
-                    menu_image = MenuListImages.objects.get(trigger=trigger_data)
-                    # menu_image = get_menu_image(trigger_data)
+                    # menu_image = MenuListImages.objects.get(trigger=trigger_data)
+                    
+                    menu_image = get_menu_image(trigger_data)
                     image_url = menu_image.image.url
                     url = get_current_url(request)
                     media_url = url+image_url

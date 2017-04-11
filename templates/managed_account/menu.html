@@ -1,0 +1,135 @@
+{% extends "base_inner.html" %}
+{% block content %}
+  <script>
+  </script>
+  <div id="menuContent" style="overflow-y:auto;" >
+    <div >
+      <table id="mainTable" class="table">
+            <thead><tr><th>ID</th><th>Name</th><th>Price($)</th><th>Quantity</th></tr></thead>
+            <tbody>
+            {% if menu_data %}
+            {% for data in menu_data %}
+              <tr>
+                <td id="{{ data.id }}" class="id" >{{ data.id }}</td>
+                <td id="{{ data.id }}" class="item_name" >{{ data.item_name }}</td>
+                <td id="{{ data.id }}" class="item_price" >{{ data.item_price }}</td>
+                <td id="{{ data.id }}" class="quantity_available" >{{ data.quantity_available }}</td>
+              </tr>
+            {% endfor %}
+            {% else %}
+              <p>Menu List is Empty!</p>
+            {% endif %}
+            </tbody>
+      </table>
+    </div>
+      <button type="button" class="btn saveGridBtn" id="EditMenuBtn">Edit</button>
+    <div id="eidtButtons" style="display: none;margin-top: 10px">
+      <button type="button" class="btn saveGridBtn" id="cancelButton">Cancel</button>
+      <button type="button" class="btn saveGridBtn" id="saveMenuButton">Save</button>
+      <button type="button" class="btn saveGridBtn" id="addMenuButton">Add</button>      
+    </div>
+  </div>
+
+<script>
+$(".item_price").change(function(e) {
+  price = $(this).text()
+  pattern = /^(0*[1-9][0-9]*(\.[0-9]+)?|0+\.[0-9]*[1-9][0-9]*)$/;
+  if (pattern.test(price) ){
+  }
+  else{
+    alert("Please enter a valid price");
+    $(this).empty();
+
+  }
+});
+// On click Edit show add save
+$("#EditMenuBtn").click(function(){
+  if ($('#eidtButtons').css('display') == 'none') {
+    $('#mainTable').editableTableWidget();
+    $("#eidtButtons").show();    
+  }
+  else{
+    $("#eidtButtons").hide();
+    $("#addMenuButton").show();
+  }
+});
+
+// Add new empty item
+$("#addMenuButton").click(function(){
+  $.ajax({
+    url: '/account/add_new/',
+    type:'POST',
+    data:{
+      'data' : 'data',
+    },
+    success: function (data){
+      if(data["success"] == 'True' ){
+        location.reload();
+        // update_messages(data.messages);  
+      }
+      else{
+        alert("false");
+      }
+    }
+  });
+});
+
+// Cancel Btn Refresh page & dont save
+$("#cancelButton").click(function(){
+  location.reload();
+})
+
+// Save Complete Table Data
+$("#saveMenuButton").click(function(){
+  var table_data = [];  
+  var table = $('#mainTable');
+  table.find('tr').each(function (i) {
+    var $tds = $(this).find('td');
+    var row_data = {};
+    row_data['item_id'] = $tds.eq(0).text(),
+    row_data['item_name'] = $tds.eq(1).text(),
+    row_data['price'] = $tds.eq(2).text(),
+    row_data['quantity'] = $tds.eq(3).text();
+    table_data.push(row_data);
+  });
+  console.log("Data :");
+  console.log(table_data);
+  table_data_a = JSON.stringify(table_data)
+
+  $.ajax({
+    url: '/account/menu/',
+    type:'POST',
+    data:{
+      'table' : table_data_a,
+    },
+    success: function (data){
+      if(data["success"] == 'True' ){
+        update_messages(data.messages);
+        $("#eidtButtons").hide();
+          
+      }
+      else{
+        alert(data.error_msg);
+      }
+    }
+  });
+
+});
+
+function update_messages(messages){
+  console.log("update message");
+  $(".message").html("");
+  $.each(messages, function (i, m) {
+      $(".message").append(m.message);
+  });  
+  $('.message').show();
+  setTimeout(function() {
+      $('.message').fadeOut('slow');
+      location.reload();
+  }, 3000);
+}
+
+// $('#textAreaEditor').editableTableWidget({editor: $('<textarea>')});
+window.prettyPrint && prettyPrint();
+</script>
+{% endblock %}

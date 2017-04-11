@@ -115,6 +115,7 @@ class GridDetails(models.Model):
 
 
 class MenuListImages(models.Model):
+    dealer = models.ForeignKey(CustomUser,blank=True, null=True)
     trigger = models.ForeignKey(Trigger,blank=True, null=True)
     image = models.FileField(upload_to='MenuImages/')
     uploaded_at = models.DateTimeField(auto_now_add=True)

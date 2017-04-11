@@ -47,7 +47,7 @@
       <ul class="nav navbar-nav" id="rightUl">
         {% if request.user.is_staff %}
         <li><a href="/account" >Account</a></li>        
-        <!-- <li><a href="/account/menu" >Menu</a></li> -->
+        <li><a href="/account/menu" >Menu</a></li>
         {% endif %}
         <li><a href="#" onclick='if (confirm("Are you sure you want to logout ?")){window.location.replace("  {% url 'logout'%}");}'
         >Logout</a></li>

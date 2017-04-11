@@ -21,7 +21,8 @@ urlpatterns = [
     url(r'^order_ready/$', OrderReadyView.as_view()),
     url(r'^order_close/$', OrderCloseView.as_view()),
     url(r'^new_order/$', GetNewOrder.as_view()),
-    # url(r'^add_new/$', AddNewMenuView.as_view(), name='menu_view'),
+    url(r'^menu/$', MenuListView.as_view(), name='add_menu'),
+    url(r'^add_new/$', AddNewMenuView.as_view(), name='menu_view'),
     url(r'^add_bank_account/$', AddBankAccountView.as_view(), name='add_bank_account'),
     url(r'^edit_bank_account/(?P<pk>\d+)$', EditBankAccount.as_view(), name='edit_bank_account'),
 
