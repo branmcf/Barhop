@@ -1,12 +1,10 @@
-<pre>
-Hello {{user.full_name}},
 
-Welcome to Barhop. Thank you for registering your account.
+Hi {{user.full_name}},
 
+Welcome to Barhop, thank you for signing up!
 
 Please click the link below to activate your account:
 {{protocol}}://{{ domain }}{% url 'account_activate' uid token %}
 
-Best Regards,
+Best,
 Barhop Team
-

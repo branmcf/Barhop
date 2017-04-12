@@ -21,3 +21,4 @@ twilio==4.4.0
 uWSGI==2.0.14
 websocket-client==0.35.0
 imgkit==0.0.5
+django-picklefield==0.3.2

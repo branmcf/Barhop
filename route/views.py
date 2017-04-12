@@ -155,7 +155,7 @@ def handle_sms(request):
                 try:
                     # menu_image = MenuListImages.objects.get(trigger=trigger_data)
                     
-                    menu_image = get_menu_image(trigger_data)
+                    menu_image = get_menu_image(trigger_data, customer)
                     image_url = menu_image.image.url
                     url = get_current_url(request)
                     media_url = url+image_url
@@ -185,9 +185,8 @@ def handle_sms(request):
                     location = location
                     )
 
-                message_to_client = "Welcome to Barhop! here is the menu for "+ str(trigger_data.trigger_name) +" Reply 'START' to start your order"
-                message_recieved_dealer = client_message
-
+                message_to_client = " Welcome to Barhop! Here is the menu for "+ str(trigger_data.trigger_name) +" Reply 'START' to start your order! "
+                message_recieved_dealer = trigger_data.trigger_name
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
                 send_multimedia_message(vendor_number, from_, message_to_client, media_url)                
 
@@ -207,8 +206,9 @@ def handle_sms(request):
             purchaseOrder.location = location
             purchaseOrder.save()
 
-        if process_stage == 1 and client_message.lower() == "start" :                        
-            message_to_client = "Text in the drink number of the first drink you want"
+        if process_stage == 1 and client_message.lower() == "start" :
+
+            message_to_client = "Text in the item number from the menu of the first item you want ()!"
             message_recieved_dealer = client_message
 
             save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -227,7 +227,11 @@ def handle_sms(request):
             # Check menu item is valid #
             #=========================#
             try:
-                menu_object = MenuItems.objects.get(id=client_message)
+                menu_map_object = MenuCustomerMappping.objects.get(trigger=trigger,dealer=dealer,customer=customer)
+                menu_data = menu_map_object.menu_data
+                menu_id = menu_data[client_message_number]
+                menu_object = MenuItems.objects.get(id=menu_id,dealer=dealer)
+
             except:
                 menu_object = None
 
@@ -276,9 +280,8 @@ def handle_sms(request):
                 total_amount = float(price) * float(quantity)
 
                 order_menu_mapping.total_item_amount = total_amount
-                order_menu_mapping.save()
-
-                message_to_client = "Text in the drink number of the second drink you want or reply 'DONE' to checkout"
+                order_menu_mapping.save()                            
+                message_to_client = "Text in the item number from the menu of the next item you want () or reply 'DONE' to checkout" 
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -294,6 +297,7 @@ def handle_sms(request):
                 send_message(vendor_number, from_, message_to_client)
 
         elif process_stage == 4 and client_message.lower() == "done" :
+
             url = get_current_url(request)
             payment_url = str(url) +"/payment/purchase_invoice/"+str(purchaseOrder.id)
             url_shorten = shorten(payment_url)
@@ -341,14 +345,18 @@ def handle_sms(request):
 
             conversation.process_stage = 5
             conversation.save()
-
+            # remove customer menu map
+            MenuCustomerMappping.objects.filter(trigger=trigger,dealer=dealer,customer=customer).delete()
         elif process_stage == 4 and type(client_message_number) == int:
 
             # ========================= #
             # Check menu item is valid
             # ========================= #
             try:
-                menu_object = MenuItems.objects.get(id=client_message)
+                menu_map_object = MenuCustomerMappping.objects.get(trigger=trigger,dealer=dealer,customer=customer)
+                menu_data = menu_map_object.menu_data
+                menu_id = menu_data[client_message_number]
+                menu_object = MenuItems.objects.get(id=menu_id)
             except:
                 menu_object = None
 

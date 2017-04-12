@@ -2,7 +2,7 @@ __author__ = 'nibesh'
 
 from trophy.models import TrophyModel
 from t_auth.models import CustomUser, RefNewUser
-from managed_account.models import Trigger, GridDetails, MenuListImages, MenuItems
+from managed_account.models import Trigger, GridDetails, MenuListImages, MenuItems, MenuCustomerMappping
 from route.models import Message
 import imgkit
 from django.core.files import File
@@ -105,20 +105,31 @@ def check_grid_availability(trigger_id):
     else:
         return False
 
-def get_menu_image(trigger_data):
+def get_menu_image(trigger_data, customer):
     try:
+        print("_______Get Menu_________")
         trigger_name = trigger_data.trigger_name
         dealer = trigger_data.dealer
 
         html = "<html><body style='color:red;'><div style='width:60%;margin:10% auto;'><table style='width:100%;color:#191919;' border=1><h2 style='color:#191919;'>"+ str(trigger_name) +"</h2><tr><th style='width:20%;background-color:#191919;color:#c1c1c1;'>Item Number</th><th style='background-color:#191919;color:#c1c1c1;'>Name</th><th style='width:20%;background-color:#191919;color:#c1c1c1;'>Price</th></tr>"
 
         menu_list = MenuItems.objects.filter(dealer=dealer)
-        
+        #==========================================#
+        # Logic to set item number always 1,2,3.. #
+        #========================================#
+        item_number = 0
+        menu_dict = {}
         for menu in menu_list:
             if menu.quantity_available > 0 and menu.item_price > 0:
-                html += "<tr><td style='padding-left:10px;'>"+str(menu.id)+"</td><td style='padding-left:10px;'>"+str(menu.item_name)+"</td><td style='padding-left:10px;'>"+str(menu.item_price)+"</td></tr>"
-        
+                item_number = item_number+1
+                menu_dict[item_number] = menu.id
+                html += "<tr><td style='padding-left:10px;'>"+ str(item_number) +"</td><td style='padding-left:10px;'>"+str(menu.item_name)+"</td><td style='padding-left:10px;'>"+str(menu.item_price)+"</td></tr>"
+            pass
         html += "</table></div></body></html>"
+
+        menu_custom_obj, created = MenuCustomerMappping.objects.get_or_create(trigger=trigger_data,dealer=dealer,customer=customer)
+        menu_custom_obj.menu_data=menu_dict
+        menu_custom_obj.save()
 
         Html_file= open("test.html","w")
         Html_file.write(html)

@@ -41,7 +41,7 @@ def send_new_user_message(request, from_, to, ref_id):
     :param ref_id:
     :return:
     """
-    message = 'Welcome to Barhop, We see you are new ! Please Signup here. '
+    message = "Welcome to Barhop! We see you're new, please sign up here:"
     url = get_current_url(request) + reverse('new_register')
     url += '?id=' + str(ref_id)
     #====== for developments only ===============

@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from t_auth.models import CustomUser
 from django.utils.translation import ugettext_lazy as _
+from picklefield.fields import PickledObjectField
 
 ORDER_CHOICES = (
     ('PENDING', _('Pending')),
@@ -113,10 +114,14 @@ class GridDetails(models.Model):
         verbose_name = 'GridDetails'
         verbose_name_plural = 'GridDetails'
 
-
 class MenuListImages(models.Model):
     dealer = models.ForeignKey(CustomUser,blank=True, null=True)
     trigger = models.ForeignKey(Trigger,blank=True, null=True)
     image = models.FileField(upload_to='MenuImages/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+class MenuCustomerMappping(models.Model):
+    trigger = models.ForeignKey(Trigger, related_name="tigger_menu_map", blank=True, null=True)
+    dealer = models.ForeignKey(CustomUser,related_name="dealer_menu_map", blank=True, null=True)
+    customer = models.ForeignKey(CustomUser,related_name="customer_menu_map", blank=True, null=True)
+    menu_data = PickledObjectField()

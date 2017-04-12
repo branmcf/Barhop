@@ -167,7 +167,6 @@ class PaymentInvoiceView(TemplateView):
 
         current_date = datetime.now()
         time_threshold = current_date + timedelta(hours=1)
-        # import pdb;pdb.set_trace()
 
         try:
             if payment_obj:
