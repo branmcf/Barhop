@@ -43,8 +43,8 @@ def handle_sms(request):
     except:
         location = ''
 
-    #from_ = '+9562130923'
-    from_ = '+919747385617'
+
+    from_ = '+919048451716'
 
 
     if body:
@@ -271,7 +271,10 @@ def handle_sms(request):
                 # Update quantity in order table #
                 #================================#
                 purchaseOrder = PurchaseOrder.objects.get(conversation=conversation, dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
-                order_menu_mapping = OrderMenuMapping.objects.get(order=purchaseOrder)
+                order_menu_mapping = OrderMenuMapping.objects.filter(order=purchaseOrder)
+
+                order_menu_mapping = [ each_order_item  if not each_order_item.quantity for each_order_item in order_menu_mapping]
+                order_menu_mapping = order_menu_mapping[0]
                 order_menu_mapping.quantity = client_message
 
                 #=============================#
@@ -349,6 +352,7 @@ def handle_sms(request):
             conversation.save()
             # remove customer menu map
             MenuCustomerMappping.objects.filter(trigger=trigger,dealer=dealer,customer=customer).delete()
+        
         elif process_stage == 4 and type(client_message_number) == int:
 
             # ========================= #
@@ -370,6 +374,15 @@ def handle_sms(request):
                 send_message(vendor_number, from_, message_to_client)
 
                 return HttpResponse(str(r))
+
+            #==================================#
+            # Update menu item in order table #
+            #================================#
+            purchaseOrder = PurchaseOrder.objects.get(conversation=conversation,dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
+
+            order_menu_mapping = OrderMenuMapping.objects.create(order=purchaseOrder,
+                menu_item=menu_object)
+
 
             message_to_client = "How many '"+ str(menu_object.item_name) +"' do you want?"
             message_recieved_dealer = client_message
