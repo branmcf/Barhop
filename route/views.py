@@ -43,7 +43,9 @@ def handle_sms(request):
     except:
         location = ''
 
-    from_ = '+9562130923'
+    #from_ = '+9562130923'
+    from_ = '+919747385617'
+
 
     if body:
         body = str(body)
