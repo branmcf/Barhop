@@ -40,7 +40,9 @@ from django.views.generic import TemplateView,CreateView, FormView, DetailView, 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 vendor_number = settings.BARHOP_NUMBER
 
+
 def new_user_signup(request):
+    # customer sign-up
     form = forms.NewUserSignUpForm(request.POST or None)
     if request.method == 'POST':
         _id = int(request.POST['id'])
@@ -157,7 +159,7 @@ def activate_account(request, uidb64=None, token=None,
             msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
             msg_data.save()
             del msg_data
-            message = "Welcome to Barhop! here is the menu for "+ str(current_trigger.trigger_name) +". Reply 'START' to start your order"
+            message = " Welcome to Barhop! Here is the menu for "+ str(current_trigger.trigger_name) +". Reply 'START' to start your order! "
             msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
             msg_data.save()            
 
