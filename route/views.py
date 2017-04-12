@@ -44,7 +44,7 @@ def handle_sms(request):
         location = ''
 
 
-    from_ = '+919048451716'
+    from_ = '+919946341903'
 
 
     if body:
@@ -277,6 +277,21 @@ def handle_sms(request):
                 for each_order in order_menu_mapping_list:
                     if not each_order.quantity:
                         order_menu_mapping = each_order
+
+                # ====================================== #
+                # Checking the available quantity
+                # ====================================== #
+                available_quantity = order_menu_mapping.menu_item.quantity_available
+                if available_quantity < client_message_number :
+                    conversation.process_stage = 3
+                    conversation.save()
+                    
+                    message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(order_menu_mapping.menu_item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
+                    message_recieved_dealer = client_message
+
+                    save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                    send_message(vendor_number, from_, message_to_client)
+                    return HttpResponse(str(r))    
                 
                 order_menu_mapping.quantity = client_message
 
