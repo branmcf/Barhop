@@ -15,7 +15,7 @@ import shortuuid
 from lib.utils import json_response
 from lib.tw import send_price_message, send_message
 
-from t_auth.models import CustomUser
+from t_auth.models import CustomUser,DealerEmployeMapping
 
 from .models import ManagedAccountStripeCredentials
 
@@ -197,7 +197,8 @@ class PaymentInvoiceView(TemplateView):
                 payment_obj.detail = "Payment Successful"
                 payment_obj.processed = True
                 payment_obj.save()
-
+                
+                #import pdb;pdb.set_trace()
                 order_obj = PurchaseOrder.objects.get(id=order_id)
                 order_obj.order_status = "PAID"
                 order_obj.expires = time_threshold
@@ -206,11 +207,17 @@ class PaymentInvoiceView(TemplateView):
 
 
                 ###################################################################
+                import time
+                time.sleep(2)
+                employee_data = DealerEmployeMapping.objects.filter(dealer=dealer)
+                employee_list = [each_employee.employe.username for each_employee in employee_data]
+                employee_list.append(dealer.username)
+       
                 from ws4redis.publisher import RedisPublisher
                 from ws4redis.redis_store import RedisMessage
                 from ws4redis.redis_store import SELF
 
-                redis_publisher = RedisPublisher(facility='barhop', users=[request.user.username])
+                redis_publisher = RedisPublisher(facility='barhop', users=[dealer.username])
                 message = RedisMessage('Hello World1212')
                 redis_publisher.publish_message(message)
                 ###################################################################
