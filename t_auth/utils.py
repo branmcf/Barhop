@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 import json
 from django.core.mail import send_mail
