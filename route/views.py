@@ -271,10 +271,13 @@ def handle_sms(request):
                 # Update quantity in order table #
                 #================================#
                 purchaseOrder = PurchaseOrder.objects.get(conversation=conversation, dealer=dealer,customer=customer,trigger=trigger,order_status='PENDING')
-                order_menu_mapping = OrderMenuMapping.objects.filter(order=purchaseOrder)
+                order_menu_mapping_obj = OrderMenuMapping.objects.filter(order=purchaseOrder)
 
-                order_menu_mapping = [ each_order_item  if not each_order_item.quantity for each_order_item in order_menu_mapping]
-                order_menu_mapping = order_menu_mapping[0]
+                order_menu_mapping_list = [ each_order_item for each_order_item in order_menu_mapping_obj]
+                for each_order in order_menu_mapping_list:
+                    if not each_order.quantity:
+                        order_menu_mapping = each_order
+                
                 order_menu_mapping.quantity = client_message
 
                 #=============================#
