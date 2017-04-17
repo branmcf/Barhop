@@ -1,6 +1,6 @@
 
 {% for order in purchase_paid_orders %}
-<div class="row" id="unassignedOrderRow">
+<div class="row ready_{{order.id}}" id="unassignedOrderRow">
   <div class="col-md-10 col-md-offset-1" id="unassignedOrderTicket">
     <div class="row unassignedOrderTicketRow" id="orderDataList">
       <div class="col-md-10 unassignedOrderTicketText" id="">
