@@ -71,7 +71,8 @@ class HomeView(TemplateView):
 
                 dealer_triggers = Trigger.objects.filter(dealer=dealer)
                 if not dealer_triggers:
-                    warning_message += "Kindly add Triggers to get orders.<br>" 
+                    warning_message += "Kindly add Triggers to get orders.<br>"
+
                 if trigger_id:
                     current_trigger = Trigger.objects.get(id=int(trigger_id))
                     purchase_paid_orders = PurchaseOrder.objects.filter(dealer=dealer, order_status='PAID', trigger=current_trigger)
@@ -627,47 +628,45 @@ class OrderReadyView(View):
     def post(self, request):
         data = {}
         django_messages = []
+        employee_name_list = []
         try:
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
+            
+            try:
+                flag = request.POST['flag']
+            except:
+                flag = ''
+
+            if not flag:                
+
+                trigger = Trigger.objects.get(id=purchase_order_obj.trigger.id)
+                grid = trigger.grid_trgger.all()[0]
+                # ================================#
+                # Finding the least counter grid  #
+                # ================================#
+                counter_list = []
+                grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
+                for grid_detail in grid_detail_obj:
+                    counter_list.append(grid_detail.grid_counter)
+                counter = min(counter_list)
+                
+                # ==================================== #
+                # Updating the grid with purchase order 
+                # ==================================== #
+                grid_detail = GridDetails.objects.get(grid_counter=counter, grid=grid)
+                grid_detail.order = purchase_order_obj
+                grid_detail.is_active = True
+                grid_detail.save()
+
+                #========== Send Message =============
+                customer = purchase_order_obj.customer
+                customer_mob = customer.mobile
+                message = "Your Order is Ready! Your Order Code is '"+ str(purchase_order_obj.order_code) +"'. Come to the bar, Thank you."
+                vendor_number = settings.BARHOP_NUMBER
+                send_message(vendor_number, customer_mob, message)
+            
             purchase_order_obj.order_status = 'READY'
-
-            trigger = Trigger.objects.get(id=purchase_order_obj.trigger.id)            
-            grid = trigger.grid_trgger.all()[0]
-            
-            grid_detail_obj = GridDetails.objects.filter(grid=grid, is_active=False)
-            
-            # row = grid.grid_row
-            # column = grid.grid_column
-            # for i in range(row):
-            #     for k in range(column):
-            #         location = list[i]
-            #         location = location + str(k+1)
-            #         select_grid = grid_detail_obj.filter(grid_counter=location,is_active=False)
-
-            #         if select_grid.count() > 0:
-            #             select_grid = GridDetails.objects.get(grid_counter=counter, grid=grid)
-            #             select_grid.order = purchase_order_obj
-            #             select_grid.is_active = True
-            #             select_grid.save()
-
-
-            # ================================#
-            # Finidng the least counter grid  #
-            # ================================#
-            counter_list = []
-            for grid_detail in grid_detail_obj:
-                counter_list.append(grid_detail.grid_counter)
-            counter = min(counter_list)
-            
-            # ==================================== #
-            # Updating the grid with purchase order
-            # ==================================== #
-            grid_detail = GridDetails.objects.get(grid_counter=counter, grid=grid)
-            grid_detail.order = purchase_order_obj
-            grid_detail.is_active = True
-            grid_detail.save()
-            
             purchase_order_obj.save()
 
             data['error_msg'] = ""
@@ -676,13 +675,24 @@ class OrderReadyView(View):
             order_closed = PurchaseOrder.objects.filter(id=order_id)
             data['purchase_ready_orders'] = order_closed 
             html = render_to_string('dealer/order_ready.html', data)
+            
+            if not flag:
+                ###################################################################
+                dealer = purchase_order_obj.dealer
+                employee_data = DealerEmployeMapping.objects.filter(dealer=dealer)
+                employee_name_list = [each_employee.employe.username for each_employee in employee_data]
+                employee_name_list.append(dealer.username)
+       
+                from ws4redis.publisher import RedisPublisher
+                from ws4redis.redis_store import RedisMessage
+                from ws4redis.redis_store import SELF
 
-            #========== Send Message =============
-            customer = purchase_order_obj.customer
-            customer_mob = customer.mobile
-            message = "Your Order is Ready! Your Order Code is '"+ str(purchase_order_obj.order_code) +"'. Come to the bar, Thank you."
-            vendor_number = settings.BARHOP_NUMBER
-            send_message(vendor_number, customer_mob, message)
+                for username in employee_name_list:
+                    redis_publisher = RedisPublisher(facility='barhop', users=[username])
+                    message = RedisMessage(".ready_"+str(order_id))
+                    redis_publisher.publish_message(message)
+                ###################################################################
+
 
             return HttpResponse(html)
             # return HttpResponse(json.dumps(data), content_type='application/json')
@@ -697,7 +707,6 @@ class OrderCloseView(View):
         data = {}
         django_messages = []
         try:
-
             order_id = request.POST['order_id']
             purchase_order_obj = PurchaseOrder.objects.get(id=order_id)
             purchase_order_obj.order_status = 'CLOSED'
@@ -710,10 +719,28 @@ class OrderCloseView(View):
             conversation.save()
 
             #=========== Grid Updation ============ 
-            grid_detail = GridDetails.objects.get(order=purchase_order_obj, is_active=True)
-            grid_detail.is_active = False
-            grid_detail.order = None
-            grid_detail.save()
+            grid_detail_data = GridDetails.objects.filter(order=purchase_order_obj, is_active=True)
+            for grid_detail in grid_detail_data:
+                grid_detail.is_active = False
+                grid_detail.order = None
+                grid_detail.save()
+
+            
+            ###################################################################
+            dealer = purchase_order_obj.dealer
+            employee_data = DealerEmployeMapping.objects.filter(dealer=dealer)
+            employee_name_list = [each_employee.employe.username for each_employee in employee_data]
+            employee_name_list.append(dealer.username)
+   
+            from ws4redis.publisher import RedisPublisher
+            from ws4redis.redis_store import RedisMessage
+            from ws4redis.redis_store import SELF
+
+            for username in employee_name_list:
+                redis_publisher = RedisPublisher(facility='barhop', users=[username])
+                message = RedisMessage(".close_"+str(order_id))
+                redis_publisher.publish_message(message)
+            ###################################################################
 
             data['error_msg'] = ""
             data['success'] = "True"
