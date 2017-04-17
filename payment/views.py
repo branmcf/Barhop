@@ -79,7 +79,6 @@ class PaymentInvoiceView(TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
-
         data = []
         context = self.get_context_data(**kwargs)
         try:            
@@ -157,6 +156,7 @@ class PaymentInvoiceView(TemplateView):
 
     def post(self, request, *args, **kwargs):
 
+        employee_name_list = []
         application_fee = 0
         payment_id = self.request.POST['id']
         stripe_token = self.request.POST['stripeToken']
@@ -198,7 +198,6 @@ class PaymentInvoiceView(TemplateView):
                 payment_obj.processed = True
                 payment_obj.save()
                 
-                #import pdb;pdb.set_trace()
                 order_obj = PurchaseOrder.objects.get(id=order_id)
                 order_obj.order_status = "PAID"
                 order_obj.expires = time_threshold
@@ -207,19 +206,18 @@ class PaymentInvoiceView(TemplateView):
 
 
                 ###################################################################
-                import time
-                time.sleep(2)
                 employee_data = DealerEmployeMapping.objects.filter(dealer=dealer)
-                employee_list = [each_employee.employe.username for each_employee in employee_data]
-                employee_list.append(dealer.username)
+                employee_name_list = [each_employee.employe.username for each_employee in employee_data]
+                employee_name_list.append(dealer.username)
        
                 from ws4redis.publisher import RedisPublisher
                 from ws4redis.redis_store import RedisMessage
                 from ws4redis.redis_store import SELF
 
-                redis_publisher = RedisPublisher(facility='barhop', users=[dealer.username])
-                message = RedisMessage('Hello World1212')
-                redis_publisher.publish_message(message)
+                for username in employee_name_list:
+                    redis_publisher = RedisPublisher(facility='barhop', users=[username])
+                    message = RedisMessage('Hello World1212')
+                    redis_publisher.publish_message(message)
                 ###################################################################
 
                 return HttpResponseRedirect('/payment/payment_success/'+str(payment_obj.bill_number))
@@ -247,9 +245,8 @@ class PaymentSuccessView(TemplateView):
             conversation.save()
         except:
             context['payment_data'] = ''
-            pass
-
-        message = "Your payment of '$"+str(payment_obj.total_amount)+"' has recieved.Your order number is '"+str(payment_obj.order.order_code)+"' . We'll text you when your drink is ready! "
+            pass                
+        message = "Your payment of '$"+str(payment_obj.total_amount)+"' has been received. Your order number is '"+str(payment_obj.order.order_code)+"'. We'll text you when your drink is ready!"
         vendor_number = settings.BARHOP_NUMBER
         send_message(vendor_number, customer_mob, message)
 

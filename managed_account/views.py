@@ -680,7 +680,7 @@ class OrderReadyView(View):
             #========== Send Message =============
             customer = purchase_order_obj.customer
             customer_mob = customer.mobile
-            message = "Your Order is Ready.Your Order Code is '"+ str(purchase_order_obj.order_code) +"' Come to the bar, Thank you"
+            message = "Your Order is Ready! Your Order Code is '"+ str(purchase_order_obj.order_code) +"'. Come to the bar, Thank you."
             vendor_number = settings.BARHOP_NUMBER
             send_message(vendor_number, customer_mob, message)
 

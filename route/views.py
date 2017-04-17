@@ -44,7 +44,7 @@ def handle_sms(request):
         location = ''
 
 
-    #from_ = '+919946341903'
+    # from_ = '+919946341903'
 
 
     if body:
@@ -209,8 +209,7 @@ def handle_sms(request):
             purchaseOrder.save()
 
         if process_stage == 1 and client_message.lower() == "start" :
-
-            message_to_client = "Text in the item number from the menu of the first item you want ()!"
+            message_to_client = "Text in the item number of the first item you want"
             message_recieved_dealer = client_message
 
             save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -303,8 +302,9 @@ def handle_sms(request):
                 total_amount = float(price) * float(quantity)
 
                 order_menu_mapping.total_item_amount = total_amount
-                order_menu_mapping.save()                            
-                message_to_client = "Text in the item number from the menu of the next item you want () or reply 'DONE' to checkout" 
+                order_menu_mapping.save()
+
+                message_to_client = "Text in the item number of the next item you want, or reply 'DONE' to checkout!"
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)

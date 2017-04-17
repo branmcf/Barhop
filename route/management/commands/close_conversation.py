@@ -32,9 +32,12 @@ class Command(BaseCommand):
                 orderMenuMappings = OrderMenuMapping.objects.filter(order=order)
 
                 for mapping in orderMenuMappings:
+
                     quantity = mapping.quantity
                     menu_item = mapping.menu_item
+
                     new_quantity = menu_item.quantity_available + quantity
+                    
                     menuItemObj = MenuItems.objects.get(id=menu_item.id)
                     menuItemObj.quantity_available = new_quantity
                     menuItemObj.save()
