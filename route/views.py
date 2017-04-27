@@ -163,7 +163,11 @@ def handle_sms(request):
                     media_url = url+image_url
                     print("\n Media_url :"+str(media_url))
                 except:
-                    message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                    
+                    # old text
+                    # message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+
+                    message_to_client = "There is currently no menu for"+ str(trigger_data.trigger_name) +". please try again later" 
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -176,8 +180,10 @@ def handle_sms(request):
                 #************************************#
                 # random number creation order_code #
                 #**********************************#
-                random_num = get_random_string(length=4, allowed_chars='QWERTYUIOP123ASDFGHJKL456ZXCVBNM7890')
-                order_code = str(random_num)+str(conversation.id)
+                # random_num = get_random_string(length=4, allowed_chars='QWERTYUIOP123ASDFGHJKL456ZXCVBNM7890')
+                #order_code = str(random_num)+str(conversation.id)
+                order_code = get_random_string(length=3, allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+
                 purchaseOrder = PurchaseOrder.objects.create(order_code=order_code,
                     conversation=conversation,
                     dealer=dealer,
@@ -237,7 +243,8 @@ def handle_sms(request):
                 menu_object = None
 
             if menu_object is None:
-                message_to_client = "Invalid input. Please check Item number"
+                # message_to_client = "Invalid input. Please check Item number"
+                message_to_client = "invalid input. Text in the number of the item you want"
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)                
@@ -281,6 +288,19 @@ def handle_sms(request):
                 # Checking the available quantity
                 # ====================================== #
                 available_quantity = order_menu_mapping.menu_item.quantity_available
+
+                if available_quantity == 0:
+                    conversation.process_stage = 2
+                    conversation.save()
+                                    
+                    message_to_client = "We're sorry, there are no more" + str(order_menu_mapping.menu_item.item_name) +". Enter the item number of the item you want"
+
+                    message_recieved_dealer = client_message
+
+                    save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+                    send_message(vendor_number, from_, message_to_client)
+                    return HttpResponse(str(r))
+
                 if available_quantity < client_message_number :
                     conversation.process_stage = 3
                     conversation.save()

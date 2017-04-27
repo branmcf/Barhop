@@ -111,7 +111,7 @@ def get_menu_image(trigger_data, customer):
         trigger_name = trigger_data.trigger_name
         dealer = trigger_data.dealer
 
-        html = "<html><body style='color:red;'><div style='width:60%;margin:10% auto;'><table style='width:100%;color:#191919;' border=1><h2 style='color:#191919;'>"+ str(trigger_name) +"</h2><tr><th style='width:20%;background-color:#191919;color:#c1c1c1;'>Item Number</th><th style='background-color:#191919;color:#c1c1c1;'>Name</th><th style='width:20%;background-color:#191919;color:#c1c1c1;'>Price</th></tr>"
+        html = "<html><body style='color:red;'><div style='width:90%;margin:5%; auto;'><table style='width:100%;color:#191919;font-size:22px;' border=1><h2 style='color:#191919;'>"+ str(trigger_name) +"</h2><tr><th style='width:20%;background-color:#191919;color:#c1c1c1;padding:1%;'>Item Number</th><th style='background-color:#191919;color:#c1c1c1;padding:1%;'>Name</th><th style='width:20%;background-color:#191919;color:#c1c1c1;padding:1%;'>Price</th></tr>"
 
         menu_list = MenuItems.objects.filter(dealer=dealer)
         #==========================================#
@@ -123,13 +123,19 @@ def get_menu_image(trigger_data, customer):
             if menu.quantity_available > 0 and menu.item_price > 0:
                 item_number = item_number+1
                 menu_dict[item_number] = menu.id
-                html += "<tr><td style='padding-left:10px;'>"+ str(item_number) +"</td><td style='padding-left:10px;'>"+str(menu.item_name)+"</td><td style='padding-left:10px;'>"+str(menu.item_price)+"</td></tr>"
+                html += "<tr><td style='padding:1%;'>"+ str(item_number) +"</td><td style='padding-left:10px;'>"+str(menu.item_name)+"</td><td style='padding-left:10px;'>"+str(menu.item_price)+"</td></tr>"
             pass
         html += "</table></div></body></html>"
 
         menu_custom_obj, created = MenuCustomerMappping.objects.get_or_create(trigger=trigger_data,dealer=dealer,customer=customer)
         menu_custom_obj.menu_data=menu_dict
         menu_custom_obj.save()
+
+        #=================================================================#
+        # return False, If no menu item have quantinty greater than zero #
+        #===============================================================#
+        if item_number <= 0 :
+            return False
 
         Html_file= open("test.html","w")
         Html_file.write(html)
