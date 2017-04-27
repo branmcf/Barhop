@@ -167,7 +167,7 @@ def handle_sms(request):
                     # old text
                     # message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
 
-                    message_to_client = "There is currently no menu for"+ str(trigger_data.trigger_name) +". please try again later" 
+                    message_to_client = "There is currently no menu for "+ str(trigger_data.trigger_name) +". please try again later" 
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -244,7 +244,7 @@ def handle_sms(request):
 
             if menu_object is None:
                 # message_to_client = "Invalid input. Please check Item number"
-                message_to_client = "invalid input. Text in the number of the item you want"
+                message_to_client = "invalid input. Text in the number of the item you want from Menu"
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)                
@@ -272,7 +272,7 @@ def handle_sms(request):
 
             
             if client_message_number > 0:
-
+                
                 #================================#
                 # Update quantity in order table #
                 #================================#
@@ -287,9 +287,11 @@ def handle_sms(request):
                 # ====================================== #
                 # Checking the available quantity
                 # ====================================== #
+                
                 available_quantity = order_menu_mapping.menu_item.quantity_available
 
                 if available_quantity == 0:
+                    order_menu_mapping.delete()
                     conversation.process_stage = 2
                     conversation.save()
 
@@ -297,14 +299,14 @@ def handle_sms(request):
                     # Latest Menu list #
                     #=================#
                     try:                        
-                        menu_image = get_menu_image(trigger_data, customer)
+                        menu_image = get_menu_image(trigger, customer)
                         image_url = menu_image.image.url
                         url = get_current_url(request)
                         media_url = url+image_url
                         print("\n Media_url :"+str(media_url))
                     except:
 
-                        message_to_client = "There is currently no menu for"+ str(trigger_data.trigger_name) +". please try again later" 
+                        message_to_client = "There is currently no menu for "+ str(trigger_name) +". please try again later" 
                         message_recieved_dealer = client_message
 
                         save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -312,15 +314,13 @@ def handle_sms(request):
                         conversation.closed = True
                         conversation.save()
                         return HttpResponse(str(r))
-                                    
-                    message_to_client = "We're sorry, there are no more" + str(order_menu_mapping.menu_item.item_name) +". Enter the item number of the item you want from the menu"
+                    message_to_client = "We're sorry, there are no more " + str(order_menu_mapping.menu_item.item_name) +". Enter the item number of the item you want from the menu"
                     message_recieved_dealer = client_message
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
                     send_message(vendor_number, from_, message_to_client)
 
-                    message_to_client = "check updated menu of"+ str(trigger_data.trigger_name)                    
+                    message_to_client = "check updated menu of "+ str(trigger_name)                    
                     send_multimedia_message(vendor_number, from_, message_to_client, media_url)
-                    
                     return HttpResponse(str(r))
 
                 if available_quantity < client_message_number :
@@ -362,7 +362,7 @@ def handle_sms(request):
                 send_message(vendor_number, from_, message_to_client)
 
         elif process_stage == 4 and client_message.lower() == "done" :
-
+            # import pdb; pdb.set_trace()
             url = get_current_url(request)
             payment_url = str(url) +"/payment/purchase_invoice/"+str(purchaseOrder.id)
             url_shorten = shorten(payment_url)
@@ -453,6 +453,7 @@ def handle_sms(request):
             conversation.process_stage = 3            
             conversation.save()
 
+        # elif client_message.lower() == "cancel" :
         else:
             if process_stage == 5:
                 message_to_client = "You have already one pending order to pay"

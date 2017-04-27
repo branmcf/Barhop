@@ -147,7 +147,8 @@ def activate_account(request, uidb64=None, token=None,
                 media_url = url+image_url
                 print("Media_url : "+str(media_url))
             except:
-                message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                # message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+                message_to_client = "There is currently no menu for "+ str(current_trigger.trigger_name) +". please try again later" 
                 message_recieved_dealer = ref_user.current_trigger.trigger_name
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
                 send_message(vendor_number, ref_user.mobile, message_to_client)
