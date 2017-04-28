@@ -135,32 +135,33 @@ def activate_account(request, uidb64=None, token=None,
                 conversation.save()
                 return render(request, 'authentication/customer_signUp_success.html', {'message': message})
 
-            # =============#
-            #   Menu list  #
-            # =============#
-            try:
-                # menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
-                menu_image = get_menu_image(current_trigger)
+            # # =============#
+            # #   Menu list  #
+            # # =============#
+            # try:
+            #     # menu_image = MenuListImages.objects.get(trigger_id=trigger_id)
+            #     menu_image = get_menu_image(current_trigger)
 
-                image_url = menu_image.image.url
-                url = get_current_url(request)
-                media_url = url+image_url
-                print("Media_url : "+str(media_url))
-            except:
-                # message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
-                message_to_client = "There is currently no menu for "+ str(current_trigger.trigger_name) +". please try again later" 
-                message_recieved_dealer = ref_user.current_trigger.trigger_name
-                save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
-                send_message(vendor_number, ref_user.mobile, message_to_client)
-                conversation.closed = True
-                conversation.save()
-                r = twiml.Response()
-                return HttpResponse(str(r))
+            #     image_url = menu_image.image.url
+            #     url = get_current_url(request)
+            #     media_url = url+image_url
+            #     print("Media_url : "+str(media_url))
+            # except:
+            #     # message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
+            #     message_to_client = "There is currently no menu for "+ str(current_trigger.trigger_name) +". please try again later" 
+            #     message_recieved_dealer = ref_user.current_trigger.trigger_name
+            #     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
+            #     send_message(vendor_number, ref_user.mobile, message_to_client)
+            #     conversation.closed = True
+            #     conversation.save()
+            #     r = twiml.Response()
+            #     return HttpResponse(str(r))
 
             msg_data = Message(conversation=conversation, message=ref_user.current_trigger.trigger_name, from_client=True, direction=True)
             msg_data.save()
             del msg_data
-            message = " Welcome to Barhop! Here is the menu for "+ str(current_trigger.trigger_name) +". Reply 'START' to start your order! "
+            # message = " Welcome to Barhop! Here is the menu for "+ str(current_trigger.trigger_name) +". Reply 'START' to start your order! "
+            message = " Welcome to Barhop!. Reply 'START' to start your order from "+ str(current_trigger.trigger_name) +"!"
             msg_data = Message(conversation=conversation, message=message, from_dealer=True, direction=False)
             msg_data.save()            
 
@@ -182,7 +183,8 @@ def activate_account(request, uidb64=None, token=None,
                 )
 
             to = str(user.mobile)
-            send_multimedia_message(vendor_number, to, message, media_url)
+            # send_multimedia_message(vendor_number, to, message, media_url)
+            send_message(vendor_number, to, message)
             return render(request, 'authentication/customer_signUp_success.html')
 
         else:
