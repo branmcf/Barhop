@@ -230,7 +230,7 @@ def handle_sms(request):
             save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
             send_message(vendor_number, from_, message_to_client)
             return HttpResponse(str(r))
-            
+
         elif process_stage == 2 and type(client_message_number) == int :
 
             #===========================#
@@ -317,6 +317,7 @@ def handle_sms(request):
                         conversation.closed = True
                         conversation.save()
                         return HttpResponse(str(r))
+                        
                     message_to_client = "We're sorry, there are no more " + str(order_menu_mapping.menu_item.item_name) +". Enter the item number of the item you want from the menu"
                     message_recieved_dealer = client_message
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -330,7 +331,8 @@ def handle_sms(request):
                     conversation.process_stage = 3
                     conversation.save()
                     
-                    message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(order_menu_mapping.menu_item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
+                    # message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(order_menu_mapping.menu_item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
+                    message_to_client = "The quantity of '"+ str(order_menu_mapping.menu_item.item_name) +"'' is "+str(available_quantity)+ ", please text in the number of the item you want"
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -395,7 +397,8 @@ def handle_sms(request):
                     conversation.process_stage = 3
                     conversation.save()
                     
-                    message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
+                    # message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
+                    message_to_client = "The quantity of '"+ str(order_menu_mapping.menu_item.item_name) +"'' is "+str(available_quantity)+ ", please text in the number of the item you want"
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)

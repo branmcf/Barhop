@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 from django.conf.urls import url
 

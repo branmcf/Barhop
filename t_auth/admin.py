@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 from django.contrib import admin
 from django.conf import settings

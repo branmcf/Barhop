@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 from twilio import exceptions
 from twilio.rest import TwilioRestClient

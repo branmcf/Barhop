@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 import smtplib
 from email.mime.multipart import MIMEMultipart

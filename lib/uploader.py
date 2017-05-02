@@ -1,4 +1,4 @@
-__author__ = 'nibesh'
+
 import os
 import math
 import uuid

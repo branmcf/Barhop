@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 from PIL import Image
 from lib.uploader import ImageUploader

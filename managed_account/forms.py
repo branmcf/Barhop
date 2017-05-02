@@ -1,6 +1,5 @@
-from payment.models import BankAccount
 
-__author__ = 'nibesh'
+from payment.models import BankAccount
 
 from django import forms
 from .models import Trigger, Grid

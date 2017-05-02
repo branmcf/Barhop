@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 from trophy.models import TrophyModel
 from t_auth.models import CustomUser, RefNewUser

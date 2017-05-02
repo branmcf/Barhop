@@ -1,4 +1,3 @@
-__author__ = 'nibesh'
 
 import bitly_api
 
