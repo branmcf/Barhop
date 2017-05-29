@@ -1,10 +1,10 @@
 {% extends "base_inner.html" %}
 {% block content %}
 
-  <div id="trigger_name"><span style="color:#9e9e9e;">Trigger Name :</span> {{trigger_name}}</div>
-
+<!-- <div id="trigger_name"><span style="color:black">Trigger Name :</span> {{trigger_name}}</div> -->
   <div id="gridContent" >
-
+    <div id="trigger_name">Trigger Name : {{trigger_name}}</div>
+<br>
       <form method="POST" novalidate>
         <div>
           {% csrf_token %}
@@ -33,7 +33,7 @@
       <br>
       <br>
 
-      <a href="" data-toggle="modal" data-target="#addTriggerModal" style="font-size:large;" >Change Trigger</a>
+      <a href="" data-toggle="modal" data-target="#addTriggerModal" style="font-size:large;" id="ctAnchor" >Change Trigger</a>
 
       <div class="modal fade" id="addTriggerModal" role="dialog">
         <div class="modal-dialog">
@@ -66,7 +66,7 @@
  
   <footer class="footer">
     <div class="container" id="footerText">
-      <h5> &copy; 2016 Barhop Corporation</h5>
+      <h5> &copy; 2017 Barhop Corporation</h5>
       <!-- <a href="terms.html"><h5><u>Terms and Conditions</u></h5></a> -->
     </div>
   </footer>

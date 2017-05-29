@@ -2,51 +2,28 @@
 
 {% block content %}
 
-<div class="container1" style="color: #fff">
-    
-    <div class="row1">
-
-        <div class="col-md-3">        
-        </div>
-
-        <div class="col-md-6">
-
-
-            <div style="text-align:left;">
-
-
-            Barhop is a lightweight service that allows people to order and securely pay for drinks at a bar via text message, <span style="color:red;">no app required</span>.
-
-                <br>
-                -->[Trigger]
-                <br>
-                <--"Welcome to Barhop! here is the menu for [trigger]. Reply 'START' to start your order"
-                <br>
-                <--[MENU]
-                <br>
-                -->"START
-                <br>
-                <--"Text in the drink number of the first drink you want"
-                <br>
-                -->[NUM]
-                <br>
-                <--"How many [DRINK NAME] do you want?"
-                <br>
-                -->[NUM]
-                <br>
-                <--"Text in the drink number of the second drink you want or reply 'DONE' to checkout"
-                <br>
-                -->"Done"
-                <br>
-                <-- Pay for your drinks here [Barhop Link]
-                <br>
-                <-- "Your order number is [ORDER NUMBER]. We'll text you when your drink is ready!"
-                <br>
-                <-- "Come to the bar"
+<div class="row">
+    <div class="col-md-8" id="aboutCol1">
+        <div style="display: table-cell; vertical-align: middle;">
+            <div style="max-width:90%">
+             <h2>We build software for the bar and nightclub industry that makes buying a drink as easy as sending a text message </h2>
+             <br>
+             <a type="button" class="btn" id="gsBtn" href="/how_it_works/" >See how it works!</a>
             </div>
-
+<!--         <h2>We build software for the bar and nightclub industry <br> that makes buying a drink as easy as sending a text message </h2> -->
         </div>
-
+    </div>
+    <div class="col-md-4" id="aboutCol2">
+        <img src="/static/images/iphone_text.png" id="aboutImg">
     </div>
 </div>
+
+<!-- <div id="aboutContent">
+    <h2>We build software for the bar and nightclub industry <br> that makes buying a drink as easy as sending a text message </h2>
+</div> -->
 {% endblock %}
+
+<!-- 
+            Barhop is a lightweight service that allows people to order and securely pay for drinks at a bar via text message, <span style="color:red;">no app required</span>.
+
+    <h4>We build software for the bar and nightclub industry that makes buying  a drink as easy as sending a text message </h4> -->

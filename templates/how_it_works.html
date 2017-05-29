@@ -2,29 +2,12 @@
 {% block content %}
 
 
-<div class="container1" style="color: #fff">
-    <div class="row1">
-
-        <div class="col-md-3">        
-        </div>
-
-        <div class="col-md-6">
-            <div class="content2" >
-
-                <iframe src="https://player.vimeo.com/video/153309307" width="750" height="422" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-
-                <h3>We know that ordering a drink at a crowded bar is a pain in the ass, that's why we built Barhop.</h3>
-
-                <h3>
-                    Barhop is a message-driven service that combines the approachability of SMS
-                    <br>
-                    and the security of a web application to streamline ordering and payment.
-                    <br>
-                    <br>
-                </h3>
-            </div>
-        </div>
-    </div>
+<div id="hiwContent">
+    <iframe src="https://player.vimeo.com/video/153309307" width="80%" height="80%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); border: none;"></iframe>
+<br>
+<br>
+    <a type="button" class="btn" id="suLinkBtn" href="{% url 'sign_up' %}" >Sign Up!</a>
 </div>
+
 
 {% endblock %}

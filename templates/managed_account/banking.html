@@ -4,7 +4,7 @@
       <div class="row">           
         <table class="table">
           <thead>
-            <tr>
+            <tr id="bankingHeader">
               <th>Charge ID</th>
               <th>Description</th>
               <th>Amount</th>
@@ -39,9 +39,9 @@
         </div>
         <div class="col-sm-4 bankingBottomRight">
           {% if bankaccount %}
-          <a href="{% url 'managed_account:edit_bank_account' bankaccount.id %}"><button class="btn btn-primary">Edit Bank Account</button></a>
+          <a href="{% url 'managed_account:edit_bank_account' bankaccount.id %}"><button class="btn btn-primary" id="abid">Edit Bank Account</button></a>
           {% else %}
-          <a href="{% url 'managed_account:add_bank_account' %}"><button class="btn btn-primary">Add Bank Account</button></a>
+          <a href="{% url 'managed_account:add_bank_account' %}" id="ubid"><button class="btn btn-primary">Add Bank Account</button></a>
           {% endif %}
         </div>
       </div>        

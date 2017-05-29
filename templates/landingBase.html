@@ -13,7 +13,7 @@
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Pacifico">
 </head>
 
-<body id="">
+<body id="landingBody">
   {% if messages %}
     {% for message in messages %}
       <div{% if message.tags %} class="alert alert-{{ message.tags }} message"{% endif %}>
@@ -40,16 +40,16 @@
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse" id="navData">
-      <ul class="nav navbar-nav" id="rightUl">
-        <li><a href="/how_it_works/">How it Works</a></li>
-        <li><a href="/pricing/">Pricing</a></li>
-        <li><a href="/about_us">About Us</a></li>
-        <li><a href="/contact_us">Contact</a></li>
-        <li><a href="{% url 'login' %}"><span style="color:#0084b4;"><b>Login</b></span></a></li>
-        <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
-      </ul>
-    </div>
+      <div class="collapse" id="navData">
+        <ul class="nav navbar-nav" id="rightUl">
+          <li><a href="/how_it_works/">How it Works</a></li>
+          <li><a href="/pricing/">Pricing</a></li>
+          <li><a href="/about_us">About Us</a></li>
+          <li><a href="/contact_us">Contact</a></li>
+          <li><a href="{% url 'login' %}"><span style="color:#0084b4;">Login</span></a></li>
+          <li><a href="{% url 'sign_up' %}" id="navlinks">Sign Up</a></li>
+        </ul>
+      </div>
   </nav>
 
   {% block content %} {% endblock %}

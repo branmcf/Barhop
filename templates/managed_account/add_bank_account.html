@@ -4,17 +4,15 @@
 <!-- new changes-->
 {% extends "base_inner.html" %}
 {% block content %}
-<div class="container1" style="color: #fff">
-    <div class="row1">
-        <div class="container-mid">
-            <center><h2>Add/Edit Bank Account</h2></center>
+        <div class="container1">
             <div class="form-top">
                 <div class="form-top-right">
                     <i class="fa fa-key"></i>
                 </div>
             </div>
-            <div class="form-bottom">
-                <form role="form" style="color: #607D8B" method="POST" action="{{ app_path }}" id="add_bank_account_form">
+            <div class="addBankContent">
+                <form role="form" method="POST" action="{{ app_path }}" id="add_bank_account_form">
+                  <center><h2>Add/Edit Bank Account</h2></center>
                   {% csrf_token %}
                   <p class="bank-errors"></p>
                   <div class="form-group">
@@ -67,9 +65,6 @@
         <div class="col-md-3">
 
         </div>
-
-    </div>
-</div>
 
 <!-- end -->
 

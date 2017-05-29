@@ -6,7 +6,7 @@
 </div>
 
  <div class="container">
-  <div class="row" style="text-align:center;">
+  <div class="row" style="text-align:center;" id="orderRow">
     <div id="orderView">
       <div class="col-md-6" id="unassignedCol" style="overflow:auto;">
         {% if purchase_paid_orders %}
@@ -27,7 +27,7 @@
                 </div>
               </div>              
               <a href="">
-              <div class="col-md-2 orderReadyCol" id={{order.id}}>
+              <div class="col-md-2 orderReadyCol" id="{{order.id}}">
                 Order Ready
               </div>
               </a>
@@ -44,7 +44,7 @@
         <div id="imaginary_container">
           <span id="searchError" style="display:none;">Please enter a Order Code </span> 
           <div class="input-group stylish-input-group">
-              <input type="text" id="order_code" class="form-control"  placeholder="Search" >
+              <input type="text" id="order_code" class="form-control"  placeholder="Search by order ID" >
               <span class="input-group-addon">
                   <button id="searchButton">
                     <span class="glyphicon glyphicon-search"></span>
@@ -95,10 +95,10 @@
   <div class="modal fade" id="myTriggerModal" role="dialog">
     <div class="modal-dialog">
       <!-- Modal content-->
-      <div class="modal-content" id="triggerModalStyle">
+      <div class="modal-content" id="changeTriggerModalStyle">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Triggers</h4>
+          <button type="button" class="close" data-dismiss="modal" style="color:grey;">&times;</button>
+          <h4 class="modal-title" style="text-align:center;">Triggers</h4>
         </div>
         <div class="modal-body">
           {% for trigger in triggers %}
