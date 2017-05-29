@@ -1123,7 +1123,26 @@ font-size: 13px;
   color:grey;
 }
 
+/*INVOICE*/
+#invoiceTable{
+  color: black;
 
+}
+
+#userAuthButton{
+  background: black;
+  border: none;
+  border-radius: 0px; 
+  width: 30%;
+}
+
+#authanticationPopup{
+  width: 100%;
+}
+
+/*.stripe-button{
+  background: red;
+}*/
 
 
 

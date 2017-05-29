@@ -2,7 +2,7 @@
 {% block content%}
 <div class="container">
     <div class="row">
-        <div class="col-md-9 no-float" style="color:#fff">
+        <div class="col-md-9 no-float" id="invoiceTable">
             <h2> Invoice </h2>
             <table class="table">
                 <thead>
@@ -48,7 +48,7 @@
                 </tr>
                 </tbody>
             </table>
-            <div style="margin-left: 85%;">
+            <div style="margin-left: 70%;">
                 <div class="container">
                     <form action="" method="POST">
                         {% csrf_token %}
@@ -71,7 +71,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="authanticationPopup" role="dialog">
-<div class="modal-dialog modal_mob">
+<div class="modal-dialog modal_mob" id="authanticationPopup">
 
 <!-- Modal content-->
   <div class="modal-content" id="triggerModalStyle">
@@ -90,7 +90,7 @@
     margin-top: 5px;
     text-align: center;
     width: 100%;" id="errorMessage"></label>
-          <p class="p_form"><button id="userAuthButton" class="btn btn-primary">Click Here</button></p>
+          <p class="p_form"><button id="userAuthButton" class="btn btn-primary">Submit</button></p>
           <script type="text/javascript">
             $('#userAuthButton').click(function(){
                 var password = $("#password").val();

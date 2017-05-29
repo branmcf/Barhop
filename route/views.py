@@ -91,7 +91,7 @@ def handle_sms(request):
         # such trigger name.
         # ================================================== #
         if trigger_data is None:
-            message = 'This trigger name does not exist'
+            message = 'That was not a valid trigger word. Please text a valid trigger word.'
             send_message(vendor_number, from_, message)
             return HttpResponse(str(r))
 
@@ -141,7 +141,7 @@ def handle_sms(request):
                 grid_availability = check_grid_availability(trigger_id)
 
                 if not grid_availability:
-                    message_to_client = "Sorry, Too many orders in server. Please try after few minutes, Thank you."
+                    message_to_client = "Sorry, Barhop is a maximum capacity. Please try again in few minutes, thank you."
                     message_recieved_dealer = trigger_data.trigger_name
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -168,14 +168,14 @@ def handle_sms(request):
                     )
 
                 # message_to_client = " Welcome to Barhop! Here is the menu for "+ str(trigger_data.trigger_name) +" Reply 'START' to start your order! "
-                message_to_client = " Welcome to Barhop!. Reply 'START' to start your order from "+ str(trigger_data.trigger_name) +"!"
+                message_to_client = " Welcome to Barhop! Reply 'start' to start your order from "+ str(trigger_data.trigger_name) +"!"
                 message_recieved_dealer = trigger_data.trigger_name
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
                 send_message(vendor_number, from_, message_to_client)
                                
 
             else:
-                message = 'Your account is not active yet. Please activate your account by following link your in your email.'
+                message = 'Your account is not active yet. Please activate your account by following the link your in your email.'
                 send_message(vendor_number, from_, message)
                 return HttpResponse(str(r))
 
@@ -209,7 +209,7 @@ def handle_sms(request):
                 # old text
                 # message_to_client = "Sorry for the inconvenience. No Menu added for this Bar. Thank you."
 
-                message_to_client = "There is currently no menu for "+ str(trigger_name) +". please try again later" 
+                message_to_client = "There is currently no menu for "+ str(trigger_name) +". Please try again later" 
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -225,7 +225,7 @@ def handle_sms(request):
             conversation.process_stage = 2
             conversation.save()
 
-            message_to_client = "Text in the item number of the first item you want from the menu"
+            message_to_client = "Text in the item number of the first item you want."
             message_recieved_dealer = client_message
             save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
             send_message(vendor_number, from_, message_to_client)
@@ -247,7 +247,7 @@ def handle_sms(request):
 
             if menu_object is None:
                 # message_to_client = "Invalid input. Please check Item number"
-                message_to_client = "invalid input. Text in the number of the item you want from Menu"
+                message_to_client = "Invalid input. Text in the item number of the item you want."
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)                
@@ -309,7 +309,7 @@ def handle_sms(request):
                         print("\n Media_url :"+str(media_url))
                     except:
 
-                        message_to_client = "There is currently no menu for "+ str(trigger_name) +". please try again later" 
+                        message_to_client = "There is currently no menu for "+ str(trigger_name) +". Please try again later" 
                         message_recieved_dealer = client_message
 
                         save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -318,7 +318,7 @@ def handle_sms(request):
                         conversation.save()
                         return HttpResponse(str(r))
                         
-                    message_to_client = "We're sorry, there are no more " + str(order_menu_mapping.menu_item.item_name) +". Enter the item number of the item you want from the menu"
+                    message_to_client = "We're sorry, there are no more " + str(order_menu_mapping.menu_item.item_name) +". Enter the item number of the item you want."
                     message_recieved_dealer = client_message
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
                     send_message(vendor_number, from_, message_to_client)
@@ -332,7 +332,7 @@ def handle_sms(request):
                     conversation.save()
                     
                     # message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(order_menu_mapping.menu_item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
-                    message_to_client = "The quantity of '"+ str(order_menu_mapping.menu_item.item_name) +"'' is "+str(available_quantity)+ ", please text in the number of the item you want"
+                    message_to_client = "The quantity of '"+ str(order_menu_mapping.menu_item.item_name) +"'' is "+str(available_quantity)+ ", please text in the quantity of the item you want."
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -351,7 +351,7 @@ def handle_sms(request):
                 order_menu_mapping.total_item_amount = total_amount
                 order_menu_mapping.save()
 
-                message_to_client = "Text in the item number of the next item you want, or reply 'DONE' to checkout!"
+                message_to_client = "Text in the item number of the next item you want, or reply 'done' to checkout!"
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -398,7 +398,7 @@ def handle_sms(request):
                     conversation.save()
                     
                     # message_to_client = "Sorry, your order is higher than available stock. Available quantity of " + str(item.item_name) +" is "+str(available_quantity)+ ". Please enter the number of quantity again."
-                    message_to_client = "The quantity of '"+ str(order_menu_mapping.menu_item.item_name) +"'' is "+str(available_quantity)+ ", please text in the number of the item you want"
+                    message_to_client = "The quantity of '"+ str(order_menu_mapping.menu_item.item_name) +"'' is "+str(available_quantity)+ ", please text in the quantity of the item you want"
                     message_recieved_dealer = client_message
 
                     save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
@@ -433,7 +433,7 @@ def handle_sms(request):
                 menu_object = None
 
             if menu_object is None:
-                message_to_client = "Invalid input. Please check Item number"
+                message_to_client = "Invalid input. Please check the item number."
                 message_recieved_dealer = client_message
 
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)                
@@ -460,7 +460,7 @@ def handle_sms(request):
             conversation.save()
         else:
             if process_stage == 5:
-                message_to_client = "You have already one pending order to pay"
+                message_to_client = "You have already one pending order to pay."
                 message_recieved_dealer = client_message
                 send_message(vendor_number, from_, message_to_client)
                 save_user_dealer_chat(conversation,message_to_client, message_recieved_dealer)
