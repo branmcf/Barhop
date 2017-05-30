@@ -1,6 +1,6 @@
 {% extends "base_user.html" %}
 {% block content%}
-<div class="container">
+<!-- <div class="container">
     <div class="row">
         <div class="col-md-9 no-float" style="color:#fff">
             <div style="margin-left: 100px;">
@@ -11,5 +11,12 @@
             </div>      
         </div>
     </div>
-</div>
+</div> -->
+
+  <div id="aboutContent">
+    <h3> Your account has been activated. We've sent a message to your mobile so you can continue checking out, thanks! </h3>
+    {% if message %}
+         <h4>{{message}}</h4>
+    {% endif %}
+  </div>
 {% endblock%}

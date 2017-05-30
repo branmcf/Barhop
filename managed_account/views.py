@@ -60,18 +60,23 @@ class HomeView(TemplateView):
                 dealer = utils.get_dealer(request.user)
                 trigger_id = request.GET.get('trigger')
 
-                dealer_grid = Grid.objects.filter(dealer=dealer)
+                dealer_triggers = Trigger.objects.filter(dealer=dealer)
                 warning_message = ''
+                if not dealer_triggers:
+                    warning_message += "1) Create a trigger word.<br><br>"
+
+                dealer_grid = Grid.objects.filter(dealer=dealer)
+                # warning_message = ''
                 if not dealer_grid:
-                    warning_message += "Kindly add the Grid details to process your orders.<br>"
+                    warning_message += "2) Create a grid.<br><br>"
 
                 dealer_bankaccount = BankAccount.objects.filter(dealer=dealer)
                 if not dealer_bankaccount:
-                    warning_message += "Kindly add the bank account details.<br>"
+                    warning_message += "3) Connect your bank account.<br><br>"
 
-                dealer_triggers = Trigger.objects.filter(dealer=dealer)
-                if not dealer_triggers:
-                    warning_message += "Kindly add Triggers to get orders.<br>"
+                # dealer_triggers = Trigger.objects.filter(dealer=dealer)
+                # if not dealer_triggers:
+                #     warning_message += "3) Create a trigger word.<br><br>"
 
                 if trigger_id:
                     current_trigger = Trigger.objects.get(id=int(trigger_id))
